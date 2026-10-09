@@ -12,9 +12,9 @@ export interface Expect {
 
 export type SourceView =
   | { kind: "sheet"; file: string; sheet: string; sheets: string[]; cols: string[]; rows: { n: number; cells: string[] }[]; hit: { row: number; col: number } | null; merged: string[] }
-  | { kind: "doc"; file: string; blocks: ({ type: "p"; text: string; hit: boolean } | { type: "table"; n: number; rows: { cells: string[]; hit: boolean }[] })[] }
+  | { kind: "doc"; file: string; blocks: ({ type: "p"; text: string; hit: boolean } | { type: "table"; n: number; rows: { cells: string[]; hit: boolean; value?: number }[] })[] }
   | { kind: "email"; file: string; headers: [string, string][]; lines: { text: string; hit: boolean }[] }
-  | { kind: "pdf"; file: string; page: number; pages: number; width: number; height: number; items: { str: string; x: number; y: number; w: number; h: number; hit: boolean }[]; found: boolean }
+  | { kind: "pdf"; file: string; page: number; pages: number; width: number; height: number; items: { str: string; x: number; y: number; w: number; h: number; hit: boolean; value?: boolean }[]; found: boolean }
   | { kind: "image"; file: string; path: string; region: SourceRef["region"] }
   | { kind: "none"; file: string; why: string };
 
@@ -64,7 +64,9 @@ function docView(f: ReplyFile, src: SourceRef, ex: Expect, rowHint?: string): So
           (rowNo !== undefined && Number(rowNo) === ri + 1 && (hasNumber(text, ex.valueText, ex.value) || contains(text, src.snippet))) ||
           (!!rowHint && cells.some((c) => norm(c) === norm(rowHint)) && hasNumber(text, ex.valueText, ex.value)));
         any ||= hit;
-        return { cells, hit };
+        // The cell that holds the value itself, so the panel can keep it in view.
+        const value = hit ? cells.findIndex((c) => hasNumber(c, ex.valueText, ex.value)) : -1;
+        return { cells, hit, ...(value >= 0 ? { value } : {}) };
       }),
     });
   });
@@ -88,7 +90,7 @@ async function pdfView(f: ReplyFile, src: SourceRef, ex: Expect, rowHint?: strin
   const tc = await page.getTextContent();
   const items = (tc.items as { str: string; transform: number[]; width: number; height: number }[])
     .filter((i) => i.str?.trim())
-    .map((i) => ({ str: i.str, x: i.transform[4], y: vp.height - i.transform[5] - (i.height || Math.abs(i.transform[3])), w: i.width, h: i.height || Math.abs(i.transform[3]), hit: false }));
+    .map((i) => ({ str: i.str, x: i.transform[4], y: vp.height - i.transform[5] - (i.height || Math.abs(i.transform[3])), w: i.width, h: i.height || Math.abs(i.transform[3]), hit: false, value: false }));
   // Group items into text lines by their vertical position, as the source check does.
   const lines: (typeof items)[] = [];
   for (const it of [...items].sort((a, b) => a.y - b.y || a.x - b.x)) {
@@ -104,6 +106,9 @@ async function pdfView(f: ReplyFile, src: SourceRef, ex: Expect, rowHint?: strin
     const bySnippet = contains(text, src.snippet) || (src.snippet.length > 12 && contains(src.snippet, text) && text.length > 12);
     if (byRow || bySnippet) {
       ln.forEach((i) => (i.hit = true));
+      // The piece of the row that holds the value itself, so the panel can keep it in view.
+      const v = ln.find((i) => hasNumber(i.str, ex.valueText, ex.value));
+      if (v) v.value = true;
       found = true;
     }
   }

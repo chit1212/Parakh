@@ -14,6 +14,7 @@ export function SourceDoc({ replyId, source, raw, lineId, filePath }: {
   const [view, setView] = useState<SourceView | null>(null);
   const [failed, setFailed] = useState(false);
   const box = useRef<HTMLDivElement>(null);
+  const [pinRow, setPinRow] = useState(false);
   const key = JSON.stringify([replyId, source, raw, lineId]);
 
   // Uploaded files stay in the buyer's browser session; the server keeps no copy to draw.
@@ -33,6 +34,20 @@ export function SourceDoc({ replyId, source, raw, lineId, filePath }: {
 
   // Bring the highlighted place into view inside the document box.
   useEffect(() => {
+    setPinRow(false);
+    const val = box.current?.querySelector("[data-value]") as HTMLElement | null;
+    if (val && box.current) {
+      // A PDF or Word row can be wider than the panel: keep the value in view, and if that hides the
+      // start of the row, show the whole row above the page so the buyer still sees what it is.
+      const b = box.current.getBoundingClientRect(), r = val.getBoundingClientRect();
+      const lefts = [...box.current.querySelectorAll("[data-hit]")].map((h) => h.getBoundingClientRect().left);
+      const rowLeft = Math.min(...lefts) - b.left + box.current.scrollLeft;
+      const need = Math.max(0, r.right - b.left + box.current.scrollLeft + 16 - box.current.clientWidth);
+      box.current.scrollTop += r.top - b.top - b.height / 3;
+      box.current.scrollLeft = need;
+      setPinRow(need > rowLeft - 8);
+      return;
+    }
     const el = box.current?.querySelector("[data-hit]") as HTMLElement | null;
     if (el && box.current) {
       const b = box.current.getBoundingClientRect(), r = el.getBoundingClientRect();
@@ -68,6 +83,7 @@ export function SourceDoc({ replyId, source, raw, lineId, filePath }: {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       {head}
+      {pinRow && <RowStrip v={view} />}
       <div ref={box} style={frame}>
         {view.kind === "sheet" && <Sheet v={view} />}
         {view.kind === "doc" && <Doc v={view} />}
@@ -144,7 +160,7 @@ function Doc({ v }: { v: Extract<SourceView, { kind: "doc" }> }) {
             <tbody>
               {b.rows.map((r, ri) => (
                 <tr key={ri} data-hit={r.hit || undefined} style={r.hit ? HIT : undefined}>
-                  {r.cells.map((c, ci) => <td key={ci} style={{ padding: "2px 6px", borderBottom: "1px solid var(--color-neutral-300)", fontWeight: ri === 0 ? 600 : 400, whiteSpace: "nowrap" }}>{c}</td>)}
+                  {r.cells.map((c, ci) => <td key={ci} data-value={(r.hit && r.value === ci) || undefined} style={{ padding: "2px 6px", borderBottom: "1px solid var(--color-neutral-300)", fontWeight: ri === 0 ? 600 : 400, whiteSpace: "nowrap", ...(r.hit && r.value === ci ? { boxShadow: "inset 0 0 0 2px var(--color-accent)" } : {}) }}>{c}</td>)}
                 </tr>
               ))}
             </tbody>
@@ -176,10 +192,26 @@ function Pdf({ v }: { v: Extract<SourceView, { kind: "pdf" }> }) {
   return (
     <div style={{ position: "relative", width: v.width, height: v.height, background: "#fff", fontFamily: "var(--font-body)" }}>
       {v.items.map((it, i) => (
-        <span key={i} data-hit={it.hit || undefined} style={{ position: "absolute", left: it.x, top: it.y, fontSize: Math.max(6, it.h * 0.95), lineHeight: 1, whiteSpace: "pre", ...(it.hit ? { background: "var(--color-accent-200)", outline: "1px solid var(--color-accent)" } : {}) }}>
+        <span key={i} data-hit={it.hit || undefined} data-value={it.value || undefined} style={{ position: "absolute", left: it.x, top: it.y, fontSize: Math.max(6, it.h * 0.95), lineHeight: 1, whiteSpace: "pre", ...(it.hit ? { background: "var(--color-accent-200)", outline: it.value ? "2px solid var(--color-accent)" : "1px solid var(--color-accent)" } : {}) }}>
           {it.str}
         </span>
       ))}
+    </div>
+  );
+}
+
+// The whole row read, in one line, for when it is wider than the panel.
+function RowStrip({ v }: { v: SourceView }) {
+  let parts: { text: string; value: boolean }[] = [];
+  if (v.kind === "pdf") parts = v.items.filter((it) => it.hit).sort((a, b) => a.y - b.y || a.x - b.x).map((it) => ({ text: it.str, value: !!it.value }));
+  if (v.kind === "doc") {
+    const r = v.blocks.flatMap((b) => (b.type === "table" ? b.rows : [])).find((r) => r.hit);
+    if (r) parts = r.cells.map((c, i) => ({ text: c, value: r.value === i })).filter((p) => p.text.trim());
+  }
+  if (!parts.length) return null;
+  return (
+    <div style={{ fontSize: 12, padding: "4px 8px", background: "var(--color-accent-200)", boxShadow: "inset 2px 0 0 var(--color-accent)", display: "flex", flexWrap: "wrap", columnGap: 12 }}>
+      {parts.map((p, i) => <span key={i} style={{ fontWeight: p.value ? 600 : 400 }}>{p.text}</span>)}
     </div>
   );
 }
