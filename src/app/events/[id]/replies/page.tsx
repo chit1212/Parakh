@@ -6,6 +6,8 @@ import { ScreenHead } from "@/components/Rail";
 import { Shell } from "@/components/Shell";
 import { useReadings, type EventData, type ReplyState } from "@/components/useReadings";
 import { buildGrid, cellKey } from "@/lib/compare";
+import { qualityOf, type Quality } from "@/lib/quality";
+import { useScheme } from "@/components/useScheme";
 import type { ReplyReading } from "@/lib/reader/pipeline";
 import { mainFile, type ReplySummary } from "@/lib/summary";
 import { readStamp, where } from "@/lib/format";
@@ -73,7 +75,7 @@ function termLine(rd: ReplyReading): string[] {
   return out;
 }
 
-function Row({ r, st, ev, onRead, impact }: { r: ReplySummary; st: ReplyState | undefined; ev: SourcingEvent; onRead: (fresh: boolean) => void; impact?: string | null }) {
+function Row({ r, st, ev, onRead, impact, quality }: { r: ReplySummary; st: ReplyState | undefined; ev: SourcingEvent; onRead: (fresh: boolean) => void; impact?: string | null; quality?: Quality }) {
   const [open, setOpen] = useState(false);
   const rd = st?.reading ?? null;
   const f = mainFile(r, rd);
@@ -172,8 +174,25 @@ function Row({ r, st, ev, onRead, impact }: { r: ReplySummary; st: ReplyState | 
         {rd && (rd.status === "read" || rd.status === "incomplete") && (
           <>
             <div className="font-semibold">
-              Questionnaire · {rd.questionnaire.length ? `${rd.questionnaire.length} of ${ev.questions.length} answers read` : "not returned"}
+              Questionnaire · {quality?.returned && rd.questionnaire.length
+                ? `${quality.score} / 100 · ${quality.cleared ? "cleared" : quality.mandatoryFailed ? `${quality.mandatoryFailed} mandatory item${quality.mandatoryFailed > 1 ? "s" : ""} failed` : "below the pass mark"}`
+                : rd.questionnaire.length ? `${rd.questionnaire.length} of ${ev.questions.length} answers read` : "not returned"}
             </div>
+            {quality?.returned && rd.questionnaire.length > 0 && (
+              <details className="text-[12.5px] mt-[2px]">
+                <summary className="cursor-pointer text-n-700">How code marked it ({rd.questionnaire.length} of {ev.questions.length} answers read; pass mark {quality.passMark})</summary>
+                <ul className="mt-[4px] space-y-[2px]">
+                  {quality.items.map((x) => (
+                    <li key={x.id} className="grid grid-cols-[30px_44px_1fr] gap-[6px]">
+                      <span className="text-n-700">{x.id}</span>
+                      <span className={x.mandatory && x.pts === 0 ? "font-semibold text-[var(--color-accent-2-800)]" : ""}>{x.pts} / {x.of}</span>
+                      <span className="text-n-700">{x.why}{x.mandatory ? " · mandatory" : ""}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link href={`/events/${ev.id}/rfq?tab=rules`} className="text-[12px]">See the marking scheme</Link>
+              </details>
+            )}
             <ul className="mt-[4px] space-y-[3px]">
               {docs.map((d, i) => (
                 <li key={i} className="flex gap-[6px]">
@@ -373,8 +392,14 @@ function revisionImpact(data: EventData, state: Record<string, ReplyState>, id: 
 
 export default function RepliesPage() {
   const { data, state, blocked, readOne, upload } = useReadings();
+  const [scheme] = useScheme();
   if (!data) return <Shell><div className="text-n-700">Loading the event…</div></Shell>;
   const ev = data.event;
+  const readings = data.replies.map((x) => state[x.id]?.reading).filter((x): x is ReplyReading => Boolean(x && x.status !== "error"));
+  const qualityFor = (id: string) => {
+    const v = state[id]?.reading?.vendorId;
+    return v ? qualityOf(ev, v, readings, scheme) : undefined;
+  };
   // Quotes first (in arrival order), then everything kept out of the comparison.
   const outOfGrid = (id: string) => {
     const s = state[id]?.reading?.status;
@@ -405,7 +430,7 @@ export default function RepliesPage() {
         <div className="text-[13px] text-n-700 mt-[var(--space-3)]">Reading: {done} of {data.replies.length} done</div>
       )}
       <div className="mt-[var(--space-6)]">
-        {main.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} impact={revisionImpact(data, state, r.id)} />)}
+        {main.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} impact={revisionImpact(data, state, r.id)} quality={qualityFor(r.id)} />)}
       </div>
       {other.length > 0 && (
         <>
