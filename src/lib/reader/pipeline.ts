@@ -252,7 +252,12 @@ export async function readReply(
     };
 
     // 6. Status. Missing pages hold the reply out of the comparison until the buyer decides.
-    const pagesMissing = missingPages(readable) ?? (c.looks_incomplete ? c.incomplete_evidence ?? "The reply looks incomplete." : null);
+    // Page counts are code's call: where every PDF's "page x of n" marks match its real page
+    // count, a sorter's doubt about pages (it only sees an excerpt) is overruled.
+    const pagesCounted = readable.some((f) => f.kind === "pdf" && f.pdfPages?.some((p) => /page\s+\d+\s+of\s+\d+/i.test(p)));
+    const sorterDoubt = c.looks_incomplete && !(pagesCounted && /page/i.test(c.incomplete_evidence ?? "page"));
+    const pagesMissing = missingPages(readable) ?? (sorterDoubt ? c.incomplete_evidence ?? "The reply looks incomplete." : null);
+    if (c.looks_incomplete && !sorterDoubt) out.readingNotes.push(`The sorter thought pages might be missing (${c.incomplete_evidence ?? "no detail"}); code counted the pages and all are present.`);
     const n = out.coverage.quoted.length;
     if (pagesMissing) {
       out.status = "incomplete";
