@@ -14,7 +14,7 @@ import {
   Classification, Extraction, type NotQuoted, type PriceItem, type QualityDoc, type QuestionnaireAnswer,
   type RateRule, type TermItem, TermsSweep,
 } from "./schemas";
-import { verifySource, type RecordFile } from "./verify";
+import { contains, verifySource, type RecordFile } from "./verify";
 
 export type ReplyStatus = "read" | "incomplete" | "unreadable" | "pending" | "ignored" | "error";
 
@@ -252,12 +252,18 @@ export async function readReply(
     };
 
     // 6. Status. Missing pages hold the reply out of the comparison until the buyer decides.
-    // Page counts are code's call: where every PDF's "page x of n" marks match its real page
-    // count, a sorter's doubt about pages (it only sees an excerpt) is overruled.
+    // The sorter only sees an excerpt, so its doubt needs a source like everything else: the words
+    // it quotes must be in a file (photos and scans, which code cannot search, are taken as given).
+    // Page counts are code's call: where every PDF's "page x of n" marks match its real page count,
+    // a sorter's doubt about pages is overruled.
     const pagesCounted = readable.some((f) => f.kind === "pdf" && f.pdfPages?.some((p) => /page\s+\d+\s+of\s+\d+/i.test(p)));
-    const sorterDoubt = c.looks_incomplete && !(pagesCounted && /page/i.test(c.incomplete_evidence ?? "page"));
+    const searchable = readable.filter((f) => f.text !== undefined || f.pdfPages?.some((p) => p.trim()));
+    const ev0 = c.incomplete_evidence ?? "";
+    const evidenceFound = readable.length > searchable.length ||
+      searchable.some((f) => contains(f.text ?? f.pdfPages!.join("\n"), ev0));
+    const sorterDoubt = c.looks_incomplete && evidenceFound && !(pagesCounted && /page/i.test(ev0 || "page"));
     const pagesMissing = missingPages(readable) ?? (sorterDoubt ? c.incomplete_evidence ?? "The reply looks incomplete." : null);
-    if (c.looks_incomplete && !sorterDoubt) out.readingNotes.push(`The sorter thought pages might be missing (${c.incomplete_evidence ?? "no detail"}); code counted the pages and all are present.`);
+    if (c.looks_incomplete && !sorterDoubt) out.readingNotes.push(`The sorter thought pages might be missing (${c.incomplete_evidence ?? "no detail"}); code found no sign of it in the files.`);
     const n = out.coverage.quoted.length;
     if (pagesMissing) {
       out.status = "incomplete";

@@ -55,7 +55,7 @@ export const PriceItem = z.object({
     .describe("Whether the number can be read without doubt."),
   alternative_readings: z
     .array(Alternative)
-    .describe("Other values this number could plausibly be (e.g. a pen digit that could be 1 or 7). Empty if clear."),
+    .describe("Other ways to read the value the vendor intends (e.g. a pen digit that could be 1 or 7). Not a struck-out earlier value. Empty if clear."),
   source: Source,
 });
 
@@ -161,7 +161,10 @@ export const Classification = z.object({
     )
     .describe("The role of each attached file. A file that contains both prices and questionnaire answers is a quote."),
   looks_incomplete: z.boolean().describe("True if the reply itself shows something is missing, e.g. 'Page 1 of 2' with only one page, or 'continued' with nothing following."),
-  incomplete_evidence: z.string().nullable(),
+  incomplete_evidence: z
+    .string()
+    .nullable()
+    .describe("If looks_incomplete: the exact words in the file that show something is missing (e.g. 'Page 1 of 2'), copied character for character. A file excerpt that ends where it was cut for reading is not evidence."),
   promised_followup: z.string().nullable().describe("If the sender promises to send prices or documents later, what and when, in their words."),
 });
 export type Classification = z.infer<typeof Classification>;
