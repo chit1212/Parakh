@@ -89,7 +89,7 @@ export function findDoubts(ev: SourcingEvent, grid: Grid, cleared: string[]): Do
       add({
         kind: "freight_unknown", vendorId: v.id, lineIds: cells.filter((c) => c.norm.variants.lastYearFreight).map((c) => c.lineId),
         title: `${name(v.id)}: freight extra, amount not given`,
-        why: `Its prices are compared before freight. ${lyf.when[0].toUpperCase() + lyf.when.slice(1)}.`,
+        why: `Its prices are compared before freight. If freight is the same as last year (${lyf.when.match(/\((.*)\)/)?.[1] ?? "last year’s rate"}), every ${name(v.id)} price rises by that amount; code re-solved the table with it added.`,
         ask: "Confirm the freight per box to Chakan, or a delivered price.",
         route: "vendor", tested: `re-solved with last year’s freight added to ${name(v.id)}’s prices`,
       }, (c) => (c.vendorId === v.id && c.canWin ? c.norm.variants.lastYearFreight?.value ?? c.perBox : asQuotedPrice(c)));
@@ -120,8 +120,8 @@ export function findDoubts(ev: SourcingEvent, grid: Grid, cleared: string[]): Do
         for (const a of read.alternatives) {
           add({
             kind: "hard_to_read", vendorId: v.id, lineIds: [c.lineId],
-            title: `${name(v.id)} ${c.lineId}: ${read.asWritten} could be read as ${a.value}`,
-            why: a.reason, ask: `Confirm the price for ${c.lineId}: is it ${read.raw?.text} or ${a.value}?`,
+            title: `${name(v.id)} ${c.lineId}: ${read.raw?.text ?? read.asWritten} or ${a.value.toFixed(2)}? ${read.legibility === "corrected_by_hand" ? "Corrected by hand" : "Hard to read"}`,
+            why: `${a.reason} Read as ₹${c.perBox.toFixed(2)} a box; the other reading is ₹${a.perBox.toFixed(2)}.`, ask: `Confirm the price for ${c.lineId}: is it ${read.raw?.text} or ${a.value.toFixed(2)}?`,
             route: "vendor", tested: `re-solved at ₹${a.perBox.toFixed(2)}`,
           }, (x) => (x === c ? (x.canWin ? a.perBox : null) : asQuotedPrice(x)));
         }

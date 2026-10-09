@@ -14,6 +14,8 @@ export interface ChatMsg {
   scenarios?: number[];
   model?: string;
   error?: boolean;
+  /** While the answer is on its way: what Parakh is doing. */
+  status?: string;
 }
 
 export interface People { buyer: string; vp: string }
@@ -52,7 +54,7 @@ export function Conversation({ msgs, results, titles, people, asker, busy, q, se
             </div>
           ) : (
             <div key={i} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              <Bot text={m.text} muted={m.error} model={m.model} />
+              <Bot text={m.text || m.status || "…"} muted={m.error || (!m.text && !!m.status)} model={m.model} />
               {(m.scenarios ?? []).map((si) => {
                 const r = results[si];
                 if (!r) return null;
@@ -76,7 +78,7 @@ export function Conversation({ msgs, results, titles, people, asker, busy, q, se
             </div>
           ),
         )}
-        {busy && <Bot text="Working it out: choosing the rules, then solving them in code…" muted />}
+        {busy && msgs[msgs.length - 1]?.role === "user" && <Bot text="Working it out: choosing the rules, then solving them in code…" muted />}
       </div>
       <div style={{ padding: "10px 22px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>

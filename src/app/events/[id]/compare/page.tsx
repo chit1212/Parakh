@@ -12,6 +12,7 @@ import { DECISIONS_KEY, DoubtsView } from "@/components/DoubtsView";
 import { freeze, OVERRIDES_KEY, SNAPSHOT_KEY, type Override, type Snapshot } from "@/lib/award";
 import { download } from "@/lib/download";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { LIBRARY, runScenario, sameRules, type ScenarioResult, type ScenarioRules } from "@/lib/scenario";
 import { useScheme } from "@/components/useScheme";
 import { useRole } from "@/components/useRole";
@@ -219,7 +220,7 @@ const SORTS: [Sort, string][] = [["line", "Line number"], ["stake", "Rupees at s
 const NO_FILTER = { show: "all" as Show, win: "", ply: "" };
 
 export default function ComparePage() {
-  const { data, state } = useReadings();
+  const { data, state, empty } = useReadings();
   const [scheme] = useScheme();
   const [role] = useRole();
   const [checks, setCheck] = useVerified();
@@ -314,27 +315,54 @@ export default function ComparePage() {
     setQ("");
     setBusy(true);
     setPane("conv");
+    // The answer streams in: rules first (the table switches at once), then the words.
+    const at = next.length;
+    const put = (patch: Partial<ChatMsg>) => setMsgs((m) => {
+      const cur = m[at] ?? { role: "assistant" as const, text: "" };
+      const out = [...m];
+      out[at] = { ...cur, ...patch };
+      return out;
+    });
+    // Scenarios this answer adds go after the ones already asked.
+    const base = asked.length;
+    let added = 0;
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
-        body: JSON.stringify({ scheme, messages: next.map((m) => ({ role: m.role, text: m.text, asker: m.asker === "vp" ? `${data!.event.vp} (VP)` : m.asker ? `${data!.event.buyer} (buyer)` : undefined })) }),
+        body: JSON.stringify({
+          scheme, readings, prior: asked.map((a) => ({ title: a.title, ...a.rules })),
+          messages: next.map((m) => ({ role: m.role, text: m.text, asker: m.asker === "vp" ? `${data!.event.vp} (VP)` : m.asker ? `${data!.event.buyer} (buyer)` : undefined })),
+        }),
       });
-      const j = await res.json();
-      if (j.error) { setMsgs((m) => [...m, { role: "assistant", text: j.error, error: true }]); return; }
-      const added: Asked[] = (j.scenarios as (ScenarioRules & { title: string })[]).map(({ title, ...rules }) => {
-        const lib = LIBRARY.find((x) => sameRules(x.rules, rules));
-        return { title: lib?.title ?? title, rules, asker: who, libKey: lib?.key ?? null };
-      });
-      const first = asked.length;
-      setAsked((a) => [...a, ...added]);
-      setMsgs((m) => [...m, { role: "assistant", text: j.answer, model: j.model, scenarios: added.map((_, i) => first + i) }]);
-      if (added.length) {
-        const last = added[added.length - 1];
-        setScen(last.libKey ?? `asked:${first + added.length - 1}`);
-        setView(j.view ?? "table"); setTab("compare");
+      if (!res.body || !res.ok) throw new Error(`Server answered ${res.status}`);
+      const reader = res.body.getReader();
+      const dec = new TextDecoder();
+      let buf = "", textSoFar = "";
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        let nl: number;
+        while ((nl = buf.indexOf("\n")) >= 0) {
+          const msg = JSON.parse(buf.slice(0, nl));
+          buf = buf.slice(nl + 1);
+          if (msg.type === "status") put({ status: msg.text });
+          else if (msg.type === "scenario") {
+            const { title, ...rules } = msg.scenario as ScenarioRules & { title: string };
+            const lib = LIBRARY.find((x) => sameRules(x.rules, rules));
+            const a: Asked = { title: lib?.title ?? title, rules, asker: who, libKey: lib?.key ?? null };
+            const index = base + added++;
+            setAsked((xs) => [...xs, a]);
+            put({ scenarios: [...Array(added).keys()].map((k) => base + k) });
+            setScen(a.libKey ?? `asked:${index}`);
+            setView(msg.view === "chart" ? "chart" : "table"); setTab("compare");
+          } else if (msg.type === "delta") { textSoFar += msg.text; put({ text: textSoFar, status: undefined }); }
+          else if (msg.type === "done") put({ model: msg.model, status: undefined });
+          else if (msg.type === "error") put({ text: msg.message, error: true, status: undefined });
+        }
       }
     } catch {
-      setMsgs((m) => [...m, { role: "assistant", text: "Something went wrong while answering. Nothing was changed; try again in a minute.", error: true }]);
+      put({ text: "Something went wrong while answering. Nothing was changed; try again in a minute.", error: true, status: undefined });
     } finally {
       setBusy(false);
     }
@@ -446,6 +474,7 @@ export default function ComparePage() {
             Doubts <span style={{ color: "var(--color-accent-2-700)" }}>{report.raised.length}</span> · {lakh(report.raised.reduce((a, d) => a + d.stake, 0))} at stake
           </button>
           {pending > 0 && <span style={{ color: "var(--color-neutral-700)" }}>Reading {pending} more repl{pending === 1 ? "y" : "ies"}…</span>}
+          {!readings.length && <span style={{ color: "var(--color-neutral-700)" }}>{empty ? "No replies yet. " : "Nothing read yet. "}<Link href={`/events/${ev.id}/replies`}>Upload a reply on Replies</Link> and it joins this table when it is read.</span>}
           <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12, fontSize: 12.5 }}>
             <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", lineHeight: 1.25 }}>
               <span><b>{winChecked} of {winners.length}</b> winning prices verified by you</span>
@@ -542,7 +571,7 @@ export default function ComparePage() {
           <Conversation msgs={msgs} results={results} titles={asked.map((a) => a.title)} people={{ buyer: ev.buyer, vp: ev.vp }} asker={asker}
             busy={busy} q={q} setQ={setQ} onAsk={ask} onShow={(i, v) => { setScen(asked[i]?.libKey ?? `asked:${i}`); setView(v); setTab("compare"); }}
             vendorNames={Object.fromEntries(grid.vendors.map((v) => [v.id, v.short]))}
-            opening={`Quotes from ${new Set(readings.filter((r) => r.status === "read" && r.vendorId).map((r) => r.vendorId)).size} of ${ev.vendors.length} vendors are read and on one basis. ${report.raised.length} doubts could change a winner (${lakh(report.raised.reduce((a, d) => a + d.stake, 0))} at stake); see the Doubts tab. Ask me anything about this table; every answer is solved in code and added to the Scenario list, so you can keep, compare and switch between them.`} />
+            opening={!readings.length ? `No replies are read yet, so there is nothing to compare. Upload a reply on the Replies screen; as soon as it is read it joins this table, and you can ask me about it.` : `Quotes from ${new Set(readings.filter((r) => r.status === "read" && r.vendorId).map((r) => r.vendorId)).size} of ${ev.vendors.length} vendors are read and on one basis. ${report.raised.length} doubts could change a winner (${lakh(report.raised.reduce((a, d) => a + d.stake, 0))} at stake); see the Doubts tab. Ask me anything about this table; every answer is solved in code and added to the Scenario list, so you can keep, compare and switch between them.`} />
         ) : (
         <div style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "16px 22px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
           {sel ? (
@@ -723,6 +752,15 @@ function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, overrid
           {vendor.short} wrote “{n.vendorWording ?? n.asWritten}”: {n.asWritten}, at {where(n.source)}.
           {n.matchReason && <> {n.matchReason}</>}
           {reading?.readAt && <span style={{ color: "var(--color-neutral-700)" }}> Read on {day(reading.readAt)} by {reading.models.join(" and ")}.</span>}
+          {n.alternatives.map((a, i) => {
+            const logged = report.logged.find((d) => d.kind === "hard_to_read" && d.vendorId === sel.v && d.lineIds.includes(sel.l));
+            return (
+              <span key={i} style={{ display: "block", marginTop: 4 }}>
+                <b>Two readings: {n.raw?.text} or {a.value.toFixed(2)}.</b> {a.reason} At {a.value.toFixed(2)} this is {inr(a.perBox)} a box.
+                {logged ? " Code re-solved the table at the other reading: no winner changes, so it is logged, not raised." : doubt ? " It could change a winner: see the Doubts tab." : ""}
+              </span>
+            );
+          })}
         </>
       ),
     });
@@ -821,6 +859,7 @@ function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, overrid
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <span style={label11}>As written</span>
           <span style={{ fontSize: 20, fontWeight: 600, lineHeight: 1.2 }}>{n.asWritten}</span>
+          {n.alternatives.length > 0 && <span style={{ fontSize: 12.5, color: "var(--color-neutral-800)" }}>or {n.alternatives.map((a) => a.value.toFixed(2)).join(" / ")}: {n.legibility === "corrected_by_hand" ? "corrected by hand" : "hard to read"}</span>}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <span style={label11}>On our basis</span>

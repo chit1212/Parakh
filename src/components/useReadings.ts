@@ -59,10 +59,21 @@ const saveUploads = (u: ReplySummary[]) => {
   }
 };
 
+/** Demo: start the event with no replies, so the buyer uploads them and watches the table build. */
+const EMPTY = "parakh-empty-event";
+export const isEmptyEvent = () => {
+  try { return localStorage.getItem(EMPTY) === "1"; } catch { return false; }
+};
+export const setEmptyEvent = (on: boolean) => {
+  try { if (on) localStorage.setItem(EMPTY, "1"); else localStorage.removeItem(EMPTY); } catch { /* blocked */ }
+  window.location.reload();
+};
+
 export function useReadings() {
   const [data, setData] = useState<EventData | null>(null);
   const [state, setState] = useState<Record<string, ReplyState>>({});
   const [blocked, setBlocked] = useState<string | null>(null);
+  const [empty, setEmpty] = useState(false);
   const started = useRef(false);
 
   const set = (id: string, patch: Partial<ReplyState>) =>
@@ -149,8 +160,11 @@ export function useReadings() {
     started.current = true;
     (async () => {
       const d0 = (await (await fetch("/api/event")).json()) as EventData;
-      // Replies uploaded earlier in this session come first (newest), then the demo inbox.
-      const d = { ...d0, replies: [...loadUploads(), ...d0.replies] };
+      // Replies uploaded earlier in this session come first (newest), then the demo inbox,
+      // unless the buyer chose to start the event empty.
+      const none = isEmptyEvent();
+      setEmpty(none);
+      const d = { ...d0, replies: [...loadUploads(), ...(none ? [] : d0.replies)] };
       setData(d);
       const kept = load(); // live readings done in this browser session win over saved ones
       const todo: string[] = [];
@@ -175,5 +189,5 @@ export function useReadings() {
     })();
   }, [readOne]);
 
-  return { data, state, blocked, readOne, upload };
+  return { data, state, blocked, readOne, upload, empty };
 }
