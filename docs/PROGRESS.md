@@ -13,7 +13,9 @@ Built:
 - `npm run scorecard` grades the reader against `06_answer_key` (grading only; `test/isolation.test.ts` pins that nothing else reads the key).
 - Per-visitor limit on paid model calls (`src/lib/guard.ts`).
 
-Waiting on: the network secret being added to the cloud environment (next session picks it up), then the first real run of `npm run scorecard` and tuning the prompts against it.
+- Saved demo readings (`data/saved-readings/`, committed): `npm run scorecard -- --save` stores the model answers a clean full run used; the reader checks them after its own cache, so the live demo opens without paid calls. Keyed by file + prompt + model, so edits never get stale answers.
+
+Waiting on: an API key visible to the dev session (`ANTHROPIC_API_KEY` or `PARAKH_ANTHROPIC_API_KEY` env var, or the network secret; only new sessions pick up environment changes). Then: `npm run scorecard -- --fresh --save`, tune prompts against the misses, re-run with `--save`, commit `data/saved-readings`.
 
 ## Decisions (technical)
 - "Strict schema" is done with structured outputs (`output_config.format`), the supported way on Sonnet 5.5, which does not accept forced tool choice.

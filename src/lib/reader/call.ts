@@ -10,6 +10,15 @@ import { anthropic, usageOf, type Usage } from "../ai";
 import { MODELS } from "../config";
 
 const CACHE_DIR = process.env.VERCEL ? path.join(os.tmpdir(), "parakh-cache") : path.join(process.cwd(), ".cache", "readings");
+/**
+ * Saved demo readings: model answers from a clean full run, committed with the app so the
+ * demo event opens without paid calls. Keyed like the cache (file content + prompt + model),
+ * so a changed file or prompt never gets a stale answer; it is simply read again.
+ */
+export const SAVED_DIR = path.join(process.cwd(), "data", "saved-readings");
+
+/** Every cache key served or written in this process, so a run can save exactly what it used. */
+export const usedKeys = new Set<string>();
 
 export function hashOf(...parts: (string | Buffer)[]): string {
   const h = crypto.createHash("sha256");
@@ -18,11 +27,24 @@ export function hashOf(...parts: (string | Buffer)[]): string {
 }
 
 async function cacheGet<T>(key: string): Promise<T | null> {
-  try {
-    return JSON.parse(await fs.readFile(path.join(CACHE_DIR, key + ".json"), "utf8")) as T;
-  } catch {
-    return null;
+  for (const dir of [CACHE_DIR, SAVED_DIR]) {
+    try {
+      return JSON.parse(await fs.readFile(path.join(dir, key + ".json"), "utf8")) as T;
+    } catch {
+      // not in this one
+    }
   }
+  return null;
+}
+
+/** Copy the model answers used in this process into the saved folder, replacing what was there. */
+export async function saveUsedReadings(): Promise<number> {
+  const answers = new Map<string, unknown>();
+  for (const key of usedKeys) answers.set(key, await cacheGet(key)); // read all before clearing the folder
+  await fs.rm(SAVED_DIR, { recursive: true, force: true });
+  await fs.mkdir(SAVED_DIR, { recursive: true });
+  for (const [key, value] of answers) await fs.writeFile(path.join(SAVED_DIR, key + ".json"), JSON.stringify(value));
+  return answers.size;
 }
 
 async function cachePut(key: string, value: unknown) {
@@ -60,7 +82,10 @@ export async function callStructured<S extends z.ZodType>(opts: {
   const t0 = Date.now();
   if (!opts.fresh) {
     const hit = await cacheGet<z.infer<S>>(key);
-    if (hit) return { data: hit, usage: null, cached: true, ms: Date.now() - t0 };
+    if (hit) {
+      usedKeys.add(key);
+      return { data: hit, usage: null, cached: true, ms: Date.now() - t0 };
+    }
   }
 
   opts.beforeCall?.();
@@ -80,5 +105,6 @@ export async function callStructured<S extends z.ZodType>(opts: {
   const data = msg.parsed_output as z.infer<S> | null;
   if (!data) throw new ReaderError(`The model's answer did not match the expected format (${opts.step}).`);
   await cachePut(key, data);
+  usedKeys.add(key);
   return { data, usage: usageOf(msg.model ?? opts.model, msg.usage), cached: false, ms: Date.now() - t0 };
 }

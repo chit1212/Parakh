@@ -2,6 +2,8 @@
 //   npm run scorecard            uses cached readings when the files and prompts are unchanged
 //   npm run scorecard -- --fresh reads everything again (costs API credit)
 //   npm run scorecard -- --only=4_anand_photo
+//   npm run scorecard -- --save  after a full run with no errors, save the model answers it used to
+//                                data/saved-readings (committed), so the demo opens without paid calls
 import fs from "node:fs";
 import path from "node:path";
 import { loadEnv } from "./env";
@@ -9,12 +11,14 @@ loadEnv();
 
 import { hasApiKey } from "@/lib/ai";
 import { loadDemoInbox } from "@/lib/inbox";
+import { saveUsedReadings } from "@/lib/reader/call";
 import { readReply, type ReplyReading } from "@/lib/reader/pipeline";
 import { loadEvent } from "@/lib/rfq";
 import { grade, loadKey } from "@/lib/scorecard";
 
 const args = process.argv.slice(2);
 const fresh = args.includes("--fresh");
+const save = args.includes("--save");
 const only = args.find((a) => a.startsWith("--only="))?.split("=")[1];
 const pct = (a: number, b: number) => (b ? `${((100 * a) / b).toFixed(1)}%` : "-");
 
@@ -43,7 +47,10 @@ async function main() {
   const out = path.join(process.cwd(), ".cache");
   fs.mkdirSync(out, { recursive: true });
   fs.writeFileSync(path.join(out, "readings-latest.json"), JSON.stringify(readings, null, 1));
-  if (only) return;
+  if (only) {
+    if (save) console.log("--save needs a full run (without --only).");
+    return;
+  }
 
   const sc = grade(ev, await loadKey(), readings);
   fs.writeFileSync(path.join(out, "scorecard-latest.json"), JSON.stringify(sc, null, 1));
@@ -65,6 +72,12 @@ async function main() {
   for (const e of sc.failures) console.log(`  ${e.ok ? "PASS" : "FAIL"}  ${e.name}  [${e.detail}]`);
   console.log(`\nNot graded yet: ${sc.notYet.join("; ")}`);
   console.log(`API cost this run: $${sc.costUsd.toFixed(3)}`);
+
+  if (save) {
+    const failed = readings.filter((r) => r.status === "error");
+    if (failed.length) console.log(`\nNot saved: ${failed.length} replies stopped with an error (${failed.map((r) => r.replyId).join(", ")}).`);
+    else console.log(`\nSaved ${await saveUsedReadings()} model answers to data/saved-readings.`);
+  }
 }
 
 main().catch((e) => {
