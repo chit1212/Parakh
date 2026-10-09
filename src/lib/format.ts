@@ -10,3 +10,23 @@ export function where(s: SourceRef | null): string {
   else if (s.row) parts.push(`row ${s.row}`);
   return parts.join(", ");
 }
+
+/** "9 Oct 2026", in India time (the buyer's). */
+export function day(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" });
+}
+
+/** "read on 9 Oct 2026 by gemini-3.8-flash" */
+export function readStamp(r: { readAt: string | null; models: string[] }): string {
+  if (!r.readAt) return "read in code, no model needed";
+  return `read on ${day(r.readAt)} by ${r.models.join(" and ")}`;
+}
+
+/** 4,134.00 (Indian grouping, two decimals). */
+export const num2 = (n: number) => n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+/** ₹41.80 */
+export const inr = (n: number) => `₹${num2(n)}`;
+/** ₹6.99 L (lakhs) */
+export const lakh = (n: number) => `₹${(n / 1e5).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} L`;
+/** ₹4.01 Cr (crores) */
+export const crore = (n: number) => `₹${(n / 1e7).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Cr`;

@@ -1,0 +1,679 @@
+{
+ "replyId": "F4_missing_page_quote",
+ "readAt": "2026-10-09T12:20:40.414Z",
+ "models": [
+  "gemini-3.5-flash-lite",
+  "gemini-3.5-flash"
+ ],
+ "files": "5c76a45d5bf3a603a5dc6e40",
+ "reading": {
+  "replyId": "F4_missing_page_quote",
+  "vendorId": null,
+  "vendorName": "Deccan Box Works",
+  "status": "incomplete",
+  "headline": "F4_missing_page_quote.pdf says \"of 2\" pages but contains 1. Read 15 of 30 lines from what arrived.",
+  "nextStep": {
+   "kind": "ask_missing_pages",
+   "text": "Ask the vendor for the missing page before treating this as a partial quote."
+  },
+  "classification": {
+   "category": "quote",
+   "vendor_name": "Deccan Box Works",
+   "reason": "The vendor provided rates for the RFQ line items, but the document is incomplete.",
+   "files": [
+    {
+     "name": "F4_missing_page_quote.pdf",
+     "role": "quote"
+    }
+   ],
+   "looks_incomplete": true,
+   "incomplete_evidence": "Continued on page 2... Page 1 of 2",
+   "promised_followup": null
+  },
+  "prices": [
+   {
+    "vendor_wording": "Steam iron, unit carton",
+    "line_id": "L01",
+    "match_basis": "line_id_given",
+    "match_reason": "Vendor explicitly specified line ID L01.",
+    "raw_value_text": "5.13",
+    "raw_value": 5.13,
+    "unit": "per_box",
+    "unit_text": "Rate INR/box",
+    "currency": "INR",
+    "price_basis": "not_stated",
+    "offered_spec": null,
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "F4_missing_page_quote.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L01",
+     "snippet": "L01 Steam iron, unit carton 5.13",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L01 Steam iron, unit carton 5.13\"."
+    }
+   },
+   {
+    "vendor_wording": "Steam iron, master carton (6 units)",
+    "line_id": "L02",
+    "match_basis": "line_id_given",
+    "match_reason": "Vendor explicitly specified line ID L02.",
+    "raw_value_text": "40.48",
+    "raw_value": 40.48,
+    "unit": "per_box",
+    "unit_text": "Rate INR/box",
+    "currency": "INR",
+    "price_basis": "not_stated",
+    "offered_spec": null,
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "F4_missing_page_quote.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L02",
+     "snippet": "L02 Steam iron, master carton (6 units) 40.48",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L02 Steam iron, master carton (6 units) 40.48\"."
+    }
+   },
+   {
+    "vendor_wording": "Dry iron, unit carton",
+    "line_id": "L03",
+    "match_basis": "line_id_given",
+    "match_reason": "Vendor explicitly specified line ID L03.",
+    "raw_value_text": "4.20",
+    "raw_value": 4.2,
+    "unit": "per_box",
+    "unit_text": "Rate INR/box",
+    "currency": "INR",
+    "price_basis": "not_stated",
+    "offered_spec": null,
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "F4_missing_page_quote.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L03",
+     "snippet": "L03 Dry iron, unit carton 4.20",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L03 Dry iron, unit carton 4.20\"."
+    }
+   },
+   {
+    "vendor_wording": "Dry iron, master carton (8 units)",
+    "line_id": "L04",
+    "match_basis": "line_id_given",
+    "match_reason": "Vendor explicitly specified line ID L04.",
+    "raw_value_text": "33.64",
+    "raw_value": 33.64,
+    "unit": "per_box",
+    "unit_text": "Rate INR/box",
+    "currency": "INR",
+    "price_basis": "not_stated",
+    "offered_spec": null,
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "F4_missing_page_quote.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L04",
+     "snippet": "L04 Dry iron, master carton (8 units) 33.64",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L04 Dry iron, master carton (8 units) 33.64\"."
+    }
+   },
+   {
+    "vendor_wording": "Mixer grinder 750W, unit carton",
+    "line_id": "L05",
+    "match_basis": "line_id_given",
+    "match_reason": "Vendor explicitly specified line ID L05.",
+    "raw_value_text": "36.94",
+    "raw_value": 36.94,
+    "unit": "per_box",
+    "unit_text": "Rate INR/box",
+    "currency": "INR",
+    "price_basis": "not_stated",
+    "offered_spec": null,
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "F4_missing_page_quote.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L05",
+     "snippet": "L05 Mixer grinder 750W, unit carton 36.94",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L05 Mixer grinder 750W, unit carton 36.94\"."
+    }
+   },
+   {
+    "vendor_wording": "Mixer grinder, master carton (2 units)",
+    "line_id": "L06",
+    "match_basis": "line_id_given",
+    "match_reason": "Vendor explicitly specified line ID L06.",
+    "raw_value_text": "59.40",
+    "raw_value": 59.4,
+    "unit": "per_box",
+    "unit_text": "Rate INR/box",
+    "currency": "INR",
+    "price_basis": "not_stated",
+    "offered_spec": null,
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "F4_missing_page_quote.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L06",
+     "snippet": "L06 Mixer grinder, master carton (2 units) 59.40",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L06 Mixer grinder, master carton (2 units) 59.40\"."
+    }
+   },
+   {
+    "vendor_wording": "Juicer mixer, unit carton",
+    "line_id": "L07",
+    "match_basis": "line_id_given",
+    "match_reason": "Vendor explicitly specified line ID L07.",
+    "raw_value_text": "42.83",
+    "raw_value": 42.83,
+    "unit": "per_box",
+    "unit_text": "Rate INR/box",
+    "currency": "INR",
+    "price_basis": "not_stated",
+    "offered_spec": null,
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "F4_missing_page_quote.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L07",
+     "snippet": "L07 Juicer mixer, unit carton 42.83",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L07 Juicer mixer, unit carton 42.83\"."
+    }
+   },
+   {
+    "vendor_wording": "Hand blender, unit carton",
+    "line_id": "L08",
+    "match_basis": "line_id_given",
+    "match_reason": "Vendor explicitly specified line ID L08.",
+    "raw_value_text": "3.61",
+    "raw_value": 3.61,
+    "unit": "per_box",
+    "unit_text": "Rate INR/box",
+    "currency": "INR",
+    "price_basis": "not_stated",
+    "offered_spec": null,
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "F4_missing_page_quote.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L08",
+     "snippet": "L08 Hand blender, unit carton 3.61",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L08 Hand blender, unit carton 3.61\"."
+    }
+   },
+   {
+    "vendor_wording": "Electric kettle 1.5L, unit carton",
+    "line_id": "L09",
+    "match_basis": "line_id_given",
+    "match_reason": "Vendor explicitly specified line ID L09.",
+    "raw_value_text": "7.95",
+    "raw_value": 7.95,
+    "unit": "per_box",
+    "unit_text": "Rate INR/box",
+    "currency": "INR",
+    "price_basis": "not_stated",
+    "offered_spec": null,
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "F4_missing_page_quote.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L09",
+     "snippet": "L09 Electric kettle 1.5L, unit carton 7.95",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L09 Electric kettle 1.5L, unit carton 7.95\"."
+    }
+   },
+   {
+    "vendor_wording": "Electric kettle, master carton (6 units)",
+    "line_id": "L10",
+    "match_basis": "line_id_given",
+    "match_reason": "Vendor explicitly specified line ID L10.",
+    "raw_value_text": "55.49",
+    "raw_value": 55.49,
+    "unit": "per_box",
+    "unit_text": "Rate INR/box",
+    "currency": "INR",
+    "price_basis": "not_stated",
+    "offered_spec": null,
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "F4_missing_page_quote.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L10",
+     "snippet": "L10 Electric kettle, master carton (6 units) 55.49",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L10 Electric kettle, master carton (6 units) 55.49\"."
+    }
+   },
+   {
+    "vendor_wording": "Pop-up toaster, unit carton",
+    "line_id": "L11",
+    "match_basis": "line_id_given",
+    "match_reason": "Vendor explicitly specified line ID L11.",
+    "raw_value_text": "18.52",
+    "raw_value": 18.52,
+    "unit": "per_box",
+    "unit_text": "Rate INR/box",
+    "currency": "INR",
+    "price_basis": "not_stated",
+    "offered_spec": null,
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "F4_missing_page_quote.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L11",
+     "snippet": "L11 Pop-up toaster, unit carton 18.52",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L11 Pop-up toaster, unit carton 18.52\"."
+    }
+   },
+   {
+    "vendor_wording": "Induction cooktop, unit carton",
+    "line_id": "L12",
+    "match_basis": "line_id_given",
+    "match_reason": "Vendor explicitly specified line ID L12.",
+    "raw_value_text": "22.84",
+    "raw_value": 22.84,
+    "unit": "per_box",
+    "unit_text": "Rate INR/box",
+    "currency": "INR",
+    "price_basis": "not_stated",
+    "offered_spec": null,
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "F4_missing_page_quote.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L12",
+     "snippet": "L12 Induction cooktop, unit carton 22.84",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L12 Induction cooktop, unit carton 22.84\"."
+    }
+   },
+   {
+    "vendor_wording": "Table fan 400mm, unit carton",
+    "line_id": "L13",
+    "match_basis": "line_id_given",
+    "match_reason": "Vendor explicitly specified line ID L13.",
+    "raw_value_text": "34.19",
+    "raw_value": 34.19,
+    "unit": "per_box",
+    "unit_text": "Rate INR/box",
+    "currency": "INR",
+    "price_basis": "not_stated",
+    "offered_spec": null,
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "F4_missing_page_quote.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L13",
+     "snippet": "L13 Table fan 400mm, unit carton 34.19",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L13 Table fan 400mm, unit carton 34.19\"."
+    }
+   },
+   {
+    "vendor_wording": "Exhaust fan 250mm, unit carton",
+    "line_id": "L14",
+    "match_basis": "line_id_given",
+    "match_reason": "Vendor explicitly specified line ID L14.",
+    "raw_value_text": "18.51",
+    "raw_value": 18.51,
+    "unit": "per_box",
+    "unit_text": "Rate INR/box",
+    "currency": "INR",
+    "price_basis": "not_stated",
+    "offered_spec": null,
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "F4_missing_page_quote.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L14",
+     "snippet": "L14 Exhaust fan 250mm, unit carton 18.51",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L14 Exhaust fan 250mm, unit carton 18.51\"."
+    }
+   },
+   {
+    "vendor_wording": "Pedestal fan, unit carton",
+    "line_id": "L15",
+    "match_basis": "line_id_given",
+    "match_reason": "Vendor explicitly specified line ID L15.",
+    "raw_value_text": "47.03",
+    "raw_value": 47.03,
+    "unit": "per_box",
+    "unit_text": "Rate INR/box",
+    "currency": "INR",
+    "price_basis": "not_stated",
+    "offered_spec": null,
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "F4_missing_page_quote.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L15",
+     "snippet": "L15 Pedestal fan, unit carton 47.03",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L15 Pedestal fan, unit carton 47.03\"."
+    }
+   }
+  ],
+  "rateRules": [],
+  "notQuoted": [
+   {
+    "line_id": "L16",
+    "reason": "not in the reply (page 2 is missing)",
+    "stated_by_vendor": false,
+    "source": null
+   },
+   {
+    "line_id": "L17",
+    "reason": "not in the reply (page 2 is missing)",
+    "stated_by_vendor": false,
+    "source": null
+   },
+   {
+    "line_id": "L18",
+    "reason": "not in the reply (page 2 is missing)",
+    "stated_by_vendor": false,
+    "source": null
+   },
+   {
+    "line_id": "L19",
+    "reason": "not in the reply (page 2 is missing)",
+    "stated_by_vendor": false,
+    "source": null
+   },
+   {
+    "line_id": "L20",
+    "reason": "not in the reply (page 2 is missing)",
+    "stated_by_vendor": false,
+    "source": null
+   },
+   {
+    "line_id": "L21",
+    "reason": "not in the reply (page 2 is missing)",
+    "stated_by_vendor": false,
+    "source": null
+   },
+   {
+    "line_id": "L22",
+    "reason": "not in the reply (page 2 is missing)",
+    "stated_by_vendor": false,
+    "source": null
+   },
+   {
+    "line_id": "L23",
+    "reason": "not in the reply (page 2 is missing)",
+    "stated_by_vendor": false,
+    "source": null
+   },
+   {
+    "line_id": "L24",
+    "reason": "not in the reply (page 2 is missing)",
+    "stated_by_vendor": false,
+    "source": null
+   },
+   {
+    "line_id": "L25",
+    "reason": "not in the reply (page 2 is missing)",
+    "stated_by_vendor": false,
+    "source": null
+   },
+   {
+    "line_id": "L26",
+    "reason": "not in the reply (page 2 is missing)",
+    "stated_by_vendor": false,
+    "source": null
+   },
+   {
+    "line_id": "L27",
+    "reason": "not in the reply (page 2 is missing)",
+    "stated_by_vendor": false,
+    "source": null
+   },
+   {
+    "line_id": "L28",
+    "reason": "not in the reply (page 2 is missing)",
+    "stated_by_vendor": false,
+    "source": null
+   },
+   {
+    "line_id": "L29",
+    "reason": "not in the reply (page 2 is missing)",
+    "stated_by_vendor": false,
+    "source": null
+   },
+   {
+    "line_id": "L30",
+    "reason": "not in the reply (page 2 is missing)",
+    "stated_by_vendor": false,
+    "source": null
+   }
+  ],
+  "terms": [
+   {
+    "kind": "currency",
+    "summary": "Prices are quoted in Indian Rupees (INR).",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "F4_missing_page_quote.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": null,
+     "snippet": "Rate INR/box",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"Rate INR/box\"."
+    }
+   }
+  ],
+  "questionnaire": [],
+  "qualityDocs": [],
+  "revision": {
+   "is_revision": false,
+   "supersedes": null,
+   "changes_claimed": null,
+   "source": null
+  },
+  "readingNotes": [
+   "The document explicitly mentions 'Page 1 of 2' and 'Continued on page 2...', but page 2 was not provided in the vendor file.",
+   "Lines L16 to L30 are missing from the quote because page 2 is absent.",
+   "The sorter thought pages might be missing (Continued on page 2... Page 1 of 2); code found no sign of it in the files."
+  ],
+  "coverage": {
+   "quoted": [
+    "L01",
+    "L02",
+    "L03",
+    "L04",
+    "L05",
+    "L06",
+    "L07",
+    "L08",
+    "L09",
+    "L10",
+    "L11",
+    "L12",
+    "L13",
+    "L14",
+    "L15"
+   ],
+   "missing": [
+    "L16",
+    "L17",
+    "L18",
+    "L19",
+    "L20",
+    "L21",
+    "L22",
+    "L23",
+    "L24",
+    "L25",
+    "L26",
+    "L27",
+    "L28",
+    "L29",
+    "L30"
+   ],
+   "total": 30
+  },
+  "unsourced": 0,
+  "usage": [],
+  "cached": true,
+  "ms": 3,
+  "readAt": "2026-10-09T12:20:40.414Z",
+  "models": [
+   "gemini-3.5-flash-lite",
+   "gemini-3.5-flash"
+  ]
+ }
+}

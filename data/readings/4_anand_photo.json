@@ -1,0 +1,1535 @@
+{
+ "replyId": "4_anand_photo",
+ "readAt": "2026-10-09T12:20:16.292Z",
+ "models": [
+  "gemini-3.5-flash-lite",
+  "gemini-3.5-flash"
+ ],
+ "files": "f296e2e649617309d3497607",
+ "reading": {
+  "replyId": "4_anand_photo",
+  "vendorId": "AC",
+  "vendorName": "Anand Cartons",
+  "status": "read",
+  "headline": "27 of 30 lines quoted.",
+  "nextStep": {
+   "kind": "none",
+   "text": ""
+  },
+  "classification": {
+   "category": "quote",
+   "vendor_name": "Anand Cartons",
+   "reason": "The vendor provided prices via an attached rate card alongside a questionnaire and test report.",
+   "files": [
+    {
+     "name": "Anand_RateCard_photo.jpg",
+     "role": "quote"
+    },
+    {
+     "name": "Anand_Questionnaire_reply.pdf",
+     "role": "questionnaire"
+    },
+    {
+     "name": "AC_Box_Test_Report_SAMPLE.pdf",
+     "role": "test_report"
+    }
+   ],
+   "looks_incomplete": false,
+   "incomplete_evidence": null,
+   "promised_followup": null
+  },
+  "prices": [
+   {
+    "vendor_wording": "Steam iron box",
+    "line_id": "L01",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches steam iron unit carton in name and 3-ply spec.",
+    "raw_value_text": "5.07",
+    "raw_value": 5.07,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "3 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "1",
+     "snippet": "1 Steam iron box 3 PLY 5.07",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.15,
+      "x1": 0.85,
+      "y1": 0.17
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Steam iron, master box (6 units)",
+    "line_id": "L02",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches steam iron master carton (6 units) in name and 5-ply spec.",
+    "raw_value_text": "39.91",
+    "raw_value": 39.91,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "2",
+     "snippet": "2 Steam iron, master box (6 units) 5 PLY 39.91",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.17,
+      "x1": 0.85,
+      "y1": 0.19
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Dry iron box",
+    "line_id": "L03",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches dry iron unit carton in name and 3-ply spec.",
+    "raw_value_text": "3.95",
+    "raw_value": 3.95,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "3 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "3",
+     "snippet": "3 Dry iron box 3 PLY 3.95",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.19,
+      "x1": 0.85,
+      "y1": 0.21
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Dry iron, master box (8 units)",
+    "line_id": "L04",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches dry iron master carton (8 units) in name and 5-ply spec.",
+    "raw_value_text": "31.50",
+    "raw_value": 31.5,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "4",
+     "snippet": "4 Dry iron, master box (8 units) 5 PLY 31.50",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.21,
+      "x1": 0.85,
+      "y1": 0.23
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Mixer grinder 750W box",
+    "line_id": "L05",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches mixer grinder 750W unit carton in name and 5-ply spec.",
+    "raw_value_text": "34.17",
+    "raw_value": 34.17,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "5",
+     "snippet": "5 Mixer grinder 750W box 5 PLY 34.17",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.23,
+      "x1": 0.85,
+      "y1": 0.25
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Mixer grinder, master box (2 units)",
+    "line_id": "L06",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches mixer grinder master carton (2 units) in name and 5-ply spec.",
+    "raw_value_text": "55.72",
+    "raw_value": 55.72,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "6",
+     "snippet": "6 Mixer grinder, master box (2 units) 5 PLY 55.72",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.25,
+      "x1": 0.85,
+      "y1": 0.27
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Hand blender box",
+    "line_id": "L08",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches hand blender unit carton in name and 3-ply spec.",
+    "raw_value_text": "3.35",
+    "raw_value": 3.35,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "3 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "7",
+     "snippet": "7 Hand blender box 3 PLY 3.35",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.27,
+      "x1": 0.85,
+      "y1": 0.3
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Electric kettle 1.5L box",
+    "line_id": "L09",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches electric kettle 1.5L unit carton in name and 3-ply spec.",
+    "raw_value_text": "7.49",
+    "raw_value": 7.49,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "3 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "8",
+     "snippet": "8 Electric kettle 1.5L box 3 PLY 7.49",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.3,
+      "x1": 0.85,
+      "y1": 0.32
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Electric kettle, master box (6 units)",
+    "line_id": "L10",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches electric kettle master carton (6 units) in name and 5-ply spec.",
+    "raw_value_text": "53.91",
+    "raw_value": 53.91,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "9",
+     "snippet": "9 Electric kettle, master box (6 units) 5 PLY 53.91",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.32,
+      "x1": 0.85,
+      "y1": 0.34
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Pop-up toaster box",
+    "line_id": "L11",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches pop-up toaster unit carton in name and 5-ply spec.",
+    "raw_value_text": "17.33",
+    "raw_value": 17.33,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "10",
+     "snippet": "10 Pop-up toaster box 5 PLY 17.33",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.34,
+      "x1": 0.85,
+      "y1": 0.36
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Induction cooktop box",
+    "line_id": "L12",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches induction cooktop unit carton in name and 5-ply spec.",
+    "raw_value_text": "21.71",
+    "raw_value": 21.71,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "11",
+     "snippet": "11 Induction cooktop box 5 PLY 21.71",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.36,
+      "x1": 0.85,
+      "y1": 0.38
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Table fan 400mm box",
+    "line_id": "L13",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches table fan 400mm unit carton in name and 5-ply spec.",
+    "raw_value_text": "32.21",
+    "raw_value": 32.21,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "12",
+     "snippet": "12 Table fan 400mm box 5 PLY 32.21",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.38,
+      "x1": 0.85,
+      "y1": 0.4
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Exhaust fan 250mm box",
+    "line_id": "L14",
+    "match_basis": "name_only",
+    "match_reason": "Matches exhaust fan 250mm unit carton in name, but specifies a different ply.",
+    "raw_value_text": "8.85",
+    "raw_value": 8.85,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "3 PLY",
+    "differs_from_rfq": true,
+    "difference": "Offered 3-ply instead of 5-ply.",
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "13",
+     "snippet": "13 Exhaust fan 250mm box 3 PLY 8.85",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.4,
+      "x1": 0.85,
+      "y1": 0.42
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Pedestal fan box",
+    "line_id": "L15",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches pedestal fan unit carton in name and 5-ply spec.",
+    "raw_value_text": "43.86",
+    "raw_value": 43.86,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "14",
+     "snippet": "14 Pedestal fan box 5 PLY 43.86",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.42,
+      "x1": 0.85,
+      "y1": 0.44
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Wall fan box",
+    "line_id": "L16",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches wall fan unit carton in name and 5-ply spec.",
+    "raw_value_text": "33.51",
+    "raw_value": 33.51,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "15",
+     "snippet": "15 Wall fan box 5 PLY 33.51",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.44,
+      "x1": 0.85,
+      "y1": 0.47
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Ceiling fan 1200mm box",
+    "line_id": "L17",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches ceiling fan 1200mm unit carton in name and 5-ply spec.",
+    "raw_value_text": "31.58",
+    "raw_value": 31.58,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "16",
+     "snippet": "16 Ceiling fan 1200mm box 5 PLY 31.58",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.47,
+      "x1": 0.85,
+      "y1": 0.49
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Ceiling fan, master box (2 units)",
+    "line_id": "L18",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches ceiling fan master carton (2 units) in name and 7-ply spec.",
+    "raw_value_text": "120.92",
+    "raw_value": 120.92,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "7 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "17",
+     "snippet": "17 Ceiling fan, master box (2 units) 7 PLY 120.92",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.49,
+      "x1": 0.85,
+      "y1": 0.51
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Room heater 2000W box",
+    "line_id": "L19",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches room heater 2000W unit carton in name and 5-ply spec.",
+    "raw_value_text": "37.20",
+    "raw_value": 37.2,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "corrected_by_hand",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "18",
+     "snippet": "18 Room heater 2000W box 5 PLY 29.03 37.20 AS",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.51,
+      "x1": 0.85,
+      "y1": 0.53
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Water heater 15L box",
+    "line_id": "L20",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches water heater 15L unit carton in name and 5-ply spec.",
+    "raw_value_text": "49.95",
+    "raw_value": 49.95,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "19",
+     "snippet": "19 Water heater 15L box 5 PLY 49.95",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.53,
+      "x1": 0.85,
+      "y1": 0.55
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Water heater 25L box",
+    "line_id": "L21",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches water heater 25L unit carton in name and 7-ply spec.",
+    "raw_value_text": "114.50",
+    "raw_value": 114.5,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "7 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "20",
+     "snippet": "20 Water heater 25L box 7 PLY 114.50",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.55,
+      "x1": 0.85,
+      "y1": 0.58
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Rice cooker 1.8L box",
+    "line_id": "L23",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches rice cooker 1.8L unit carton in name and 5-ply spec.",
+    "raw_value_text": "28.51",
+    "raw_value": 28.51,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "21",
+     "snippet": "21 Rice cooker 1.8L box 5 PLY 28.51",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.58,
+      "x1": 0.85,
+      "y1": 0.6
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Sandwich maker box",
+    "line_id": "L24",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches sandwich maker unit carton in name and 3-ply spec.",
+    "raw_value_text": "7.52",
+    "raw_value": 7.52,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "3 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "22",
+     "snippet": "22 Sandwich maker box 3 PLY 7.52",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.6,
+      "x1": 0.85,
+      "y1": 0.62
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Vegetable chopper box",
+    "line_id": "L25",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches vegetable chopper unit carton in name and 3-ply spec.",
+    "raw_value_text": "5.31",
+    "raw_value": 5.31,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "3 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "23",
+     "snippet": "23 Vegetable chopper box 3 PLY 5.31",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.62,
+      "x1": 0.85,
+      "y1": 0.64
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Partition set, 6-cell, for kettle master",
+    "line_id": "L26",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches partition set, 6-cell, for kettle master in name and 3-ply spec.",
+    "raw_value_text": "10.89",
+    "raw_value": 10.89,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "3 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "24",
+     "snippet": "24 Partition set, 6-cell, for kettle master 3 PLY 10.89",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.64,
+      "x1": 0.85,
+      "y1": 0.66
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Layer pad 1000 x 1200 mm, for pallets",
+    "line_id": "L27",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches layer pad 1000 x 1200 mm, for pallets in name and 5-ply spec.",
+    "raw_value_text": "41.39",
+    "raw_value": 41.39,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "25",
+     "snippet": "25 Layer pad 1000 x 1200 mm, for pallets 5 PLY 41.39",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.66,
+      "x1": 0.85,
+      "y1": 0.69
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Air fryer 4L box",
+    "line_id": "L28",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches air fryer 4L unit carton in name and 5-ply spec.",
+    "raw_value_text": "36.72",
+    "raw_value": 36.72,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "26",
+     "snippet": "26 Air fryer 4L box 5 PLY 36.72",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.69,
+      "x1": 0.85,
+      "y1": 0.71
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "vendor_wording": "Air fryer, master box (2 units)",
+    "line_id": "L29",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches air fryer master carton (2 units) in name and 5-ply spec.",
+    "raw_value_text": "60.50",
+    "raw_value": 60.5,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc",
+    "currency": "INR",
+    "price_basis": "delivered",
+    "offered_spec": "5 PLY",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "27",
+     "snippet": "27 Air fryer, master box (2 units) 5 PLY 60.50",
+     "region": {
+      "x0": 0.15,
+      "y0": 0.71,
+      "x1": 0.85,
+      "y1": 0.73
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   }
+  ],
+  "rateRules": [],
+  "notQuoted": [
+   {
+    "line_id": "L07",
+    "reason": "We do not make: juicer box, air cooler box, jar insert.",
+    "stated_by_vendor": true,
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "footer",
+     "snippet": "We do not make: juicer box, air cooler box, jar insert.",
+     "region": {
+      "x0": 0.1,
+      "y0": 0.77,
+      "x1": 0.9,
+      "y1": 0.85
+     }
+    }
+   },
+   {
+    "line_id": "L22",
+    "reason": "We do not make: juicer box, air cooler box, jar insert.",
+    "stated_by_vendor": true,
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "footer",
+     "snippet": "We do not make: juicer box, air cooler box, jar insert.",
+     "region": {
+      "x0": 0.1,
+      "y0": 0.77,
+      "x1": 0.9,
+      "y1": 0.85
+     }
+    }
+   },
+   {
+    "line_id": "L30",
+    "reason": "We do not make: juicer box, air cooler box, jar insert.",
+    "stated_by_vendor": true,
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "footer",
+     "snippet": "We do not make: juicer box, air cooler box, jar insert.",
+     "region": {
+      "x0": 0.1,
+      "y0": 0.77,
+      "x1": 0.9,
+      "y1": 0.85
+     }
+    }
+   }
+  ],
+  "terms": [
+   {
+    "kind": "price_basis",
+    "summary": "Rates include delivery to the Chakan plant.",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "Rates include delivery",
+     "snippet": "Rates include delivery at your Chakan plant.",
+     "region": {
+      "x0": 0.08,
+      "y0": 0.77,
+      "x1": 0.5,
+      "y1": 0.8
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "kind": "freight",
+    "summary": "Delivery charges are included in the quoted rates.",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "Rates include delivery",
+     "snippet": "Rates include delivery at your Chakan plant.",
+     "region": {
+      "x0": 0.08,
+      "y0": 0.77,
+      "x1": 0.5,
+      "y1": 0.8
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "kind": "gst",
+    "summary": "GST is extra at 18%.",
+    "value": 18,
+    "value_unit": "percent",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "GST extra",
+     "snippet": "GST 18% extra.",
+     "region": {
+      "x0": 0.35,
+      "y0": 0.77,
+      "x1": 0.5,
+      "y1": 0.8
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "kind": "validity",
+    "summary": "Prices are valid for 15 days.",
+    "value": 15,
+    "value_unit": "days",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "Valid 15 days",
+     "snippet": "Valid 15 days.",
+     "region": {
+      "x0": 0.08,
+      "y0": 0.79,
+      "x1": 0.25,
+      "y1": 0.82
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "kind": "payment",
+    "summary": "Payment term is 30 days.",
+    "value": 30,
+    "value_unit": "days",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "Payment 30 days",
+     "snippet": "Payment 30 days.",
+     "region": {
+      "x0": 0.18,
+      "y0": 0.79,
+      "x1": 0.35,
+      "y1": 0.82
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "kind": "tooling_or_plates",
+    "summary": "Printing plates are free for orders above 5,000 pieces.",
+    "value": 0,
+    "value_unit": "none",
+    "applies_to": "printed items",
+    "amount_stated": true,
+    "condition": "above 5,000 pcs.",
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "Printing plates",
+     "snippet": "Printing plates free above 5,000 pcs.",
+     "region": {
+      "x0": 0.08,
+      "y0": 0.81,
+      "x1": 0.4,
+      "y1": 0.84
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "kind": "currency",
+    "summary": "Rates are quoted in INR (Rs).",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Anand_RateCard_photo.jpg",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "Header",
+     "snippet": "Rate Rs/pc",
+     "region": {
+      "x0": 0.7,
+      "y0": 0.12,
+      "x1": 0.85,
+      "y1": 0.15
+     }
+    },
+    "verification": {
+     "status": "photo",
+     "note": "Read from a photo: code cannot check text in an image, so the checks below matter more."
+    }
+   },
+   {
+    "kind": "lead_time",
+    "summary": "Standard lead time is 7 days.",
+    "value": 7,
+    "value_unit": "days",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Anand_Questionnaire_reply.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "Q4",
+     "snippet": "7 days",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"7 days\"."
+    }
+   }
+  ],
+  "questionnaire": [
+   {
+    "question_id": "Q1",
+    "answer": "ISO 9001 audit planned for Dec 2026",
+    "source": {
+     "file": "Anand_Questionnaire_reply.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "Q1",
+     "snippet": "ISO 9001 audit planned for Dec 2026",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"ISO 9001 audit planned for Dec 2026\"."
+    }
+   },
+   {
+    "question_id": "Q2",
+    "answer": "Test report dated 18 Jan 2025 (attached)",
+    "source": {
+     "file": "Anand_Questionnaire_reply.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "Q2",
+     "snippet": "Test report dated 18 Jan 2025 (attached)",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"Test report dated 18 Jan 2025 (attached)\"."
+    }
+   },
+   {
+    "question_id": "Q3",
+    "answer": "140 tonnes per month",
+    "source": {
+     "file": "Anand_Questionnaire_reply.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "Q3",
+     "snippet": "140 tonnes per month",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"140 tonnes per month\"."
+    }
+   },
+   {
+    "question_id": "Q4",
+    "answer": "7 days",
+    "source": {
+     "file": "Anand_Questionnaire_reply.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "Q4",
+     "snippet": "7 days",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"7 days\"."
+    }
+   },
+   {
+    "question_id": "Q5",
+    "answer": "2.1%",
+    "source": {
+     "file": "Anand_Questionnaire_reply.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "Q5",
+     "snippet": "2.1%",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"2.1%\"."
+    }
+   },
+   {
+    "question_id": "Q6",
+    "answer": "Yes, on request",
+    "source": {
+     "file": "Anand_Questionnaire_reply.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "Q6",
+     "snippet": "Yes, on request",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"Yes, on request\"."
+    }
+   },
+   {
+    "question_id": "Q7",
+    "answer": "80% recycled fibre",
+    "source": {
+     "file": "Anand_Questionnaire_reply.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "Q7",
+     "snippet": "80% recycled fibre",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"80% recycled fibre\"."
+    }
+   },
+   {
+    "question_id": "Q8",
+    "answer": "Local customers in Chakan, names on request",
+    "source": {
+     "file": "Anand_Questionnaire_reply.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "Q8",
+     "snippet": "Local customers in Chakan, names on request",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"Local customers in Chakan, names on request\"."
+    }
+   }
+  ],
+  "qualityDocs": [
+   {
+    "kind": "test_report",
+    "summary": "Box compression and bursting strength test report",
+    "identifier": null,
+    "date": "18 Jan 2025",
+    "valid_until": null,
+    "marked_as_sample": true,
+    "source": {
+     "file": "AC_Box_Test_Report_SAMPLE.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": null,
+     "snippet": "SAMPLE DOCUMENT FOR A PRODUCT DEMO. NOT A REAL CERTIFICATE.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"SAMPLE DOCUMENT FOR A PRODUCT DEMO. NOT A REAL CERTIFICATE.\"."
+    }
+   }
+  ],
+  "revision": {
+   "is_revision": false,
+   "supersedes": null,
+   "changes_claimed": null,
+   "source": null
+  },
+  "readingNotes": [
+   "The attachments Anand_Questionnaire_reply.pdf and AC_Box_Test_Report_SAMPLE.pdf mentioned in the email were not parsed as they are not attached or contain no pricing data.",
+   "Row 18 (Room heater 2000W box) has a handwritten price correction to 37.20 with the initials 'AS', while the printed price of 29.03 is struck through.",
+   "Row 13 (Exhaust fan 250mm box) is quoted with 3 PLY, which differs from the RFQ spec of 5-ply BC."
+  ],
+  "coverage": {
+   "quoted": [
+    "L01",
+    "L02",
+    "L03",
+    "L04",
+    "L05",
+    "L06",
+    "L08",
+    "L09",
+    "L10",
+    "L11",
+    "L12",
+    "L13",
+    "L14",
+    "L15",
+    "L16",
+    "L17",
+    "L18",
+    "L19",
+    "L20",
+    "L21",
+    "L23",
+    "L24",
+    "L25",
+    "L26",
+    "L27",
+    "L28",
+    "L29"
+   ],
+   "missing": [
+    "L07",
+    "L22",
+    "L30"
+   ],
+   "total": 30
+  },
+  "unsourced": 0,
+  "usage": [],
+  "cached": true,
+  "ms": 9,
+  "readAt": "2026-10-09T12:20:16.292Z",
+  "models": [
+   "gemini-3.5-flash-lite",
+   "gemini-3.5-flash"
+  ]
+ }
+}

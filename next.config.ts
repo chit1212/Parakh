@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // The demo event and its saved readings load at runtime; make sure Vercel ships them with the server functions.
+  // The demo event loads from dataset/ at runtime; make sure Vercel ships it with the server functions.
   outputFileTracingIncludes: {
-    "/**": ["./dataset/**/*", "./data/**/*"],
+    "/**": ["./dataset/**/*", "./data/readings/**/*"],
   },
   serverExternalPackages: ["exceljs", "mammoth", "unpdf"],
 };

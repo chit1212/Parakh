@@ -1,16 +1,25 @@
 // One place for every model name and every demo assumption the app relies on.
 
-/**
- * Google Gemini API, free tier. Swap a model here and nowhere else.
- * Check Google's model list before changing: free-tier models and their quotas change often.
- */
+// Google Gemini API, free tier. Swap models here and nowhere else.
 export const MODELS = {
   /** Reading documents (extraction and the terms sweep) and the analyst chat. */
   reader: "gemini-3.8-flash",
-  /** Cheap steps: deciding what kind of document an email or file is. Flash-Lite has its own,
-   *  separate free quota, so sorting replies does not use up the reader's. */
+  /** Cheap steps: deciding what kind of document an email or file is. */
   classifier: "gemini-3.5-flash-lite",
 } as const;
+
+/**
+ * If a model stays busy after retries ("high demand"), the call moves to the next one.
+ * Each reading records the model that actually answered.
+ */
+export const FALLBACKS: Record<string, string[]> = {
+  // gemini-3.7-flash is not listed: Google serves gemini-3.8-flash behind that name, so it is busy when 3.8 is.
+  [MODELS.reader]: ["gemini-3.6-flash", "gemini-3.5-flash"],
+  [MODELS.classifier]: ["gemini-3.1-flash-lite"],
+};
+
+/** Free-tier rate limits: how long to keep retrying a busy or rate-limited call before giving up calmly. */
+export const RETRY = { attempts: 4, firstDelayMs: 4_000, maxDelayMs: 40_000 } as const;
 
 /**
  * USD reference rate shown to the buyer next to every converted number.

@@ -1,12 +1,13 @@
 "use client";
 import { useState } from "react";
 import { Camera, Envelope, File, FileDoc, FilePdf, FileXls, Paperclip, Warning } from "@phosphor-icons/react";
+import Link from "next/link";
+import { ScreenHead } from "@/components/Rail";
 import { Shell } from "@/components/Shell";
 import { useReadings, type ReplyState } from "@/components/useReadings";
-import { MODELS } from "@/lib/config";
 import type { ReplyReading } from "@/lib/reader/pipeline";
-import type { FileSummary, ReplySummary } from "@/lib/summary";
-import { where } from "@/lib/format";
+import { mainFile, type ReplySummary } from "@/lib/summary";
+import { readStamp, where } from "@/lib/format";
 import type { SourcingEvent } from "@/lib/types";
 
 const KIND_ICON: Record<string, typeof File> = { xlsx: FileXls, pdf: FilePdf, docx: FileDoc, image: Camera, eml: Envelope };
@@ -14,28 +15,21 @@ const KIND_LABEL: Record<string, string> = { xlsx: "Excel workbook", pdf: "PDF",
 
 const STAGE_LABEL: Record<string, string> = {
   queued: "Waiting its turn",
-  waiting: "Not read yet",
+  waiting: "Waiting to be read (no API key yet)",
   opening: "Opening the files",
   sorting: "Sorting: what is this reply?",
   "reading prices": "Reading every price",
   "sweeping terms": "Sweeping the terms: footnotes, second sheets, the cover email",
+  "waiting for the free quota": "Waiting for the free AI quota, then carrying on",
   "checking sources": "Checking every number against the original",
   done: "",
 };
-const STAGE_STEP: Record<string, number> = { queued: 0, waiting: 0, opening: 1, sorting: 2, "reading prices": 3, "sweeping terms": 4, "checking sources": 5, done: 6 };
+const STAGE_STEP: Record<string, number> = { queued: 0, waiting: 0, opening: 1, sorting: 2, "reading prices": 3, "sweeping terms": 4, "waiting for the free quota": 4, "checking sources": 5, done: 6 };
 
 const when = (iso: string | null) =>
   iso ? new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Kolkata" }) : "date unknown";
 
 
-/** The file that carries the quote: the first attachment the sorter called a quote, else the first file. */
-function mainFile(r: ReplySummary, reading: ReplyReading | null): FileSummary | null {
-  const quoteName = reading?.classification?.files.find((f) => f.role === "quote")?.name;
-  if (quoteName) return r.files.find((f) => f.name === quoteName) ?? r.files[0] ?? r.cover;
-  // Before the reply is sorted: skip files whose names say they are supporting documents.
-  const support = /certificate|test.?report|questionnaire|iso/i;
-  return r.files.find((f) => !support.test(f.name)) ?? r.files[0] ?? r.cover;
-}
 
 function needsLook(rd: ReplyReading) {
   const ids = new Set<string>();
@@ -78,13 +72,13 @@ function termLine(rd: ReplyReading): string[] {
   return out;
 }
 
-function Row({ r, st, ev, canRead, onRead }: { r: ReplySummary; st: ReplyState | undefined; ev: SourcingEvent; canRead: boolean; onRead: (fresh: boolean) => void }) {
+function Row({ r, st, ev, onRead }: { r: ReplySummary; st: ReplyState | undefined; ev: SourcingEvent; onRead: (fresh: boolean) => void }) {
   const [open, setOpen] = useState(false);
   const rd = st?.reading ?? null;
   const f = mainFile(r, rd);
   const Icon = f ? KIND_ICON[f.kind] ?? File : File;
   const name = r.vendorName ?? rd?.vendorName ?? rd?.classification?.vendor_name ?? r.from?.replace(/<.*>/, "").trim() ?? "Unknown sender";
-  const reading = st && st.stage !== "done" && st.stage !== "waiting";
+  const reading = st && st.stage !== "done";
   const look = rd ? needsLook(rd) : new Set<string>();
   const docs = rd?.qualityDocs ?? [];
 
@@ -121,20 +115,13 @@ function Row({ r, st, ev, canRead, onRead }: { r: ReplySummary; st: ReplyState |
         {reading ? (
           <div>
             <div className="font-semibold">{STAGE_LABEL[st.stage] ?? st.stage}</div>
+            {st.detail && <div className="text-n-700 text-[13px]">{st.detail}</div>}
             <div className="h-[3px] bg-n-300 mt-[8px]">
               <div className="h-[3px] bg-accent transition-all duration-500" style={{ width: `${(100 * (STAGE_STEP[st.stage] ?? 0)) / 6}%` }} />
             </div>
           </div>
-        ) : !rd ? (
-          <div>
-            <div className="font-semibold">Not read yet</div>
-            {st?.error && <div className="text-n-700 mt-[4px]">{st.error}</div>}
-            {canRead ? (
-              <button className="text-accent underline mt-[6px]" onClick={() => onRead(false)}>Read it live with {MODELS.reader}</button>
-            ) : (
-              <div className="text-n-700 text-[13px] mt-[4px]">Live reading is off: no AI key is set on the server.</div>
-            )}
-          </div>
+        ) : st?.error ? (
+          <div className="text-d-700">Could not read: {st.error}</div>
         ) : rd ? (
           <>
             {rd.status === "read" || rd.status === "incomplete" ? (
@@ -169,16 +156,12 @@ function Row({ r, st, ev, canRead, onRead }: { r: ReplySummary; st: ReplyState |
                 {rd.nextStep.text && <div className="text-n-700 text-[13px] mt-[6px]">Next: {rd.nextStep.text}</div>}
               </>
             )}
+            {st?.notice && <div className="text-[13px] text-n-800 bg-n-100 px-[8px] py-[4px] mt-[8px] rounded-[var(--radius-md)]">{st.notice}</div>}
             <div className="text-[12px] text-n-500 mt-[8px]">
-              {readLabel(st!, rd)}
-              {canRead && (
-                <>
-                  {" · "}
-                  <button className="underline" onClick={() => onRead(true)}>Read again live</button>
-                </>
-              )}
+              {rd.status === "error" ? "Not read yet" : `${rd.saved ? "Saved reading, " : "Read live, "}${readStamp(rd)}`}
+              {" · "}
+              <button className="underline" onClick={() => onRead(true)}>Read again live</button>
             </div>
-            {st?.error && <div className="text-[12px] text-n-700 mt-[2px]">{st.error}</div>}
           </>
         ) : null}
       </div>
@@ -211,17 +194,6 @@ function Row({ r, st, ev, canRead, onRead }: { r: ReplySummary; st: ReplyState |
       {open && rd && <Detail rd={rd} ev={ev} />}
     </section>
   );
-}
-
-const day = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" });
-
-/** Every reading says when and by which model it was made. */
-function readLabel(st: ReplyState, rd: ReplyReading): string {
-  const by = rd.models?.length ? rd.models.join(" and ") : null;
-  if (st.source?.kind === "saved") return `Read on ${day(st.source.readAt)}${by ? ` by ${by}` : ""}`;
-  if (rd.status === "unreadable" && !by) return "Checked by code; no AI needed";
-  return `Read live${by ? ` by ${by}` : ""}${rd.cached ? " (same files as before, earlier answer reused)" : ` in ${(rd.ms / 1000).toFixed(0)}s`}`;
 }
 
 function Check({ s }: { s: string }) {
@@ -342,27 +314,35 @@ export default function RepliesPage() {
   };
   const main = data.replies.filter((r) => !outOfGrid(r.id));
   const other = data.replies.filter((r) => outOfGrid(r.id));
-  const reading = data.replies.filter((r) => { const s = state[r.id]?.stage; return s && s !== "done" && s !== "waiting"; }).length;
+  const done = data.replies.filter((r) => state[r.id]?.stage === "done").length;
 
   return (
     <Shell>
-      <div className="eyebrow">{ev.id} · {ev.title}</div>
-      <h1 className="text-[40px] leading-tight mt-[6px]">Replies</h1>
+      <ScreenHead meta={`${ev.id} · ${ev.title}`} title="Replies">
+        <Link href="/scorecard" style={{ fontSize: 13 }}>How well did Parakh read? See the test scorecard</Link>
+      </ScreenHead>
       <p className="text-[15px] max-w-[760px] mt-[6px] text-n-800">
         {data.replies.length} replies in the event inbox, in whatever shape the vendors chose. Each one is read by AI, then every number is
         checked by code against the original file. A value that cannot be found where the reader says never enters the comparison.
+        The demo opens with saved readings, each marked with when and by which model it was read; any reply can be read again live.
       </p>
-
+      {!data.keyConfigured && (
+        <div className="mt-[var(--space-4)] p-[var(--space-3)] bg-d-100 text-[14px] rounded-[var(--radius-md)]">
+          Live reading is off: no Gemini API key is set on the server yet. Saved readings still show.
+        </div>
+      )}
       {blocked && <div className="mt-[var(--space-4)] p-[var(--space-3)] bg-d-100 text-[14px] rounded-[var(--radius-md)]">{blocked}</div>}
-      {reading > 0 && <div className="text-[13px] text-n-700 mt-[var(--space-3)]">Reading {reading} {reading > 1 ? "replies" : "reply"} live…</div>}
+      {data.keyConfigured && done < data.replies.length && (
+        <div className="text-[13px] text-n-700 mt-[var(--space-3)]">Reading: {done} of {data.replies.length} done</div>
+      )}
       <div className="mt-[var(--space-6)]">
-        {main.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} canRead={data.keyConfigured} onRead={(fresh) => readOne(r.id, fresh)} />)}
+        {main.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} />)}
       </div>
       {other.length > 0 && (
         <>
           <h2 className="text-[22px] mt-[var(--space-8)]">Not in the comparison</h2>
           <p className="text-[14px] text-n-700 mb-[var(--space-3)]">Messages that are not quotes, or could not be read. Each has a next step.</p>
-          {other.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} canRead={data.keyConfigured} onRead={(fresh) => readOne(r.id, fresh)} />)}
+          {other.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} />)}
         </>
       )}
     </Shell>

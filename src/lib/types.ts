@@ -89,6 +89,8 @@ export interface ReplyFile {
 export interface Vendor {
   id: string; // short code used across the app, e.g. "SB"
   name: string;
+  /** Name as the buyer says it, for tight columns: "Shree Balaji". */
+  short: string;
   city: string;
   contact: string;
   email: string;

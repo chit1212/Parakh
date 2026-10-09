@@ -31,6 +31,9 @@ describe("source check: Word", () => {
     expect(verifySource(src({ file, table: 1, row: "2", snippet: "446.00" }), f, [], { valueText: "446.00", value: 446 }).status).toBe("verified");
     expect(verifySource(src({ file, table: 1, row: "L09", snippet: "579.00" }), f, [], { valueText: "579.00", value: 579 }).status).toBe("verified");
     expect(verifySource(src({ file, table: 1, row: "L09", snippet: "579.00" }), f, [], { valueText: "597.00", value: 597 }).status).toBe("failed");
+    // The row cited with its full printed label, as some models do.
+    expect(verifySource(src({ file, table: 1, row: "Table 1, row 2", snippet: "446.00" }), f, [], { valueText: "446.00", value: 446 }).status).toBe("verified");
+    expect(verifySource(src({ file, table: 1, row: "Table 1, row 2", snippet: "446.00" }), f, [], { valueText: "4,134.00", value: 4134 }).status).toBe("failed");
     const freight = src({ file, snippet: "at Rs. 0.40 per box, on which a handling charge of 15% will be added" });
     expect(verifySource(freight, f, [], { value: 0.4 }).status).toBe("verified");
     expect(verifySource({ ...freight, snippet: "free delivery to Chakan" }, f, []).status).toBe("failed");

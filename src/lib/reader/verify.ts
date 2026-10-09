@@ -10,13 +10,13 @@ export const norm = (s: string) =>
 /** Same text with digit-grouping commas and spaces removed, for comparing numbers. */
 const numNorm = (s: string) => norm(s).replace(/(\d),(?=\d)/g, "$1").replace(/\s+/g, "");
 
-function contains(hay: string, needle: string): boolean {
+export function contains(hay: string, needle: string): boolean {
   if (!needle.trim()) return false;
   return norm(hay).includes(norm(needle)) || numNorm(hay).includes(numNorm(needle));
 }
 
 /** Does this text contain the number, either as written or as a plain number? */
-function hasNumber(text: string, valueText?: string, value?: number): boolean {
+export function hasNumber(text: string, valueText?: string, value?: number): boolean {
   if (valueText && contains(text, valueText)) return true;
   if (value === undefined) return false;
   const nums = (numNorm(text).match(/\d+(?:\.\d+)?/g) ?? []).map(Number);
@@ -58,7 +58,10 @@ function checkDocx(f: ReplyFile, src: SourceRef, ex: Expect): Verification {
     const t = d.tables[src.table - 1];
     if (!t) return fail(`Table ${src.table} is not in ${f.name}.`);
     let row: string[] | undefined;
-    const rowNo = src.row && /^\d+$/.test(src.row) ? Number(src.row) : null;
+    // "2", or the full label as printed in the text: "Table 1, row 2" / "row 2".
+    const rowNo = src.row && /^\s*(?:(?:table\s*\d+\s*,\s*)?row\s*)?(\d+)\s*$/i.test(src.row)
+      ? Number(src.row.match(/(\d+)\s*$/)![1])
+      : null;
     if (rowNo) row = t[rowNo - 1];
     // A row given by its label (e.g. "L09") instead of its number.
     if (!row && src.row) row = t.find((r) => r.some((c) => norm(c) === norm(src.row!)));

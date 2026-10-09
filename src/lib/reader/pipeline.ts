@@ -1,19 +1,20 @@
 // Reading one reply, end to end: open (code) → sort (AI) → read prices and sweep terms (AI)
 // → check every source (code) → coverage (code).
 import type { z } from "zod";
-import { calmMessage, type Usage } from "../ai";
+import { MissingKeyError, type Usage } from "../ai";
+import { RateLimitedError } from "../guard";
 import { MODELS } from "../config";
 import { workbookToText } from "../files/xlsx";
 import { loadHistory } from "../rfq";
 import type { Reply, ReplyFile, SourcingEvent, Verification } from "../types";
-import { callStructured } from "./call";
+import { callStructured, QuotaError } from "./call";
 import { buyerRecordBlock, fileBlocks } from "./content";
 import { classifySystem, extractionSystem, termsSystem } from "./prompts";
 import {
   Classification, Extraction, type NotQuoted, type PriceItem, type QualityDoc, type QuestionnaireAnswer,
   type RateRule, type TermItem, TermsSweep,
 } from "./schemas";
-import { verifySource, type RecordFile } from "./verify";
+import { contains, verifySource, type RecordFile } from "./verify";
 
 export type ReplyStatus = "read" | "incomplete" | "unreadable" | "pending" | "ignored" | "error";
 
@@ -44,14 +45,20 @@ export interface ReplyReading {
   /** Values that did not pass the source check. They never enter the comparison. */
   unsourced: number;
   usage: Usage[];
-  /** Models that produced this reading. */
-  models: string[];
   cached: boolean;
   ms: number;
+  /** When the model read this reply (latest model answer), ISO time. Null if no model was called. */
+  readAt: string | null;
+  /** The models that actually answered, in order. */
+  models: string[];
+  /** Set when served from data/readings (a saved run of this pipeline), not read just now. */
+  saved?: boolean;
+  /** True when the error is the free quota (or the demo's own limit), not a problem with the file. */
+  quota?: boolean;
   error?: string;
 }
 
-export type Stage = "opening" | "sorting" | "reading prices" | "sweeping terms" | "checking sources" | "done";
+export type Stage = "opening" | "sorting" | "reading prices" | "sweeping terms" | "waiting for the free quota" | "checking sources" | "done";
 export type OnProgress = (stage: Stage, detail?: string) => void;
 
 const PAGE_OF = /page\s+(\d+)\s+of\s+(\d+)/gi;
@@ -77,7 +84,7 @@ function empty(reply: Reply, ev: SourcingEvent): ReplyReading {
     status: "read", headline: "", nextStep: { kind: "none", text: "" },
     classification: null, prices: [], rateRules: [], notQuoted: [], terms: [], questionnaire: [], qualityDocs: [],
     revision: null, readingNotes: [], coverage: { quoted: [], missing: ev.lines.map((l) => l.id), total: ev.lines.length },
-    unsourced: 0, usage: [], models: [], cached: true, ms: 0,
+    unsourced: 0, usage: [], cached: true, ms: 0, readAt: null, models: [],
   };
 }
 
@@ -96,11 +103,13 @@ export async function readReply(
   const say = opts.onProgress ?? (() => {});
   const out = empty(reply, ev);
   const all = [...(reply.cover ? [reply.cover] : []), ...reply.files];
-  const track = (r: { usage: Usage | null; cached: boolean; model: string }) => {
+  const track = (r: { usage: Usage | null; cached: boolean; model: string; at: string }) => {
     if (r.usage) out.usage.push(r.usage);
-    if (!out.models.includes(r.model)) out.models.push(r.model);
     if (!r.cached) out.cached = false;
+    if (!out.models.includes(r.model)) out.models.push(r.model);
+    if (!out.readAt || r.at > out.readAt) out.readAt = r.at;
   };
+  const onWait = (s: number) => say("waiting for the free quota", `retrying in ${s}s`);
 
   try {
     // 1. Open (code). A reply whose only content cannot be opened is unreadable; no model call.
@@ -131,6 +140,7 @@ export async function readReply(
       maxTokens: 4000,
       fresh: opts.fresh,
       beforeCall: opts.beforeCall,
+      onWait,
     });
     track(cls);
     const c = cls.data;
@@ -182,6 +192,7 @@ export async function readReply(
       maxTokens: 32000,
       fresh: opts.fresh,
       beforeCall: opts.beforeCall,
+      onWait,
     }).then((r) => { say("sweeping terms"); return r; });
     const termsP = callStructured({
       step: "terms",
@@ -196,6 +207,7 @@ export async function readReply(
       maxTokens: 24000,
       fresh: opts.fresh,
       beforeCall: opts.beforeCall,
+      onWait,
     });
     const [ex, tm] = await Promise.all([extractP, termsP]);
     track(ex);
@@ -240,7 +252,18 @@ export async function readReply(
     };
 
     // 6. Status. Missing pages hold the reply out of the comparison until the buyer decides.
-    const pagesMissing = missingPages(readable) ?? (c.looks_incomplete ? c.incomplete_evidence ?? "The reply looks incomplete." : null);
+    // The sorter only sees an excerpt, so its doubt needs a source like everything else: the words
+    // it quotes must be in a file (photos and scans, which code cannot search, are taken as given).
+    // Page counts are code's call: where every PDF's "page x of n" marks match its real page count,
+    // a sorter's doubt about pages is overruled.
+    const pagesCounted = readable.some((f) => f.kind === "pdf" && f.pdfPages?.some((p) => /page\s+\d+\s+of\s+\d+/i.test(p)));
+    const searchable = readable.filter((f) => f.text !== undefined || f.pdfPages?.some((p) => p.trim()));
+    const ev0 = c.incomplete_evidence ?? "";
+    const evidenceFound = readable.length > searchable.length ||
+      searchable.some((f) => contains(f.text ?? f.pdfPages!.join("\n"), ev0));
+    const sorterDoubt = c.looks_incomplete && evidenceFound && !(pagesCounted && /page/i.test(ev0 || "page"));
+    const pagesMissing = missingPages(readable) ?? (sorterDoubt ? c.incomplete_evidence ?? "The reply looks incomplete." : null);
+    if (c.looks_incomplete && !sorterDoubt) out.readingNotes.push(`The sorter thought pages might be missing (${c.incomplete_evidence ?? "no detail"}); code found no sign of it in the files.`);
     const n = out.coverage.quoted.length;
     if (pagesMissing) {
       out.status = "incomplete";
@@ -257,9 +280,11 @@ export async function readReply(
   } catch (e) {
     out.status = "error";
     out.cached = false;
-    out.error = calmMessage(e);
-    out.headline = out.error;
-    out.nextStep = { kind: "check_reply", text: "Try reading it again." };
+    // Quota, demo limit and missing key are not problems with the file: say so calmly.
+    out.quota = e instanceof QuotaError || e instanceof RateLimitedError || e instanceof MissingKeyError;
+    out.error = (e as Error).message;
+    out.headline = out.quota ? (e as Error).message : `Reading stopped: ${(e as Error).message}`;
+    out.nextStep = { kind: "check_reply", text: out.quota ? "Nothing is wrong with the file. Read it again later." : "Try reading it again." };
     return out;
   } finally {
     out.ms = Date.now() - t0;

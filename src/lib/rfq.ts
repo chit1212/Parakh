@@ -38,11 +38,11 @@ const HEADER = {
   ],
   // The five vendors the RFQ went to (the buyer's distribution list).
   vendors: [
-    { id: "SB", name: "Shree Balaji Corrugators", city: "Bhosari MIDC, Pune", contact: "Sanjay Agarwal", email: "sanjay@shreebalaji-corr.example" },
-    { id: "VP", name: "Vardhman Packwell Exports", city: "Ranjangaon MIDC, Pune", contact: "Ritu Jain", email: "exports@vardhmanpackwell.example" },
-    { id: "KP", name: "Kaveri Paper Products", city: "Talegaon Dabhade, Pune", contact: "Prakash Kulkarni", email: "sales@kaveripaper.example" },
-    { id: "AC", name: "Anand Cartons", city: "Chakan, Pune", contact: "Anand Shinde", email: "anandcartons.chakan@example.com" },
-    { id: "RB", name: "Rohit Box Industries", city: "Shikrapur, Pune", contact: "Rohit Gaikwad", email: "rohit.gaikwad@rohitbox.example" },
+    { id: "SB", name: "Shree Balaji Corrugators", short: "Shree Balaji", city: "Bhosari MIDC, Pune", contact: "Sanjay Agarwal", email: "sanjay@shreebalaji-corr.example" },
+    { id: "VP", name: "Vardhman Packwell Exports", short: "Vardhman", city: "Ranjangaon MIDC, Pune", contact: "Ritu Jain", email: "exports@vardhmanpackwell.example" },
+    { id: "KP", name: "Kaveri Paper Products", short: "Kaveri", city: "Talegaon Dabhade, Pune", contact: "Prakash Kulkarni", email: "sales@kaveripaper.example" },
+    { id: "AC", name: "Anand Cartons", short: "Anand", city: "Chakan, Pune", contact: "Anand Shinde", email: "anandcartons.chakan@example.com" },
+    { id: "RB", name: "Rohit Box Industries", short: "Rohit Box", city: "Shikrapur, Pune", contact: "Rohit Gaikwad", email: "rohit.gaikwad@rohitbox.example" },
   ],
 };
 

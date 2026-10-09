@@ -1,8 +1,10 @@
 "use client";
 // L24 test scorecard: the reader's output on every dataset file, graded against the answer key.
 import { useEffect, useState } from "react";
+import { ScreenHead } from "@/components/Rail";
 import { Shell } from "@/components/Shell";
 import { useReadings } from "@/components/useReadings";
+import { readStamp } from "@/lib/format";
 import type { Scorecard } from "@/lib/scorecard";
 
 const pct = (a: number, b: number) => (b ? `${((100 * a) / b).toFixed(1)}%` : "–");
@@ -12,9 +14,7 @@ export default function ScorecardPage() {
   const [sc, setSc] = useState<Scorecard | null>(null);
   const [onlyMisses, setOnlyMisses] = useState(true);
   const total = data?.replies.length ?? 0;
-  // Graded once nothing is being read: saved readings, plus any read live this session.
-  const done = data ? data.replies.filter((r) => state[r.id]?.stage === "done" || state[r.id]?.stage === "waiting").length : 0;
-  const unread = data ? data.replies.filter((r) => !state[r.id]?.reading).length : 0;
+  const done = data ? data.replies.filter((r) => state[r.id]?.stage === "done").length : 0;
 
   useEffect(() => {
     if (!data || done < total || sc) return;
@@ -30,15 +30,15 @@ export default function ScorecardPage() {
 
   return (
     <Shell>
-      <div className="eyebrow">Test scorecard · L24</div>
-      <h1 className="text-[40px] leading-tight mt-[6px]">How well does Parakh read?</h1>
+      <ScreenHead meta="SE-2026-041 · Test scorecard (L24)" title="How well does Parakh read?" />
       <p className="text-[15px] max-w-[760px] mt-[6px] text-n-800">
-        The reader runs on every file in the dataset exactly as the app does (saved readings, made once on the free AI tier, or read live), then this page grades its output against the answer key,
+        The reader runs on every file in the dataset exactly as the app does, then this page grades its output against the answer key,
         field by field. The answer key is only used here, for grading. The app never reads it.
       </p>
       {blocked && <div className="mt-[var(--space-4)] p-[var(--space-3)] bg-d-100 text-[14px]">{blocked}</div>}
-      {sc && unread > 0 && <div className="mt-[var(--space-4)] p-[var(--space-3)] bg-d-100 text-[14px]">{unread} of {total} replies have no reading yet, so they score as not read.</div>}
-      {!sc && data && <div className="mt-[var(--space-4)] text-n-700">Grading…</div>}
+      {sc?.readAt && <p className="text-[13px] text-n-700 mt-[6px]">Graded readings: {readStamp({ readAt: sc.readAt, models: sc.models })} (latest).</p>}
+      {data && !data.keyConfigured && done < total && <div className="mt-[var(--space-4)] p-[var(--space-3)] bg-d-100 text-[14px]">Some replies have no saved reading and no Gemini API key is set, so they cannot be read yet.</div>}
+      {!sc && data?.keyConfigured && <div className="mt-[var(--space-4)] text-n-700">Reading replies: {done} of {total} done…</div>}
 
       {sc && (
         <>
@@ -56,8 +56,8 @@ export default function ScorecardPage() {
               <div className="text-[13px] text-n-700 mt-[4px]">failure files handled</div>
             </div>
             <div>
-              <div className="text-[20px] leading-tight mt-[12px]">{sc.models.join(", ") || "–"}</div>
-              <div className="text-[13px] text-n-700 mt-[4px]">read by (Gemini free tier)</div>
+              <div className="text-[44px] leading-none">{sc.modelCalls}</div>
+              <div className="text-[13px] text-n-700 mt-[4px]">live model calls on this page (0 when all readings are saved)</div>
             </div>
           </div>
 

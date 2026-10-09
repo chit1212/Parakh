@@ -1,8 +1,9 @@
-// Grade the reader against the answer key.
-//   npm run scorecard             grades the saved readings in data/readings/ (no AI calls)
-//   npm run scorecard -- --live   reads every reply live (uses the local cache when the files and prompts are unchanged)
-//   npm run scorecard -- --live --fresh   reads everything again from scratch (uses free-tier quota)
-//   npm run scorecard -- --live --only=4_anand_photo
+// Run the reader on every reply in the demo inbox and grade it against the answer key.
+//   npm run scorecard            uses cached model answers when the files and prompts are unchanged
+//   npm run scorecard -- --fresh reads everything again (uses the free Gemini quota)
+//   npm run scorecard -- --only=4_anand_photo
+//   npm run scorecard -- --save  after a full run with no errors, save each reply's reading to
+//                                data/readings/ (committed), stamped with date and model; the demo opens with these
 import fs from "node:fs";
 import path from "node:path";
 import { loadEnv } from "./env";
@@ -11,56 +12,51 @@ loadEnv();
 import { hasApiKey } from "@/lib/ai";
 import { loadDemoInbox } from "@/lib/inbox";
 import { readReply, type ReplyReading } from "@/lib/reader/pipeline";
-import { loadEvent } from "@/lib/rfq";
-import { loadSavedReadings } from "@/lib/saved";
+import { loadEvent, loadHistory } from "@/lib/rfq";
+import { saveReadings } from "@/lib/saved";
+import { readStamp } from "@/lib/format";
 import { grade, loadKey } from "@/lib/scorecard";
 
 const args = process.argv.slice(2);
 const fresh = args.includes("--fresh");
-const live = args.includes("--live") || fresh;
+const save = args.includes("--save");
 const only = args.find((a) => a.startsWith("--only="))?.split("=")[1];
 const pct = (a: number, b: number) => (b ? `${((100 * a) / b).toFixed(1)}%` : "-");
 
 async function main() {
+  if (!hasApiKey()) {
+    console.error("No API key. Put GEMINI_API_KEY=... in .env.local (see README).");
+    process.exit(1);
+  }
   const ev = await loadEvent();
   const inbox = (await loadDemoInbox()).filter((r) => !only || r.id === only);
   const readings: ReplyReading[] = [];
-  if (!live) {
-    const saved = await loadSavedReadings();
-    for (const r of inbox) {
-      const s = saved[r.id];
-      if (s) readings.push(s.reading);
-      console.log(`  ${r.id.padEnd(24)} ${s ? `${s.reading.status.padEnd(11)} read ${s.readAt.slice(0, 10)} by ${s.models.join(", ")}` : "no saved reading"}`);
-    }
-    if (!readings.length) {
-      console.error("No saved readings yet. Run `npm run save-readings` first, or use --live.");
-      process.exit(1);
-    }
-  } else if (!hasApiKey()) {
-    console.error("No API key. Put GEMINI_API_KEY=... in .env.local.");
-    process.exit(1);
-  }
   const queue = [...inbox];
   const worker = async () => {
     for (let r = queue.shift(); r; r = queue.shift()) {
       const reply = r;
       const t = Date.now();
-      const res = await readReply(reply, ev, { fresh });
+      const res = await readReply(reply, ev, {
+        fresh,
+        onProgress: (stage, detail) => { if (detail) console.log(`  ${reply.id.padEnd(24)} ${stage}: ${detail}`); },
+      });
       readings.push(res);
-      console.log(`  ${reply.id.padEnd(24)} ${res.status.padEnd(11)} ${((Date.now() - t) / 1000).toFixed(1).padStart(5)}s ${res.cached ? "(cached)" : `${res.usage.length} calls`}  ${res.headline}`);
+      const calls = res.usage.length;
+      console.log(`  ${reply.id.padEnd(24)} ${res.status.padEnd(11)} ${((Date.now() - t) / 1000).toFixed(1).padStart(5)}s ${res.cached ? "(cached)" : `${calls} call${calls === 1 ? "" : "s"}`}  ${readStamp(res)}  ${res.headline}`);
     }
   };
-  if (live) {
-    console.log(`Reading ${inbox.length} replies...`);
-    await Promise.all([worker(), worker()]);
-  }
+  console.log(`Reading ${inbox.length} replies...`);
+  await Promise.all([worker(), worker()]); // the free tier allows only a few calls a minute
 
   const out = path.join(process.cwd(), ".cache");
   fs.mkdirSync(out, { recursive: true });
   fs.writeFileSync(path.join(out, "readings-latest.json"), JSON.stringify(readings, null, 1));
-  if (only) return;
+  if (only) {
+    if (save) console.log("--save needs a full run (without --only).");
+    return;
+  }
 
-  const sc = grade(ev, await loadKey(), readings);
+  const sc = grade(ev, await loadKey(), readings, await loadHistory());
   fs.writeFileSync(path.join(out, "scorecard-latest.json"), JSON.stringify(sc, null, 1));
 
   console.log("\nField-level accuracy (150 cells: 5 vendors x 30 lines)");
@@ -79,7 +75,14 @@ async function main() {
   console.log("\nFailure cases");
   for (const e of sc.failures) console.log(`  ${e.ok ? "PASS" : "FAIL"}  ${e.name}  [${e.detail}]`);
   console.log(`\nNot graded yet: ${sc.notYet.join("; ")}`);
-  console.log(`Read by: ${sc.models.join(", ") || "-"}`);
+  const tokens = readings.flatMap((r) => r.usage).reduce((s, u) => s + u.inputTokens + u.outputTokens + u.thinkingTokens, 0);
+  console.log(`Model calls this run: ${sc.modelCalls} (${tokens.toLocaleString("en-IN")} tokens, free tier). Models: ${sc.models.join(", ")}`);
+
+  if (save) {
+    const failed = readings.filter((r) => r.status === "error");
+    if (failed.length) console.log(`\nNot saved: ${failed.length} replies stopped with an error (${failed.map((r) => r.replyId).join(", ")}).`);
+    else console.log(`\nSaved ${await saveReadings(inbox, readings)} readings to data/readings/.`);
+  }
 }
 
 main().catch((e) => {

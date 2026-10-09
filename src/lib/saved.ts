@@ -1,45 +1,58 @@
-// Saved readings of the demo replies (data/readings/, committed). The free AI tier allows few
-// requests a day, so the demo opens with readings made once by the real pipeline, each stamped
-// with when and by which model it was read. "Read again live" replaces one for the session.
+// Saved readings: the five demo replies (and the failure cases) read once by the real
+// pipeline and committed in data/readings/, so the demo opens without spending the free
+// quota. Each is stamped with when it was read and by which model, and with a fingerprint
+// of the reply's files: if a file changes, its saved reading is no longer shown.
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { ReplyReading } from "./reader/pipeline";
+import { hashOf } from "./reader/call";
+import type { Reply } from "./types";
 
-export const SAVED_DIR = path.join(process.cwd(), "data", "readings");
+export const READINGS_DIR = path.join(process.cwd(), "data", "readings");
 
-export interface SavedReading {
+interface SavedFile {
   replyId: string;
-  /** ISO time the reading was made. */
-  readAt: string;
-  /** Models that produced it, from the reading itself. */
+  /** When the model read the reply, and which models answered. Repeated from the reading for anyone opening the file. */
+  readAt: string | null;
   models: string[];
+  /** Fingerprint of the reply's files at the time of reading. */
+  files: string;
   reading: ReplyReading;
 }
 
-const fileOf = (replyId: string) => path.join(SAVED_DIR, `${replyId.replace(/[^\w.-]/g, "_")}.json`);
+export function filesFingerprint(r: Reply): string {
+  const all = [...(r.cover ? [r.cover] : []), ...r.files];
+  return hashOf(JSON.stringify(all.map((f) => [f.name, f.bytes, f.text ?? f.base64 ?? f.parseError ?? ""])));
+}
 
-export async function loadSavedReadings(): Promise<Record<string, SavedReading>> {
-  const out: Record<string, SavedReading> = {};
-  let names: string[] = [];
-  try {
-    names = await fs.readdir(SAVED_DIR);
-  } catch {
-    return out;
-  }
-  for (const n of names.filter((x) => x.endsWith(".json"))) {
-    try {
-      const s = JSON.parse(await fs.readFile(path.join(SAVED_DIR, n), "utf8")) as SavedReading;
-      if (s.replyId && s.reading) out[s.replyId] = s;
-    } catch {
-      // A damaged file just means that reply shows as not read yet.
-    }
-  }
+/** Saved readings for these replies, keyed by reply id. A reply whose files changed since is left out. */
+export async function loadSavedReadings(replies: Reply[]): Promise<Record<string, ReplyReading>> {
+  const out: Record<string, ReplyReading> = {};
+  await Promise.all(
+    replies.map(async (r) => {
+      try {
+        const s = JSON.parse(await fs.readFile(path.join(READINGS_DIR, `${r.id}.json`), "utf8")) as SavedFile;
+        if (s.files === filesFingerprint(r)) out[r.id] = { ...s.reading, saved: true };
+      } catch {
+        // not saved yet
+      }
+    }),
+  );
   return out;
 }
 
-export async function saveReading(reading: ReplyReading, readAt = new Date()): Promise<SavedReading> {
-  const s: SavedReading = { replyId: reading.replyId, readAt: readAt.toISOString(), models: reading.models, reading };
-  await fs.mkdir(SAVED_DIR, { recursive: true });
-  await fs.writeFile(fileOf(reading.replyId), JSON.stringify(s, null, 1) + "\n");
-  return s;
+/** Write one saved reading per reply. Only clean, model-read results are saved. */
+export async function saveReadings(replies: Reply[], readings: ReplyReading[]): Promise<number> {
+  await fs.mkdir(READINGS_DIR, { recursive: true });
+  let n = 0;
+  for (const reading of readings) {
+    const reply = replies.find((r) => r.id === reading.replyId);
+    if (!reply || reading.status === "error") continue;
+    const { saved: _saved, ...clean } = reading;
+    void _saved;
+    const file: SavedFile = { replyId: reading.replyId, readAt: reading.readAt, models: reading.models, files: filesFingerprint(reply), reading: clean };
+    await fs.writeFile(path.join(READINGS_DIR, `${reading.replyId}.json`), JSON.stringify(file, null, 1) + "\n");
+    n++;
+  }
+  return n;
 }

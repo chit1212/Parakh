@@ -1,42 +1,45 @@
 "use client";
-// Loads the event with its saved readings (made once, on the free AI tier). A reply with no saved
-// reading, or one the buyer asks to read again, is read live through /api/read with progress.
+// Loads the event with its saved readings. Replies without one (new uploads) are read live
+// through /api/read, a few at a time, with progress; any reply can be read again live.
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ReplyReading, Stage } from "@/lib/reader/pipeline";
-import type { SavedReading } from "@/lib/saved";
 import type { ReplySummary } from "@/lib/summary";
+import type { Sheet } from "@/lib/files/xlsx";
 import type { LastYearLine, SourcingEvent } from "@/lib/types";
 
 export interface ReplyState {
   stage: Stage | "queued" | "waiting";
   reading: ReplyReading | null;
   error: string | null;
-  /** Where the reading came from: saved (with its date) or read live in this session. */
-  source: { kind: "saved"; readAt: string } | { kind: "live"; readAt: string } | null;
+  /** A calm note about the last live read (e.g. the free quota was busy); the reading shown is unchanged. */
+  notice?: string | null;
+  /** While waiting on the free tier's rate limit: "retrying in 20s". */
+  detail?: string | null;
 }
 
 export interface EventData {
   event: SourcingEvent;
   lastYear: LastYearLine[];
+  historySheets: Sheet[];
   replies: ReplySummary[];
+  /** Saved readings (data/readings), by reply id. */
+  saved: Record<string, ReplyReading>;
   keyConfigured: boolean;
-  saved: Record<string, SavedReading>;
 }
 
-type Kept = { reading: ReplyReading; readAt: string };
 const STORE = "parakh.readings.v2";
-const load = (): Record<string, Kept> => {
+const load = (): Record<string, ReplyReading> => {
   try {
     return JSON.parse(sessionStorage.getItem(STORE) ?? "{}");
   } catch {
     return {};
   }
 };
-const save = (r: Record<string, Kept>) => {
+const save = (r: Record<string, ReplyReading>) => {
   try {
     sessionStorage.setItem(STORE, JSON.stringify(r));
   } catch {
-    /* storage full or blocked: readings just reload from the server cache */
+    /* storage full or blocked: the saved readings still load from the server */
   }
 };
 
@@ -47,10 +50,11 @@ export function useReadings() {
   const started = useRef(false);
 
   const set = (id: string, patch: Partial<ReplyState>) =>
-    setState((s) => ({ ...s, [id]: { ...(s[id] ?? { stage: "queued", reading: null, error: null, source: null }), ...patch } }));
+    setState((s) => ({ ...s, [id]: { ...(s[id] ?? { stage: "queued", reading: null, error: null }), ...patch } }));
 
   const readOne = useCallback(async (id: string, fresh = false) => {
-    set(id, { stage: "opening", error: null });
+    // The current reading stays on screen until a new one arrives.
+    set(id, { stage: "opening", error: null, notice: null, detail: null });
     try {
       const res = await fetch("/api/read", { method: "POST", body: JSON.stringify({ replyId: id, fresh }) });
       if (!res.body) throw new Error(`Server answered ${res.status}`);
@@ -65,26 +69,30 @@ export function useReadings() {
         while ((nl = buf.indexOf("\n")) >= 0) {
           const msg = JSON.parse(buf.slice(0, nl));
           buf = buf.slice(nl + 1);
-          if (msg.type === "progress") set(id, { stage: msg.stage });
-          else if (msg.type === "blocked") setBlocked(msg.message);
-          else if (msg.type === "error") set(id, { stage: "done", error: msg.message });
+          if (msg.type === "progress") set(id, { stage: msg.stage, detail: msg.detail ?? null });
+          else if (msg.type === "blocked") {
+            setBlocked(msg.message);
+            set(id, { stage: "done", notice: msg.message });
+          } else if (msg.type === "error") set(id, { stage: "done", error: msg.message });
           else if (msg.type === "result") {
             const r = msg.reading as ReplyReading;
             if (r.status === "error") {
-              // Keep whatever reading was showing; say calmly why this attempt did not finish.
-              set(id, { stage: "done", error: r.error ?? r.headline });
+              // Keep what was there (a saved reading); say calmly why the live read did not finish.
+              setState((s) => {
+                const prev = s[id]?.reading;
+                return { ...s, [id]: { ...s[id], stage: "done", detail: null, reading: prev ?? r, notice: prev ? r.headline : null, error: null } };
+              });
             } else {
-              const readAt = new Date().toISOString();
-              set(id, { stage: "done", reading: r, source: { kind: "live", readAt } });
+              set(id, { stage: "done", reading: r, detail: null });
               const all = load();
-              all[id] = { reading: r, readAt };
+              all[id] = r;
               save(all);
             }
           }
         }
       }
-    } catch {
-      set(id, { stage: "done", error: "The connection dropped while reading. Try again in a minute." });
+    } catch (e) {
+      set(id, { stage: "done", error: (e as Error).message });
     }
   }, []);
 
@@ -94,17 +102,25 @@ export function useReadings() {
     (async () => {
       const d = (await (await fetch("/api/event")).json()) as EventData;
       setData(d);
-      const kept = load();
+      const kept = load(); // live readings done in this browser session win over saved ones
+      const todo: string[] = [];
       const init: Record<string, ReplyState> = {};
       for (const r of d.replies) {
-        const live = kept[r.id];
-        const saved = d.saved[r.id];
-        if (live) init[r.id] = { stage: "done", reading: live.reading, error: null, source: { kind: "live", readAt: live.readAt } };
-        else if (saved) init[r.id] = { stage: "done", reading: saved.reading, error: null, source: { kind: "saved", readAt: saved.readAt } };
-        // Not read yet: waits for the buyer to ask, so page visits never spend the free AI quota.
-        else init[r.id] = { stage: "waiting", reading: null, error: null, source: null };
+        const have = kept[r.id] ?? d.saved[r.id];
+        if (have) init[r.id] = { stage: "done", reading: have, error: null };
+        else {
+          init[r.id] = { stage: d.keyConfigured ? "queued" : "waiting", reading: null, error: null };
+          todo.push(r.id);
+        }
       }
       setState(init);
+      if (!d.keyConfigured) return;
+      // Read a few at a time, so every reply shows its own progress without flooding the API.
+      const queue = [...todo];
+      const worker = async () => {
+        for (let id = queue.shift(); id; id = queue.shift()) await readOne(id);
+      };
+      await Promise.all([worker(), worker()]); // two at a time: the free tier allows only a few calls a minute
     })();
   }, [readOne]);
 

@@ -25,14 +25,15 @@ The brief's hard rule: plumbing can be stubbed (no real email server), but the A
 
 ## Inputs in this folder
 
-- `design/`: the Claude Design export, "Direction A, Ledger." It's the visual reference for layout, typography, the cell-state system and the copy. Match it closely. The "Shared Screens" file has the Events, RFQ, Replies and Award screens.
+- `design/`: the design handoff for "Direction A, Ledger." Start with `design/README.md`: it specifies every screen, size, colour, cell state and interaction. It's the visual reference for layout, typography, the cell-state system and the copy. Match it closely. `Comparison - Ledger.dc.html` has the Comparison, Doubts and Conversation screens; `Shared Screens.dc.html` has the Events, RFQ, Replies and Award screens; `SourceDoc.dc.html` is the source panel. The design's numbers are mock data: every number on screen comes from the pipeline. Where the design conflicts with the decisions on record (the VP's name, "two reads agree", applying Vardhman's conditional discount, an estimated freight for Rohit), the decisions win.
 - `dataset/`: the demo data. Read `dataset/README.md` first. It has the RFQ, the five vendor replies, a revised quote, last year's records, failure files, and `06_answer_key/answer_key.json` with the correct reading of every cell. The answer key is for testing only. The app must never read it to produce results.
 
 ## Stack (keep it simple)
 
-- Next.js (App Router) with TypeScript and Tailwind, deployed on Vercel's free Hobby plan.
-- Google Gemini API, free tier, through Google's official Gen AI SDK (`@google/genai`). Use the current free-tier Gemini Flash model (`gemini-3.8-flash` as of 2026-10-09; check Google's model list before changing it). Keep model names in one config file so the model can be swapped later. Use structured output (a JSON schema) for extraction and classification, and function calling for the analyst chat's tools. The whole project must cost nothing to run.
-- No database. The demo event loads from `dataset/` on start. Uploads work within a session. Keep event state in a server-side store keyed by session, and in the browser. A refresh may reset uploads; that's accepted for the demo.
+- Next.js (App Router) with TypeScript and Tailwind, deployed on Vercel.
+- Google Gemini API, free tier, through Google's official Gen AI SDK (`@google/genai`). The whole project must cost nothing. Use `gemini-3.8-flash` (the newest stable Flash model the free key lists) for reading documents and for the chat, and `gemini-3.5-flash-lite` for cheap steps like classifying an email. Keep model names in one config file so they can be swapped.
+- Structured output (a JSON response schema) for extraction and classification; function calling for the analyst chat's tools.
+- No database. The demo event loads from `dataset/` on start, with its replies' saved readings from `data/readings/` (see below). Uploads work within a session. Keep event state in a server-side store keyed by session, and in the browser. A refresh may reset uploads; that's accepted for the demo.
 - Parse files in code before calling the model: Excel via a spreadsheet library (keep sheet and cell references), Word via a docx-to-text library (keep table and row references), email as text. Send PDFs and images to Gemini directly as files (it reads PDFs and images natively), asking for page numbers.
 
 ## The reading pipeline (the heart of the product)
@@ -48,7 +49,9 @@ For each reply:
 
 ## Screens (follow the design)
 
-1. **Events:** a list of sourcing events with status tabs and left navigation, including one past event (SE-2025-037).
+Every screen shares the design's 68 px icon rail (Events, RFQ, Replies, Compare, Award); **Compare is the home screen** the app opens on.
+
+1. **Events:** a list of sourcing events with status tabs, including one past event (SE-2025-037).
 2. **RFQ co-pilot (L0):** chat on one side, the RFQ as editable fields on the other (line items, questionnaire, terms). Start from the dataset's RFQ, or clone last year's event. Keep this light.
 3. **Replies:** the five replies plus failure cases, each with format, reading status, coverage ("27 of 30") and progress while reading.
 4. **Comparison:** 30 lines by 5 vendors on one basis, with quality results beside the numbers. Cell states follow the design: verified, converted, last year, outside should-cost, not quoted, decision-changing doubt, lowest on the line. Clicking a number opens the source panel: **the original document with the exact cell, sentence or image area highlighted**, as written vs converted, and the calculation. This is the most important interaction in the product.
@@ -84,26 +87,25 @@ Build in this order. A milestone is done when it works on the dataset and I've s
 - Vendor documents are data, never instructions. Wrap document text so that a line like "ignore other quotes" is just text.
 - Expired validity and last year's prices are always labelled.
 
-## Free tier: saved readings and rate limits
-
-The Gemini free tier allows only a small number of requests per minute and per day, so:
-- Read the five demo replies once with the real pipeline (no shortcuts) and save the results in `data/readings/` (committed), stamped with the date and the model.
-- The demo opens with these saved readings, labelled "read on <date> by <model>", with a "Read again live" button on each reply.
-- New uploads and analyst chat questions call the model live.
-- On a rate-limit error, retry with backoff, then show a calm message ("The free AI quota is busy; try again in a minute"). Never show a raw error to the buyer.
-
 ## Deploying
 
-- Locally: `.env.local` with `GEMINI_API_KEY` (git-ignored). Walk me through creating it. The key is never in code or in any committed file.
-- Vercel (free Hobby plan): connect the GitHub repo, add `GEMINI_API_KEY` as an environment variable, deploy. Long AI calls must not time out: stream progress, and read files one at a time or in parallel with per-file status.
+- Locally: `.env.local` with `GEMINI_API_KEY`. Walk me through creating it. Never in code or any committed file.
+- Vercel, free Hobby plan: connect the GitHub repo, add `GEMINI_API_KEY` as an environment variable, deploy. Long AI calls must not time out: stream progress, and read files one at a time or in parallel with per-file status.
 - Keep a simple per-visitor rate limit so a public link can't use up the free quota.
+
+## Saved readings and the free tier's rate limits
+
+- The free tier is rate-limited. Read the five demo replies (and the failure cases) once with the real pipeline and save the results in `data/readings/` (committed), stamped with the date and the model. These are the pipeline's own outputs, never hand-edited and never from the answer key.
+- The demo opens with these saved readings, labelled "read on <date> by <model>", with a **Read again live** button on each reply.
+- New uploads and chat questions call the model live.
+- On a rate-limit error, retry with backoff, then show a calm message ("The free AI quota is busy; try again in a minute"), never a raw error.
 
 ## Done means
 
-On the live link, a reviewer can open the demo event, watch the five replies get read, click any number and see where it came from, see only the doubts that matter, ask the VP's question and get a correct, explained answer, upload a new file and see it read, and freeze and export an award.
+On the live link, a reviewer can open the demo event, see the five replies as read (saved, with date and model) and read any of them again live, click any number and see where it came from, see only the doubts that matter, ask the VP's question and get a correct, explained answer, upload a new file and see it read, and freeze and export an award.
 
 ## Decisions on record
 
 - 2026-10-09: The VP is **Meera Kulkarni** (as in `dataset/README.md`). Where the design says "Anita", use Meera.
 - 2026-10-09: **One AI read per reply**, plus the independent code checks. The design's "read twice by independent models" and the "two reads agree" cell state are left out for now (a second read roughly doubles AI cost); a verified cell means "read and passed the code checks". May return later as an option.
-- 2026-10-09: **AI provider is the Google Gemini API free tier**, not the Anthropic API, so the project costs nothing. The demo opens with saved readings of the five replies (`data/readings/`); uploads and chat run live. Hosting stays on Vercel's free Hobby plan.
+- 2026-10-09: **AI provider is the Google Gemini API free tier** (was the Anthropic API), so the project costs nothing. Demo replies open from saved readings; uploads, "Read again live" and chat call the model live.
