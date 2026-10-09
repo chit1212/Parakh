@@ -18,8 +18,9 @@ export async function GET(req: Request) {
   const rel = new URL(req.url).searchParams.get("path") ?? "";
   const root = path.join(process.cwd(), "dataset");
   const full = path.resolve(process.cwd(), rel);
-  // Only vendor-facing dataset files; never the answer key or generator scripts.
-  if (!full.startsWith(root + path.sep) || /06_answer_key|07_generator_scripts/.test(full))
+  // Only the folders the buyer would have: RFQ, inbox, replies, history, failure cases.
+  const allowed = ["01_rfq", "02_inbox", "03_vendor_replies", "04_history", "05_failure_cases"];
+  if (!allowed.some((d) => full.startsWith(path.join(root, d) + path.sep)))
     return new Response("Not found", { status: 404 });
   try {
     const buf = await fs.readFile(full);
