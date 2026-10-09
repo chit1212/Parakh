@@ -107,7 +107,7 @@ export function buildGrid(
       const n: NormCell = basis?.cells.find((c) => c.lineId === l.id) ?? {
         vendorId: v.id, lineId: l.id, status: "not_quoted", asWritten: "no reply read", source: null, verification: null, perBox: null,
         calc: null, lastYear: false, variants: {}, alternatives: [], alternate: null, flags: ["No reply from this vendor has been read."], replyId: "",
-        vendorWording: null, matchReason: null,
+        vendorWording: null, matchReason: null, raw: null,
       };
       const deviation = n.perBox != null ? n.perBox / l.shouldCost - 1 : null;
       const band = deviation == null || Math.abs(deviation) <= SHOULD_COST.band ? null : deviation > 0 ? "high" : "low";

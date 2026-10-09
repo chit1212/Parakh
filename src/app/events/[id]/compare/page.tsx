@@ -7,6 +7,7 @@ import {
   CaretDown, CaretRight, Camera, EnvelopeOpen, EnvelopeSimple, File, FileDoc, FileMagnifyingGlass, FilePdf, FileXls,
   NotePencil, SealCheck, Table, Tray, X,
 } from "@phosphor-icons/react";
+import { SourceDoc } from "@/components/SourceDoc";
 import { useReadings } from "@/components/useReadings";
 import { buildGrid, cellKey, type Grid, type GridCell } from "@/lib/compare";
 import { crore, day, inr, lakh, num2, where } from "@/lib/format";
@@ -37,6 +38,11 @@ export default function ComparePage() {
     const files = Object.fromEntries(data.replies.map((r) => [r.id, mainFile(r, state[r.id]?.reading ?? null) ?? undefined]));
     return buildGrid(data.event, readings, { sheets: data.historySheets }, files);
   }, [data, readings, state]);
+
+  // Where each file lives, to link "Open original".
+  const paths: Record<string, string> = {};
+  for (const r of data?.replies ?? []) for (const f of [...(r.cover ? [r.cover] : []), ...r.files]) paths[`${r.id}|${f.name.toLowerCase()}`] = f.path;
+  paths[`history|se-2025-037_award_summary.xlsx`] = "dataset/04_history/SE-2025-037_Award_Summary.xlsx";
 
   if (!data || !grid) return <div style={{ padding: 40, color: "var(--color-neutral-700)" }}>Loading the event…</div>;
   const ev = data.event;
@@ -86,7 +92,7 @@ export default function ComparePage() {
         </div>
         <div style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "16px 22px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
           {sel ? (
-            <SourcePanel grid={grid} sel={sel} readings={readings} onSelect={(v) => setSel({ v, l: sel.l })} onClose={() => setSel(null)} />
+            <SourcePanel grid={grid} sel={sel} readings={readings} paths={paths} onSelect={(v) => setSel({ v, l: sel.l })} onClose={() => setSel(null)} />
           ) : (
             <p style={{ margin: 0, color: "var(--color-neutral-700)", maxWidth: 320 }}>
               Click any price in the table to see where it was read, what the vendor wrote, and the arithmetic that put it on our basis.
@@ -236,8 +242,8 @@ function Cell({ c, win, selected, onClick, tip }: { c: GridCell; win: boolean; s
   );
 }
 
-function SourcePanel({ grid, sel, readings, onSelect, onClose }: {
-  grid: Grid; sel: { v: string; l: string }; readings: ReplyReading[]; onSelect: (v: string) => void; onClose: () => void;
+function SourcePanel({ grid, sel, readings, paths, onSelect, onClose }: {
+  grid: Grid; sel: { v: string; l: string }; readings: ReplyReading[]; paths: Record<string, string>; onSelect: (v: string) => void; onClose: () => void;
 }) {
   const line = grid.lines.find((l) => l.id === sel.l)!;
   const c = grid.cells[cellKey(sel.v, sel.l)];
@@ -313,11 +319,13 @@ function SourcePanel({ grid, sel, readings, onSelect, onClose }: {
       </div>
 
       {n.source && (
-        <div style={{ background: "var(--color-bg)", boxShadow: "var(--shadow-sm)", padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6 }}>
-          <span style={label11}>{n.source.file}</span>
-          <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{where({ ...n.source, file: "" }).replace(/^, /, "") || "whole reply"}</span>
-          <q style={{ fontSize: 14, background: "var(--color-accent-200)", padding: "2px 4px", alignSelf: "flex-start", quotes: "none" }}>{n.source.snippet}</q>
-        </div>
+        <SourceDoc
+          replyId={n.replyId}
+          source={n.source}
+          raw={n.raw}
+          lineId={line.id}
+          filePath={paths[`${n.replyId}|${n.source.file.toLowerCase()}`] ?? paths[`history|${n.source.file.toLowerCase()}`] ?? null}
+        />
       )}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>

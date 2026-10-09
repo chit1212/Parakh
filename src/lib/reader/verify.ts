@@ -16,7 +16,7 @@ export function contains(hay: string, needle: string): boolean {
 }
 
 /** Does this text contain the number, either as written or as a plain number? */
-function hasNumber(text: string, valueText?: string, value?: number): boolean {
+export function hasNumber(text: string, valueText?: string, value?: number): boolean {
   if (valueText && contains(text, valueText)) return true;
   if (value === undefined) return false;
   const nums = (numNorm(text).match(/\d+(?:\.\d+)?/g) ?? []).map(Number);

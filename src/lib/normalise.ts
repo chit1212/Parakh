@@ -47,6 +47,8 @@ export interface NormCell {
   /** The reader's words for this price and why it answers this line. */
   vendorWording: string | null;
   matchReason: string | null;
+  /** The number exactly as written, for finding it in the original. */
+  raw: { text: string; value: number } | null;
 }
 
 export interface VendorBasis {
@@ -161,7 +163,7 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
       const cell: NormCell = {
         vendorId, lineId: line.id, status: "unclear", asWritten: "", source: null, verification: null, perBox: null, calc: null,
         lastYear: false, variants: {}, alternatives: [], alternate: null, flags: [], replyId: latest.replyId,
-        vendorWording: null, matchReason: null,
+        vendorWording: null, matchReason: null, raw: null,
       };
       if (held) cell.flags.push("This reply looks incomplete; held out of the comparison until the buyer decides.");
       const price: Price | undefined = latest.prices.find((p) => p.line_id === line.id && ok(p.verification));
@@ -178,6 +180,7 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
         cell.verification = price.verification;
         cell.vendorWording = price.vendor_wording;
         cell.matchReason = price.match_reason;
+        cell.raw = { text: price.raw_value_text, value: price.raw_value };
         const r = toPerBox(price.raw_value, price.unit, price.currency, line);
         if ("reason" in r) cell.flags.push(r.reason);
         else base = r;
@@ -200,6 +203,7 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
         cell.source = rate.source;
         cell.verification = rate.verification;
         cell.vendorWording = rate.vendor_wording;
+        cell.raw = { text: rate.value_text, value: rate.value };
         cell.matchReason = `A ${line.plyN}-ply rate per kg of box; ${line.id} is ${line.ply}, so it is priced by weight.`;
         cell.lastYear = rate.from_earlier_record;
         cell.flags.push("priced per kg; box weight computed from the RFQ spec");
