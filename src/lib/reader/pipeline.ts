@@ -1,7 +1,7 @@
 // Reading one reply, end to end: open (code) → sort (AI) → read prices and sweep terms (AI)
 // → check every source (code) → coverage (code).
 import type { z } from "zod";
-import type { Usage } from "../ai";
+import { calmMessage, type Usage } from "../ai";
 import { MODELS } from "../config";
 import { workbookToText } from "../files/xlsx";
 import { loadHistory } from "../rfq";
@@ -44,6 +44,8 @@ export interface ReplyReading {
   /** Values that did not pass the source check. They never enter the comparison. */
   unsourced: number;
   usage: Usage[];
+  /** Models that produced this reading. */
+  models: string[];
   cached: boolean;
   ms: number;
   error?: string;
@@ -75,7 +77,7 @@ function empty(reply: Reply, ev: SourcingEvent): ReplyReading {
     status: "read", headline: "", nextStep: { kind: "none", text: "" },
     classification: null, prices: [], rateRules: [], notQuoted: [], terms: [], questionnaire: [], qualityDocs: [],
     revision: null, readingNotes: [], coverage: { quoted: [], missing: ev.lines.map((l) => l.id), total: ev.lines.length },
-    unsourced: 0, usage: [], cached: true, ms: 0,
+    unsourced: 0, usage: [], models: [], cached: true, ms: 0,
   };
 }
 
@@ -94,8 +96,9 @@ export async function readReply(
   const say = opts.onProgress ?? (() => {});
   const out = empty(reply, ev);
   const all = [...(reply.cover ? [reply.cover] : []), ...reply.files];
-  const track = (r: { usage: Usage | null; cached: boolean }) => {
+  const track = (r: { usage: Usage | null; cached: boolean; model: string }) => {
     if (r.usage) out.usage.push(r.usage);
+    if (!out.models.includes(r.model)) out.models.push(r.model);
     if (!r.cached) out.cached = false;
   };
 
@@ -121,7 +124,7 @@ export async function readReply(
       system: classifySystem(ev),
       content: [
         ...fileBlocks(all, { textExcerpt: 2500 }),
-        { type: "text", text: `Sort this reply. Received: ${reply.receivedAt ?? "unknown"}. From: ${reply.from ?? "unknown (no email)"}.` },
+        { text: `Sort this reply. Received: ${reply.receivedAt ?? "unknown"}. From: ${reply.from ?? "unknown (no email)"}.` },
       ],
       schema: Classification,
       effort: "low",
@@ -172,7 +175,7 @@ export async function readReply(
       content: [
         ...fileBlocks(quoteFiles),
         ...recordBlocks,
-        { type: "text", text: `Read every price in this reply from ${vendorName || "an unknown vendor"}. Report every RFQ line it does not price in not_quoted.` },
+        { text: `Read every price in this reply from ${vendorName || "an unknown vendor"}. Report every RFQ line it does not price in not_quoted.` },
       ],
       schema: Extraction,
       effort: "medium",
@@ -186,7 +189,7 @@ export async function readReply(
       system: termsSystem(ev),
       content: [
         ...fileBlocks(readable),
-        { type: "text", text: `Find every commercial term, questionnaire answer and quality document in this reply from ${vendorName || "an unknown vendor"}.` },
+        { text: `Find every commercial term, questionnaire answer and quality document in this reply from ${vendorName || "an unknown vendor"}.` },
       ],
       schema: TermsSweep,
       effort: "medium",
@@ -254,8 +257,8 @@ export async function readReply(
   } catch (e) {
     out.status = "error";
     out.cached = false;
-    out.error = (e as Error).message;
-    out.headline = `Reading stopped: ${(e as Error).message}`;
+    out.error = calmMessage(e);
+    out.headline = out.error;
     out.nextStep = { kind: "check_reply", text: "Try reading it again." };
     return out;
   } finally {

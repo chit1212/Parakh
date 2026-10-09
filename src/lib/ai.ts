@@ -1,18 +1,15 @@
-// The one Anthropic client. Server-only: the key never reaches the browser.
-import Anthropic from "@anthropic-ai/sdk";
-import { MODELS } from "./config";
+// The one Gemini client. Server-only: the key never reaches the browser.
+import { ApiError, GoogleGenAI } from "@google/genai";
 
-let client: Anthropic | null = null;
+let client: GoogleGenAI | null = null;
 
 export function apiKey(): string | undefined {
-  // Vercel and .env.local use ANTHROPIC_API_KEY. PARAKH_ANTHROPIC_API_KEY lets a dev
-  // machine hold the app's key without changing the key its own tools use.
-  return process.env.ANTHROPIC_API_KEY || process.env.PARAKH_ANTHROPIC_API_KEY || undefined;
+  return process.env.GEMINI_API_KEY || undefined;
 }
 
 /**
  * Cloud dev containers can hold the key as a "network secret": an egress proxy adds the
- * x-api-key header to requests for api.anthropic.com, so the key never sits on the machine.
+ * x-goog-api-key header to requests for the Gemini API, so the key never sits on the machine.
  * Used only when no key is set, a proxy is configured, and we are not on Vercel.
  */
 function proxyMode(): boolean {
@@ -23,22 +20,25 @@ export function hasApiKey(): boolean {
   return Boolean(apiKey()) || proxyMode();
 }
 
-export function anthropic(): Anthropic {
+export function gemini(): GoogleGenAI {
   if (client) return client;
-  // Explicit base URL, so an ANTHROPIC_BASE_URL set for other tools on the machine is never picked up.
-  const baseURL = process.env.PARAKH_ANTHROPIC_BASE_URL || "https://api.anthropic.com";
   const key = apiKey();
   if (key) {
-    client = new Anthropic({ apiKey: key, baseURL, maxRetries: 3 });
+    client = new GoogleGenAI({ apiKey: key });
   } else if (proxyMode()) {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { ProxyAgent } = require("undici") as typeof import("undici");
-    client = new Anthropic({
+    const undici = require("undici") as typeof import("undici");
+    const dispatcher = new undici.ProxyAgent(process.env.HTTPS_PROXY || process.env.https_proxy!);
+    client = new GoogleGenAI({
       apiKey: "added-by-network-secret",
-      baseURL,
-      maxRetries: 3,
-      defaultHeaders: { "x-api-key": null }, // the proxy adds the real one
-      fetchOptions: { dispatcher: new ProxyAgent(process.env.HTTPS_PROXY || process.env.https_proxy!) } as unknown as NonNullable<ConstructorParameters<typeof Anthropic>[0]>["fetchOptions"],
+      httpOptions: {
+        // Drop the placeholder header; the proxy adds the real one.
+        fetch: ((url: string | URL | Request, init?: RequestInit) => {
+          const headers = new Headers(init?.headers);
+          headers.delete("x-goog-api-key");
+          return undici.fetch(String(url instanceof Request ? url.url : url), { ...(init as object), headers, dispatcher } as never);
+        }) as unknown as typeof fetch,
+      },
     });
   } else throw new MissingKeyError();
   return client;
@@ -46,33 +46,68 @@ export function anthropic(): Anthropic {
 
 export class MissingKeyError extends Error {
   constructor() {
-    super("No Anthropic API key is set. Add ANTHROPIC_API_KEY to .env.local (or the hosting settings).");
+    super("No Gemini API key is set. Add GEMINI_API_KEY to .env.local (or the hosting settings).");
   }
 }
 
-/** USD per million tokens, for the running cost shown on the scorecard. */
-const PRICE: Record<string, { in: number; out: number; cacheRead: number }> = {
-  [MODELS.reader]: { in: 2, out: 10, cacheRead: 0.2 },
-  [MODELS.classifier]: { in: 0.1, out: 0.5, cacheRead: 0.01 },
-};
+/** The free AI quota is used up for now. The message is safe to show the buyer. */
+export class QuotaBusyError extends Error {}
 
 export interface Usage {
   model: string;
   inputTokens: number;
   outputTokens: number;
-  cacheReadTokens: number;
-  costUsd: number;
 }
 
-export function usageOf(model: string, u: {
-  input_tokens: number;
-  output_tokens: number;
-  cache_read_input_tokens?: number | null;
-  cache_creation_input_tokens?: number | null;
-}): Usage {
-  const p = PRICE[model] ?? PRICE[MODELS.reader];
-  const cacheRead = u.cache_read_input_tokens ?? 0;
-  const cacheWrite = u.cache_creation_input_tokens ?? 0;
-  const cost = (u.input_tokens * p.in + cacheWrite * p.in * 1.25 + cacheRead * p.cacheRead + u.output_tokens * p.out) / 1e6;
-  return { model, inputTokens: u.input_tokens + cacheWrite, outputTokens: u.output_tokens, cacheReadTokens: cacheRead, costUsd: cost };
+export function usageOf(
+  model: string,
+  u: { promptTokenCount?: number; candidatesTokenCount?: number; thoughtsTokenCount?: number } | undefined,
+): Usage {
+  return { model, inputTokens: u?.promptTokenCount ?? 0, outputTokens: (u?.candidatesTokenCount ?? 0) + (u?.thoughtsTokenCount ?? 0) };
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Seconds the API asks us to wait, from a 429's RetryInfo ("retryDelay": "31s"), if given. */
+function retryDelayOf(e: ApiError): number | null {
+  const m = e.message.match(/"retryDelay"\s*:\s*"(\d+(?:\.\d+)?)s"/);
+  return m ? Number(m[1]) : null;
+}
+
+const isBusy = (e: unknown) => e instanceof ApiError && (e.status === 429 || e.status === 503 || e.status === 500);
+/** A daily quota cannot be waited out in a request; a per-minute one can. */
+const isDaily = (e: ApiError) => /PerDay|per day|RequestsPerDay/i.test(e.message);
+
+/**
+ * Run a model call, retrying with backoff when the free tier is rate-limited or busy.
+ * Gives up with a QuotaBusyError (a calm message) rather than a raw API error.
+ */
+export async function withBackoff<T>(fn: () => Promise<T>, opts: { tries?: number; maxWaitS?: number } = {}): Promise<T> {
+  const tries = opts.tries ?? 4;
+  const maxWait = opts.maxWaitS ?? 40;
+  for (let i = 0; ; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      if (!isBusy(e)) throw e;
+      const err = e as ApiError;
+      if (err.status === 429 && isDaily(err))
+        throw new QuotaBusyError("Today's free AI quota is used up. Saved readings still show; live reading works again tomorrow.");
+      const asked = retryDelayOf(err);
+      const wait = Math.min(maxWait, asked ?? 2 ** i * 4 + Math.random() * 2);
+      if (i + 1 >= tries || (asked !== null && asked > maxWait))
+        throw new QuotaBusyError("The free AI quota is busy right now. Try again in a minute.");
+      await sleep(wait * 1000);
+    }
+  }
+}
+
+/** Turn any error from a model call into words fit for the buyer. Raw details go to the server log. */
+export function calmMessage(e: unknown): string {
+  if (e instanceof QuotaBusyError || e instanceof MissingKeyError) return e.message;
+  const name = (e as Error)?.constructor?.name;
+  if (name === "ReaderError" || name === "RateLimitedError") return (e as Error).message;
+  console.error("[parakh] model call failed:", e);
+  if (e instanceof ApiError && (e.status === 401 || e.status === 403)) return "The AI service did not accept this app's key. Readings already saved still show.";
+  return "Something went wrong while reading. Nothing was changed; try again in a minute.";
 }

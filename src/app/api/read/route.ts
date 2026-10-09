@@ -1,5 +1,5 @@
 // Read one reply and stream progress as it goes (one JSON object per line).
-import { MissingKeyError } from "@/lib/ai";
+import { calmMessage, MissingKeyError, QuotaBusyError } from "@/lib/ai";
 import { callBudget, RateLimitedError, visitorOf } from "@/lib/guard";
 import { loadDemoInbox } from "@/lib/inbox";
 import { readReply } from "@/lib/reader/pipeline";
@@ -25,12 +25,12 @@ export async function POST(req: Request) {
           beforeCall: budget,
           onProgress: (stage, detail) => send({ type: "progress", stage, detail }),
         });
-        // A refused or keyless read is reported as such, not as a broken file.
-        if (reading.status === "error" && /API key|limit/i.test(reading.error ?? "")) send({ type: "blocked", message: reading.error });
+        // A refused, keyless or quota-limited read is reported as such, not as a broken file.
+        if (reading.status === "error" && /API key|limit|quota/i.test(reading.error ?? "")) send({ type: "blocked", message: reading.error });
         send({ type: "result", reading });
       } catch (e) {
-        const blocked = e instanceof RateLimitedError || e instanceof MissingKeyError;
-        send({ type: blocked ? "blocked" : "error", message: (e as Error).message });
+        const blocked = e instanceof RateLimitedError || e instanceof MissingKeyError || e instanceof QuotaBusyError;
+        send({ type: blocked ? "blocked" : "error", message: calmMessage(e) });
       } finally {
         ctrl.close();
       }

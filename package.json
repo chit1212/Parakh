@@ -9,11 +9,12 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "scorecard": "tsx scripts/scorecard.ts"
+    "scorecard": "tsx scripts/scorecard.ts",
+    "save-readings": "tsx scripts/save-readings.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.132.1",
     "@fontsource-variable/source-serif-4": "^5.3.0",
+    "@google/genai": "^2.28.0",
     "@phosphor-icons/react": "^2.1.10",
     "exceljs": "^4.4.0",
     "mammoth": "^1.13.0",
