@@ -62,6 +62,7 @@ export function markingText(r: MarkRule): string {
     : `≤ ${fmt(b.atMost!)}${u}: ${b.pts}`);
   for (const x of r.bonus ?? []) parts.push(`${x.word} named: +${x.pts}`);
   parts.push(r.how === "count" ? "none named: 0" : "otherwise or not stated: 0");
+  if (r.how === "count") return parts.join(" · ").replace(/≥ 1 (\w+?)s:/, "≥ 1 $1:");
   return parts.join(" · ");
 }
 

@@ -17,7 +17,7 @@ export function Rail() {
     { icon: SealCheck, label: "Award", href: `/events/${EVENT}/award` },
   ];
   return (
-    <nav style={{ width: 68, flex: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "18px 0", position: "sticky", top: 0, height: "100vh" }}>
+    <nav style={{ width: 68, flex: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "18px 0", position: "sticky", top: 0, height: "100vh", zIndex: 30 }}>
       <WorkspaceMenu />
       {items.map((r) => {
         const on = r.href.split("?")[0] === path;

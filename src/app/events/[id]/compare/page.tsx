@@ -221,7 +221,7 @@ const NO_FILTER = { show: "all" as Show, win: "", ply: "" };
 export default function ComparePage() {
   const { data, state } = useReadings();
   const [scheme] = useScheme();
-  const [role, setRole] = useRole();
+  const [role] = useRole();
   const [checks, setCheck] = useVerified();
   const [sel, setSel] = useState<{ v: string; l: string } | null>(null);
   const [legendUser, setLegendUser] = useState<boolean | null>(null);
@@ -539,7 +539,7 @@ export default function ComparePage() {
           </button>
         </div>
         {pane === "conv" ? (
-          <Conversation msgs={msgs} results={results} titles={asked.map((a) => a.title)} people={{ buyer: ev.buyer, vp: ev.vp }} asker={asker} setAsker={(a) => setRole(a === "vp" ? "VP" : "Buyer")}
+          <Conversation msgs={msgs} results={results} titles={asked.map((a) => a.title)} people={{ buyer: ev.buyer, vp: ev.vp }} asker={asker}
             busy={busy} q={q} setQ={setQ} onAsk={ask} onShow={(i, v) => { setScen(asked[i]?.libKey ?? `asked:${i}`); setView(v); setTab("compare"); }}
             vendorNames={Object.fromEntries(grid.vendors.map((v) => [v.id, v.short]))}
             opening={`Quotes from ${new Set(readings.filter((r) => r.status === "read" && r.vendorId).map((r) => r.vendorId)).size} of ${ev.vendors.length} vendors are read and on one basis. ${report.raised.length} doubts could change a winner (${lakh(report.raised.reduce((a, d) => a + d.stake, 0))} at stake); see the Doubts tab. Ask me anything about this table; every answer is solved in code and added to the Scenario list, so you can keep, compare and switch between them.`} />
