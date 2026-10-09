@@ -3,12 +3,20 @@
 .env.local
 .env*.local
 
-# build and dependencies
+# dependencies and build
 node_modules/
 .next/
 out/
+build/
 .vercel/
+*.tsbuildinfo
+next-env.d.ts
+coverage/
+
+# local run output (reader results cached during development)
+.cache/
 
 # OS clutter
 .DS_Store
 __MACOSX/
+npm-debug.log*
