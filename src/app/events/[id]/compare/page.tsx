@@ -3,12 +3,15 @@
 // code from the readings. Click a price to see where it came from and how it was converted.
 import { useMemo, useState } from "react";
 import {
-  CaretDown, CaretRight, Camera, ChatsCircle, EnvelopeSimple, File, FileDoc, FileMagnifyingGlass, FilePdf, FileXls, X,
+  CaretDown, CaretRight, Camera, ChatsCircle, Export, SealCheck, EnvelopeSimple, File, FileDoc, FileMagnifyingGlass, FilePdf, FileXls, X,
 } from "@phosphor-icons/react";
 import { Rail } from "@/components/Rail";
 import { SourceDoc } from "@/components/SourceDoc";
 import { Conversation, type ChatMsg } from "@/components/Conversation";
-import { DoubtsView } from "@/components/DoubtsView";
+import { DECISIONS_KEY, DoubtsView } from "@/components/DoubtsView";
+import { freeze, SNAPSHOT_KEY, type Snapshot } from "@/lib/award";
+import { download } from "@/lib/download";
+import { useRouter } from "next/navigation";
 import { runScenario, type ScenarioResult, type ScenarioRules } from "@/lib/scenario";
 import { useReadings } from "@/components/useReadings";
 import { findDoubts, type Doubt, type DoubtReport } from "@/lib/doubts";
@@ -135,6 +138,7 @@ export default function ComparePage() {
   const [asker, setAsker] = useState<"buyer" | "vp">("vp");
   const [busy, setBusy] = useState(false);
   const [q, setQ] = useState("");
+  const router = useRouter();
 
   const readings = useMemo(
     () => (data ? data.replies.map((r) => state[r.id]?.reading).filter((r): r is ReplyReading => Boolean(r && r.status !== "error")) : []),
@@ -195,6 +199,14 @@ export default function ComparePage() {
     }
   };
 
+  // The table as shown (as quoted, or the active scenario), frozen with every number's source.
+  const snapshotNow = (): Snapshot => {
+    let decisions: Record<string, string> = {};
+    try { decisions = JSON.parse(localStorage.getItem(DECISIONS_KEY) ?? "{}"); } catch { /* none */ }
+    return freeze({ ev: data!.event, grid: grid!, quality, report: report!, lastYear: data!.lastYear, decisions,
+      scenario: cur && active != null ? { title: asked[active].title, result: cur } : null });
+  };
+
   // Where each file lives, to link "Open original".
   const paths: Record<string, string> = {};
   for (const r of data?.replies ?? []) for (const f of [...(r.cover ? [r.cover] : []), ...r.files]) paths[`${r.id}|${f.name.toLowerCase()}`] = f.path;
@@ -216,6 +228,12 @@ export default function ComparePage() {
           <span style={{ color: "var(--color-neutral-700)", maxWidth: 330, textAlign: "right" }}>
             Every price per box, in rupees, delivered Chakan, GST extra.
           </span>
+          <button className="btn btn-secondary" onClick={() => download(snapshotNow(), "xlsx")} title="Download the table as shown (Excel)"><Export size={16} weight="duotone" />Export</button>
+          <button className="btn btn-primary" style={{ whiteSpace: "nowrap" }} onClick={() => {
+            const s = snapshotNow();
+            try { localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(s)); } catch { /* storage blocked */ }
+            router.push(`/events/${ev.id}/award`);
+          }}><SealCheck size={16} weight="duotone" />Freeze for award</button>
         </header>
 
         <div style={{ display: "flex", alignItems: "center", gap: 22, padding: "0 28px 0 8px" }}>

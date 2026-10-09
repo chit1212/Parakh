@@ -31,3 +31,10 @@ export const inr = (n: number) => `₹${num2(n)}`;
 export const lakh = (n: number) => `₹${(n / 1e5).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} L`;
 /** ₹4.01 Cr (crores) */
 export const crore = (n: number) => `₹${(n / 1e7).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Cr`;
+
+/** A short, stable fingerprint of some text (browser-safe; for snapshot ids, not security). */
+export function hashOfText(s: string): string {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+  return (h >>> 0).toString(16).padStart(8, "0");
+}

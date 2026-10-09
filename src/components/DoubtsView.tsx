@@ -2,20 +2,32 @@
 // Doubts (design: Comparison - Ledger, #doubts). Only doubts that change a winner, ranked by rupees.
 // Vendor-routed doubts get an AI-drafted email the buyer edits and approves (sending is stubbed);
 // buyer judgements get options. Nothing goes to a vendor without approval.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cellKey, type Grid } from "@/lib/compare";
 import type { Doubt, DoubtReport } from "@/lib/doubts";
 import { lakh } from "@/lib/format";
 
 const label11 = { fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--color-neutral-700)" };
 const COLS = "40px minmax(0,1fr) 120px 110px 120px";
+export const DECISIONS_KEY = "parakh.decisions.v1";
 
 type Draft = { to: string; subject: string; body: string; model?: string } | { error: string } | "loading";
 
 export function DoubtsView({ grid, report, onSee }: { grid: Grid; report: DoubtReport; onSee: (vendorId: string, lineId: string) => void }) {
   const [open, setOpen] = useState<string | null>(report.raised[0]?.id ?? null);
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
-  const [done, setDone] = useState<Record<string, string>>({});
+  // Decisions persist in this browser (by doubt title) so the award record can show them.
+  const [done, setDoneState] = useState<Record<string, string>>({});
+  useEffect(() => {
+    try { setDoneState(JSON.parse(localStorage.getItem(DECISIONS_KEY) ?? "{}")); } catch { /* none yet */ }
+  }, []);
+  const setDone = (f: (s: Record<string, string>) => Record<string, string>) =>
+    setDoneState((s) => {
+      const n = f(s);
+      try { localStorage.setItem(DECISIONS_KEY, JSON.stringify(n)); } catch { /* storage blocked: kept for this visit */ }
+      return n;
+    });
+  const decided = Object.fromEntries(report.raised.map((d) => [d.id, done[d.title]]).filter(([, v]) => v));
   const [choice, setChoice] = useState<Record<string, number>>({});
   const name = (v: string) => grid.vendors.find((x) => x.id === v)?.short ?? v;
   const logged = report.logged.length + report.checks.length;
@@ -70,8 +82,8 @@ export function DoubtsView({ grid, report, onSee }: { grid: Grid; report: DoubtR
                   <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>
                     Checked by code: {d.tested}. Changes: {d.changes.map((c) => `${c.lineId} ${c.from ? name(c.from.vendorId) : "—"} → ${c.to ? name(c.to.vendorId) : "—"} (${c.view === "cleared" ? "quality-cleared" : "all vendors"})`).join("; ")}.
                   </span>
-                  {done[d.id] ? (
-                    <span style={{ color: "var(--color-accent-800)" }}>{done[d.id]}</span>
+                  {decided[d.id] ? (
+                    <span style={{ color: "var(--color-accent-800)" }}>{decided[d.id]}</span>
                   ) : d.route === "vendor" ? (
                     !dr ? (
                       <div style={{ display: "flex", gap: 8 }}>
@@ -87,8 +99,8 @@ export function DoubtsView({ grid, report, onSee }: { grid: Grid; report: DoubtR
                         <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>To {dr.to} · {dr.subject} · drafted by {dr.model ?? "AI"}, for you to check</span>
                         <textarea className="input" style={{ minHeight: 190, whiteSpace: "pre-wrap" }} value={dr.body} onChange={(e) => setDrafts((s) => ({ ...s, [d.id]: { ...dr, body: e.target.value } }))} />
                         <div style={{ display: "flex", gap: 8 }}>
-                          <button className="btn btn-primary" onClick={() => setDone((s) => ({ ...s, [d.id]: `Approved by you and marked as sent to ${dr.to}. (Demo: no email server; nothing left this app.)` }))}>Approve &amp; send</button>
-                          <button className="btn btn-ghost" onClick={() => setDone((s) => ({ ...s, [d.id]: "You will call instead. The doubt stays open until you record the answer." }))}>I’ll call instead</button>
+                          <button className="btn btn-primary" onClick={() => setDone((s) => ({ ...s, [d.title]: `Approved by you and marked as sent to ${dr.to}. (Demo: no email server; nothing left this app.)` }))}>Approve &amp; send</button>
+                          <button className="btn btn-ghost" onClick={() => setDone((s) => ({ ...s, [d.title]: "You will call instead. The doubt stays open until you record the answer." }))}>I’ll call instead</button>
                         </div>
                       </div>
                     )
@@ -100,7 +112,7 @@ export function DoubtsView({ grid, report, onSee }: { grid: Grid; report: DoubtR
                         </label>
                       ))}
                       <div style={{ display: "flex", gap: 8 }}>
-                        <button className="btn btn-primary" disabled={choice[d.id] === undefined} onClick={() => setDone((s) => ({ ...s, [d.id]: `Decision recorded: ${d.options![choice[d.id]]}.` }))}>Record decision</button>
+                        <button className="btn btn-primary" disabled={choice[d.id] === undefined} onClick={() => setDone((s) => ({ ...s, [d.title]: `Decision recorded: ${d.options![choice[d.id]]}.` }))}>Record decision</button>
                         <button className="btn btn-ghost" onClick={() => onSee(d.vendorId, d.lineIds[0])}>See source</button>
                       </div>
                     </div>
