@@ -212,12 +212,10 @@ const STATE_LABEL: Record<GridCell["kind"], string> = {
   checked: "checked", converted: "converted", last_year: "last year’s rate", not_quoted: "not quoted", unclear: "not on the basis",
 };
 
-type Show = "all" | "doubts" | "changed" | "unverified" | "unusual" | "missing" | "lastyear";
-type Sort = "line" | "stake" | "value" | "closest" | "above";
+type Show = "all" | "doubts" | "changed" | "unverified";
 interface Asked { title: string; rules: ScenarioRules; asker: "buyer" | "vp"; libKey: string | null }
-const SHOW: [Show, string][] = [["all", "All lines"], ["doubts", "With doubts"], ["changed", "Winner changed"], ["unverified", "Winner not verified by you"], ["unusual", "Unusual price"], ["missing", "Missing quotes"], ["lastyear", "Last year’s prices"]];
-const SORTS: [Sort, string][] = [["line", "Line number"], ["stake", "Rupees at stake in doubts"], ["value", "Award value, highest first"], ["closest", "Closest calls (gap to 2nd)"], ["above", "Furthest above should-cost"]];
-const NO_FILTER = { show: "all" as Show, win: "", ply: "" };
+const SHOW: [Show, string][] = [["all", "All lines"], ["doubts", "With doubts"], ["changed", "Winner changed"], ["unverified", "Not verified by you"]];
+const NO_FILTER = { show: "all" as Show, win: "" };
 
 export default function ComparePage() {
   const { data, state, empty } = useReadings();
@@ -233,7 +231,8 @@ export default function ComparePage() {
   const [asked, setAsked] = useState<Asked[]>([]);
   // The view on screen: a library strategy ("base", "S1", …) or a scenario asked in chat ("asked:3").
   const [scen, setScen] = useState<string>("base");
-  const [f, setF] = useState<{ show: Show; win: string; ply: string; sort: Sort }>({ ...NO_FILTER, sort: "line" });
+  const [f, setF] = useState<{ show: Show; win: string }>(NO_FILTER);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [q, setQ] = useState("");
   const router = useRouter();
@@ -264,17 +263,6 @@ export default function ComparePage() {
     });
     return m;
   }, [report]);
-  // Rupees at stake in raised doubts, per line.
-  const stakeAt = useMemo(() => {
-    const m = new Map<string, number>();
-    for (const d of report?.raised ?? []) {
-      const per = new Map<string, number>();
-      for (const c of d.changes) per.set(c.lineId, Math.max(per.get(c.lineId) ?? 0, c.stake));
-      for (const [l, x] of per) m.set(l, (m.get(l) ?? 0) + x);
-    }
-    return m;
-  }, [report]);
-
   // Every scenario asked so far, solved in code (the chat only chose the rules).
   const results = useMemo<ScenarioResult[]>(
     () => (data && grid ? asked.map((a) => runScenario(data.event, grid, quality, a.rules)) : []),
@@ -376,39 +364,17 @@ export default function ComparePage() {
     if (!grid || !award) return null;
     const live = grid.vendors.filter((v) => !excluded.has(v.id));
     const base = grid.asQuoted;
-    const any = (l: string, t: (c: GridCell) => boolean) => live.some((v) => t(grid.cells[cellKey(v.id, l)]));
     return {
       doubts: (l: string) => live.some((v) => doubtAt.has(cellKey(v.id, l))),
       changed: (l: string) => !!cur && award.per[l]?.vendorId !== base.per[l]?.vendorId,
       unverified: (l: string) => !!award.per[l] && !checks[checkKey(award.per[l]!.vendorId, l)],
-      unusual: (l: string) => any(l, (c) => c.band != null),
-      missing: (l: string) => any(l, (c) => c.perBox == null),
-      lastyear: (l: string) => any(l, (c) => c.kind === "last_year"),
     } as Record<Exclude<Show, "all">, (l: string) => boolean>;
   }, [grid, award, cur, excluded, doubtAt, checks]);
 
-  const plys = grid ? [...new Set(grid.lines.map((l) => l.plyN))].sort() : [];
-  const pre = grid && award ? grid.lines.filter((l) => (!f.win || award.per[l.id]?.vendorId === f.win) && (!f.ply || String(l.plyN) === f.ply)) : [];
+  const pre = grid && award ? grid.lines.filter((l) => !f.win || award.per[l.id]?.vendorId === f.win) : [];
   const counts = Object.fromEntries(SHOW.map(([k]) => [k, k === "all" ? pre.length : pre.filter((l) => tests?.[k](l.id)).length])) as Record<Show, number>;
-  const shown = (() => {
-    if (!grid || !award) return [];
-    const keep = pre.filter((l) => f.show === "all" || tests?.[f.show](l.id));
-    const val = (id: string, qty: number) => (award.per[id] ? award.per[id]!.perBox * qty : -1);
-    const gap = (id: string) => {
-      const ps = grid.vendors.filter((v) => !excluded.has(v.id)).map((v) => grid.cells[cellKey(v.id, id)]).filter((c) => c.canWin && c.perBox != null).map((c) => c.perBox!).sort((a, b) => a - b);
-      return ps.length > 1 ? (ps[1] - ps[0]) / ps[0] : Infinity;
-    };
-    const above = (id: string) => { const w = award.per[id]; return w ? grid.cells[cellKey(w.vendorId, id)].deviation ?? -Infinity : -Infinity; };
-    const by: Record<Sort, (a: (typeof keep)[number], b: (typeof keep)[number]) => number> = {
-      line: () => 0,
-      stake: (a, b) => (stakeAt.get(b.id) ?? 0) - (stakeAt.get(a.id) ?? 0),
-      value: (a, b) => val(b.id, b.qty) - val(a.id, a.qty),
-      closest: (a, b) => gap(a.id) - gap(b.id),
-      above: (a, b) => above(b.id) - above(a.id),
-    };
-    return [...keep].sort(by[f.sort]);
-  })();
-  const filtered = f.show !== "all" || !!f.win || !!f.ply;
+  const shown = pre.filter((l) => f.show === "all" || tests?.[f.show](l.id));
+  const filtered = f.show !== "all" || !!f.win;
 
   // "Verified by you": winners in the active view, and every quoted price.
   const winners = grid && award ? grid.lines.filter((l) => award.per[l.id]) : [];
@@ -492,32 +458,21 @@ export default function ComparePage() {
         <>
         <Legend open={legendOpen} toggle={() => setLegendUser(!legendOpen)} />
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "2px 28px 10px 8px" }}>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 12, flexWrap: "wrap" }}>
-            <label style={sel11}>Scenario
-              <select className="input" style={{ ...selS, width: 320 }} value={scen} onChange={(e) => { setScen(e.target.value); setView("table"); }}>
-                {LIBRARY.map((x) => <option key={x.key} value={x.key}>{x.title}{asked.some((a) => a.libKey === x.key) ? " · asked in chat" : ""}</option>)}
-                {asked.map((a, i) => (a.libKey ? null : <option key={`a${i}`} value={`asked:${i}`}>{a.title} · asked in chat</option>))}
-              </select>
-            </label>
-            <label style={sel11}>Won by
-              <select className="input" style={{ ...selS, width: 150 }} value={f.win} onChange={(e) => setF({ ...f, win: e.target.value })}>
-                <option value="">Any vendor</option>
-                {grid.vendors.map((v) => <option key={v.id} value={v.id}>{v.short}</option>)}
-              </select>
-            </label>
-            <label style={sel11}>Board
-              <select className="input" style={{ ...selS, width: 110 }} value={f.ply} onChange={(e) => setF({ ...f, ply: e.target.value })}>
-                <option value="">All boxes</option>
-                {plys.map((p) => <option key={p} value={String(p)}>{p}-ply</option>)}
-              </select>
-            </label>
-            <label style={sel11}>Sort by
-              <select className="input" style={{ ...selS, width: 200 }} value={f.sort} onChange={(e) => setF({ ...f, sort: e.target.value as Sort })}>
-                {SORTS.map(([k, t]) => <option key={k} value={k}>{t}</option>)}
-              </select>
-            </label>
-            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "4px 28px 10px 8px" }}>
+          {/* Filters fold away like "How to read a price"; the line shows what is applied either way. */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <button onClick={() => setFiltersOpen(!filtersOpen)} aria-expanded={filtersOpen}
+              style={{ flex: "none", display: "flex", alignItems: "center", gap: 6, background: "none", border: 0, padding: 0, font: "inherit", ...label11, color: filtersOpen ? label11.color : "var(--color-accent-800)" }}>
+              {filtersOpen ? <CaretDown weight="duotone" /> : <CaretRight weight="duotone" />}Filters
+            </button>
+            {!filtersOpen && (
+              <span style={{ color: "var(--color-neutral-800)", fontSize: 12.5, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: "0 1 auto" }} title={isScenario ? active.title : "As quoted"}>
+                {isScenario ? active.title : "As quoted"} · {f.win ? `won by ${grid.vendors.find((v) => v.id === f.win)?.short}` : "any vendor"} · {SHOW.find(([k]) => k === f.show)![1].toLowerCase()}
+              </span>
+            )}
+            {filtered && <button className="btn btn-ghost" onClick={() => setF(NO_FILTER)} style={{ padding: "2px 8px", flex: "none", whiteSpace: "nowrap" }}>Clear filters</button>}
+            <div style={{ marginLeft: "auto", flex: "none", display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ color: "var(--color-neutral-700)", whiteSpace: "nowrap" }}>Showing {shown.length} of {grid.lines.length} lines · {shownValue >= 1e7 ? crore(shownValue) : lakh(shownValue)}</span>
               <div style={{ flex: "none", display: "inline-flex", border: "1px solid var(--color-divider)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
                 <button onClick={() => setView("table")} style={segS(view === "table")}>Table</button>
                 <button onClick={() => setView("chart")} style={segS(view === "chart")}>Chart</button>
@@ -525,17 +480,33 @@ export default function ComparePage() {
               <button className="btn btn-ghost" style={{ whiteSpace: "nowrap" }} title="Download the lines shown, as shown (Excel)" onClick={() => download(snapshotNow(shown.map((l) => l.id)), "xlsx")}><Export size={16} weight="duotone" />Export view</button>
             </div>
           </div>
-          <span style={{ fontSize: 13, color: "var(--color-neutral-800)", maxWidth: 900 }}>{active.desc}</span>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-            <span style={{ ...label11, marginRight: 4 }}>Show</span>
-            {SHOW.filter(([k]) => k !== "changed" || isScenario || overrides.length > 0).map(([k, t]) => (
-              <button key={k} onClick={() => setF({ ...f, show: k })} style={{ ...pill(f.show === k), fontSize: 12.5, padding: "4px 9px" }}>
-                {t} <span style={{ opacity: 0.75 }}>{counts[k]}</span>
-              </button>
-            ))}
-            <span style={{ marginLeft: "auto", color: "var(--color-neutral-700)", whiteSpace: "nowrap" }}>Showing {shown.length} of {grid.lines.length} lines · {shownValue >= 1e7 ? crore(shownValue) : lakh(shownValue)}</span>
-            <button className="btn btn-ghost" disabled={!filtered} onClick={() => setF({ ...NO_FILTER, sort: f.sort })} style={{ padding: "2px 8px" }}>Clear filters</button>
-          </div>
+          {filtersOpen && (
+            <>
+              <div style={{ display: "flex", alignItems: "flex-end", gap: 12, flexWrap: "wrap" }}>
+                <label style={sel11}>Scenario
+                  <select className="input" style={{ ...selS, width: 340 }} value={scen} onChange={(e) => { setScen(e.target.value); setView("table"); }}>
+                    {LIBRARY.map((x) => <option key={x.key} value={x.key}>{x.title}{asked.some((a) => a.libKey === x.key) ? " · asked in chat" : ""}</option>)}
+                    {asked.map((a, i) => (a.libKey ? null : <option key={`a${i}`} value={`asked:${i}`}>{a.title} · asked in chat</option>))}
+                  </select>
+                </label>
+                <label style={sel11}>Won by
+                  <select className="input" style={{ ...selS, width: 150 }} value={f.win} onChange={(e) => setF({ ...f, win: e.target.value })}>
+                    <option value="">Any vendor</option>
+                    {grid.vendors.map((v) => <option key={v.id} value={v.id}>{v.short}</option>)}
+                  </select>
+                </label>
+              </div>
+              <span style={{ fontSize: 13, color: "var(--color-neutral-800)", maxWidth: 900 }}>{active.desc}</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+                <span style={{ ...label11, marginRight: 4 }}>Show</span>
+                {SHOW.filter(([k]) => k !== "changed" || isScenario || overrides.length > 0).map(([k, t]) => (
+                  <button key={k} onClick={() => setF({ ...f, show: k })} style={{ ...pill(f.show === k), fontSize: 12.5, padding: "4px 9px" }}>
+                    {t} <span style={{ opacity: 0.75 }}>{counts[k]}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         {cur && (isScenario || overrides.length > 0) && (
