@@ -49,7 +49,7 @@ const NUMBER = ["", "one", "two", "three", "four", "five"];
 
 export function freeze(o: {
   ev: SourcingEvent; grid: Grid; quality: Quality[]; report: DoubtReport; lastYear: LastYearLine[];
-  scenario: { title: string; result: ScenarioResult } | null; decisions: Record<string, string>;
+  scenario: { title: string; result: ScenarioResult } | null; decisions: Record<string, string>; overrides?: Override[];
 }): Snapshot {
   const { ev, grid } = o;
   const award: Award = o.scenario?.result.award ?? grid.asQuoted;
@@ -80,9 +80,27 @@ export function freeze(o: {
     rules: o.scenario?.result.rules ?? ["Each line goes to the lowest price that can win as quoted."],
     excluded: (o.scenario?.result.excluded ?? []).map((x) => ({ name: x.name, why: x.why })),
     rows, total: award.total, cheapestOverall: grid.asQuoted.total, lastYear, byVendor,
-    decisions: o.report.raised.map((d) => ({ title: d.title, status: o.decisions[d.title] ?? "Open: not yet answered" })),
+    decisions: [
+      ...o.report.raised.map((d) => ({ title: d.title, status: o.decisions[d.title] ?? "Open: not yet answered" })),
+      ...(o.overrides ?? []).map((x) => ({
+        title: `Override: ${x.lineId} from ${grid.vendors.find((v) => v.id === x.from)?.short ?? "nobody"} to ${grid.vendors.find((v) => v.id === x.to)?.short ?? x.to}`,
+        status: `${x.who}, ${x.at.slice(0, 16).replace("T", " ")} UTC: ${x.why}`,
+      })),
+    ],
     frozenBy: ev.buyer, approvedBy: null, approvedAt: null,
   };
 }
 
 export const SNAPSHOT_KEY = "parakh.award.v1";
+export const OVERRIDES_KEY = "parakh.overrides.v1";
+
+/** L32: a buyer override, with its audit trail. */
+export interface Override {
+  lineId: string;
+  /** Vendor id the line was going to, and the one the buyer chose ("" removes the override). */
+  from: string | null;
+  to: string;
+  why: string;
+  who: string;
+  at: string;
+}

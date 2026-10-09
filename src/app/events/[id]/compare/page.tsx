@@ -1,7 +1,7 @@
 "use client";
 // Comparison (design: "Comparison - Ledger"). Every line by every vendor on one basis, built in
 // code from the readings. Click a price to see where it came from and how it was converted.
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   CaretDown, CaretRight, Camera, ChatsCircle, Export, SealCheck, EnvelopeSimple, File, FileDoc, FileMagnifyingGlass, FilePdf, FileXls, X,
 } from "@phosphor-icons/react";
@@ -9,7 +9,7 @@ import { Rail } from "@/components/Rail";
 import { SourceDoc } from "@/components/SourceDoc";
 import { Conversation, type ChatMsg } from "@/components/Conversation";
 import { DECISIONS_KEY, DoubtsView } from "@/components/DoubtsView";
-import { freeze, SNAPSHOT_KEY, type Snapshot } from "@/lib/award";
+import { freeze, OVERRIDES_KEY, SNAPSHOT_KEY, type Override, type Snapshot } from "@/lib/award";
 import { download } from "@/lib/download";
 import { useRouter } from "next/navigation";
 import { runScenario, type ScenarioResult, type ScenarioRules } from "@/lib/scenario";
@@ -41,13 +41,13 @@ const paneS = (on: boolean): React.CSSProperties => ({
   color: on ? "var(--color-text)" : "var(--color-neutral-700)", fontWeight: on ? 600 : 400, boxShadow: on ? "inset 0 -2px 0 var(--color-text)" : "none",
 });
 
-function ScenarioStrip({ r, n, grid, askedBy, onBack }: { r: ScenarioResult; n: number; grid: Grid; askedBy: string; onBack: () => void }) {
+function ScenarioStrip({ r, n, grid, askedBy, onBack, backLabel }: { r: ScenarioResult; n: number | null; grid: Grid; askedBy: string; onBack: () => void; backLabel: string }) {
   const d = r.award.total - r.base.total;
   const lbl = { ...label11, color: "var(--color-accent-800)" };
   return (
     <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1.8fr) minmax(0,1fr) auto", gap: 24, padding: "10px 28px 12px 8px", fontSize: 12.5, background: "var(--color-accent-100)", marginBottom: 4 }}>
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <span style={lbl}>Scenario {n} · rules applied</span>
+        <span style={lbl}>{n ? `Scenario ${n}` : "As quoted, with your overrides"} · rules applied</span>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: "4px 18px" }}>
           {r.rules.map((t, i) => (
             <div key={i} style={{ display: "grid", gridTemplateColumns: "24px 1fr", gap: 4, lineHeight: 1.35 }}>
@@ -60,13 +60,13 @@ function ScenarioStrip({ r, n, grid, askedBy, onBack }: { r: ScenarioResult; n: 
         <span style={lbl}>Excluded, and why</span>
         {r.excluded.length ? r.excluded.map((x) => <div key={x.vendorId}><span style={{ fontWeight: 600 }}>{x.name}</span>: {x.why}</div>) : <div>No vendor excluded.</div>}
         {r.notes.map((t, i) => <div key={i} style={{ color: "var(--color-neutral-800)" }}>{t}</div>)}
-        <span style={{ fontSize: 12, color: "var(--color-neutral-700)", paddingTop: 4 }}>Asked by {askedBy}</span>
+        <span style={{ fontSize: 12, color: "var(--color-neutral-700)", paddingTop: 4 }}>{askedBy}</span>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end", textAlign: "right" }}>
         <span style={{ fontSize: 24, fontWeight: 600, lineHeight: 1.15 }}>{crore(r.award.total)}</span>
         <span style={{ color: "var(--color-accent-800)" }}>{d >= 0 ? "+" : "−"}{lakh(Math.abs(d))} ({d >= 0 ? "+" : "−"}{Math.abs((d / r.base.total) * 100).toFixed(1)}%) vs as quoted</span>
         <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{grid.vendors.filter((v) => r.award.byVendor[v.id].lines).map((v) => `${v.short} ${r.award.byVendor[v.id].lines}`).join(" · ")} lines</span>
-        <button className="btn btn-ghost" onClick={onBack}>Back to as quoted</button>
+        <button className="btn btn-ghost" onClick={onBack}>{backLabel}</button>
       </div>
     </div>
   );
@@ -121,6 +121,43 @@ function ChartView({ grid, r }: { grid: Grid; r: ScenarioResult | null }) {
   );
 }
 
+/** L32: award a line to another vendor, with a reason; recorded with who and when. */
+function OverrideBox({ line, grid, shown, current, buyer, onOverride }: {
+  line: string; grid: Grid; shown: Award; current: Override | undefined; buyer: string; onOverride: (o: Override) => void;
+}) {
+  const [to, setTo] = useState("");
+  const [why, setWhy] = useState("");
+  const winner = shown.per[line]?.vendorId ?? null;
+  const name = (v: string | null) => grid.vendors.find((x) => x.id === v)?.short ?? "nobody";
+  if (current)
+    return (
+      <div style={{ display: "grid", gridTemplateColumns: "92px 1fr", gap: 10 }}>
+        <span style={{ fontWeight: 600 }}>Override</span>
+        <span>
+          {current.who} moved {line} from {name(current.from)} to {name(current.to)} on {new Date(current.at).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Kolkata" })}: “{current.why}”.{" "}
+          <button className="btn btn-ghost" style={{ padding: "0 4px" }} onClick={() => onOverride({ ...current, to: "" })}>Undo</button>
+        </span>
+      </div>
+    );
+  const options = grid.vendors.filter((v) => v.id !== winner && grid.cells[cellKey(v.id, line)].perBox != null);
+  return (
+    <details>
+      <summary style={{ cursor: "pointer", color: "var(--color-accent-800)" }}>Override: award {line} to another vendor</summary>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingTop: 6 }}>
+        <select className="input" value={to} onChange={(e) => setTo(e.target.value)} style={{ minHeight: 32, padding: "4px 8px" }}>
+          <option value="">Choose a vendor…</option>
+          {options.map((v) => <option key={v.id} value={v.id}>{v.short} at {inr(grid.cells[cellKey(v.id, line)].perBox!)}</option>)}
+        </select>
+        <input className="input" placeholder="Why (recorded with your name)" value={why} onChange={(e) => setWhy(e.target.value)} style={{ minHeight: 32 }} />
+        <button className="btn btn-primary" disabled={!to || !why.trim()} style={{ alignSelf: "flex-start" }}
+          onClick={() => onOverride({ lineId: line, from: winner, to, why: why.trim(), who: buyer, at: new Date().toISOString() })}>
+          Record override
+        </button>
+      </div>
+    </details>
+  );
+}
+
 const STATE_LABEL: Record<GridCell["kind"], string> = {
   checked: "checked", converted: "converted", last_year: "last year’s rate", not_quoted: "not quoted", unclear: "not on the basis",
 };
@@ -171,7 +208,22 @@ export default function ComparePage() {
     () => (data && grid ? asked.map((a) => runScenario(data.event, grid, quality, a.rules)) : []),
     [data, grid, quality, asked],
   );
-  const cur = active != null ? results[active] ?? null : null;
+  // L32: buyer overrides with an audit trail (who, from, to, why, when), kept in this browser.
+  const [overrides, setOverridesState] = useState<Override[]>([]);
+  useEffect(() => {
+    try { setOverridesState(JSON.parse(localStorage.getItem(OVERRIDES_KEY) ?? "[]")); } catch { /* none yet */ }
+  }, []);
+  const setOverrides = (o: Override[]) => {
+    setOverridesState(o);
+    try { localStorage.setItem(OVERRIDES_KEY, JSON.stringify(o)); } catch { /* kept for this visit */ }
+  };
+  // The view on screen: a scenario or as quoted, with the buyer's overrides applied on top.
+  const cur = useMemo<ScenarioResult | null>(() => {
+    if (!data || !grid) return null;
+    const base = active != null ? asked[active]?.rules : null;
+    if (!base && !overrides.length) return null;
+    return runScenario(data.event, grid, quality, { ...(base ?? { eligible: "all" }), overrides: overrides.map((o) => ({ lineId: o.lineId, vendorId: o.to })) });
+  }, [data, grid, quality, asked, active, overrides]);
 
   const ask = async (text: string) => {
     const who = asker;
@@ -204,7 +256,8 @@ export default function ComparePage() {
     let decisions: Record<string, string> = {};
     try { decisions = JSON.parse(localStorage.getItem(DECISIONS_KEY) ?? "{}"); } catch { /* none */ }
     return freeze({ ev: data!.event, grid: grid!, quality, report: report!, lastYear: data!.lastYear, decisions,
-      scenario: cur && active != null ? { title: asked[active].title, result: cur } : null });
+      scenario: cur ? { title: `${active != null ? asked[active].title : "As quoted"}${overrides.length ? `, with ${overrides.length} override${overrides.length > 1 ? "s" : ""}` : ""}`, result: cur } : null,
+      overrides });
   };
 
   // Where each file lives, to link "Open original".
@@ -222,8 +275,8 @@ export default function ComparePage() {
       <main style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", overflowY: "auto" }}>
         <header style={{ display: "flex", alignItems: "flex-end", gap: 24, padding: "18px 28px 10px 8px" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 2, marginRight: "auto" }}>
-            <span style={label11}>{ev.id} · {ev.buyerCo.replace(/ Pvt\. Ltd\.$/, "")}, Chakan · {ev.buyer}</span>
-            <h1 style={{ fontSize: 26, margin: 0 }}>{ev.title}</h1>
+            <span style={{ ...label11, whiteSpace: "nowrap" }}>{ev.id} · {ev.buyerCo.replace(/ Pvt\. Ltd\.$/, "")}, Chakan · {ev.buyer}</span>
+            <h1 style={{ fontSize: 26, margin: 0, whiteSpace: "nowrap" }}>{ev.title}</h1>
           </div>
           <span style={{ color: "var(--color-neutral-700)", maxWidth: 330, textAlign: "right" }}>
             Every price per box, in rupees, delivered Chakan, GST extra.
@@ -245,7 +298,7 @@ export default function ComparePage() {
         </div>
 
         {tab === "doubts" ? (
-          <DoubtsView grid={grid} report={report} onSee={(v, l) => { setSel({ v, l }); setTab("compare"); }} />
+          <DoubtsView grid={grid} report={report} overrides={overrides} onSee={(v, l) => { setSel({ v, l }); setTab("compare"); }} />
         ) : (
         <>
         <Legend open={legend} toggle={() => setLegend(!legend)} />
@@ -262,8 +315,10 @@ export default function ComparePage() {
           </div>
         </div>
 
-        {cur && active != null && (
-          <ScenarioStrip r={cur} n={active + 1} grid={grid} askedBy={asked[active].asker === "vp" ? `${ev.vp}, ${ev.vpRole}` : `${ev.buyer}, buyer`} onBack={() => setActive(null)} />
+        {cur && (active != null || overrides.length > 0) && (
+          <ScenarioStrip r={cur} n={active != null ? active + 1 : null} grid={grid}
+            askedBy={active != null ? (asked[active].asker === "vp" ? `Asked by ${ev.vp}, ${ev.vpRole}` : `Asked by ${ev.buyer}, buyer`) : `Overrides by ${ev.buyer}, buyer`}
+            onBack={() => (active != null ? setActive(null) : setOverrides([]))} backLabel={active != null ? "Back to as quoted" : "Clear overrides"} />
         )}
 
         <div style={{ flex: "1 0 460px", minHeight: 460, display: "flex" }}>
@@ -296,7 +351,9 @@ export default function ComparePage() {
         ) : (
         <div style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "16px 22px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
           {sel ? (
-            <SourcePanel grid={grid} sel={sel} readings={readings} paths={paths} doubt={doubtAt.get(cellKey(sel.v, sel.l))} report={report} onSelect={(v) => setSel({ v, l: sel.l })} onClose={() => setSel(null)} />
+            <SourcePanel grid={grid} sel={sel} readings={readings} paths={paths} doubt={doubtAt.get(cellKey(sel.v, sel.l))} report={report}
+              shown={cur?.award ?? grid.asQuoted} override={overrides.find((o) => o.lineId === sel.l)} buyer={ev.buyer}
+              onOverride={(o) => setOverrides([...overrides.filter((x) => x.lineId !== o.lineId), ...(o.to ? [o] : [])])} onSelect={(v) => setSel({ v, l: sel.l })} onClose={() => setSel(null)} />
           ) : (
             <p style={{ margin: 0, color: "var(--color-neutral-700)", maxWidth: 320 }}>
               Click any price in the table to see where it was read, what the vendor wrote, and the arithmetic that put it on our basis.
@@ -436,9 +493,10 @@ function Cell({ c, out, doubt, win, selected, onClick, tip }: { c: GridCell; out
   );
 }
 
-function SourcePanel({ grid, sel, readings, paths, doubt, report, onSelect, onClose }: {
+function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, override, buyer, onOverride, onSelect, onClose }: {
   grid: Grid; sel: { v: string; l: string }; readings: ReplyReading[]; paths: Record<string, string>;
   doubt: { d: Doubt; rank: number } | undefined; report: DoubtReport; onSelect: (v: string) => void; onClose: () => void;
+  shown: Award; override: Override | undefined; buyer: string; onOverride: (o: Override) => void;
 }) {
   const line = grid.lines.find((l) => l.id === sel.l)!;
   const c = grid.cells[cellKey(sel.v, sel.l)];
@@ -552,6 +610,7 @@ function SourcePanel({ grid, sel, readings, paths, doubt, report, onSelect, onCl
             <span style={{ textWrap: "pretty" }}>{s.text}</span>
           </div>
         ))}
+        <OverrideBox key={line.id} line={line.id} grid={grid} shown={shown} current={override} buyer={buyer} onOverride={onOverride} />
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>

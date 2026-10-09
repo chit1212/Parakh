@@ -4,6 +4,7 @@
 // buyer judgements get options. Nothing goes to a vendor without approval.
 import { useEffect, useState } from "react";
 import { cellKey, type Grid } from "@/lib/compare";
+import type { Override } from "@/lib/award";
 import type { Doubt, DoubtReport } from "@/lib/doubts";
 import { lakh } from "@/lib/format";
 
@@ -13,7 +14,7 @@ export const DECISIONS_KEY = "parakh.decisions.v1";
 
 type Draft = { to: string; subject: string; body: string; model?: string } | { error: string } | "loading";
 
-export function DoubtsView({ grid, report, onSee }: { grid: Grid; report: DoubtReport; onSee: (vendorId: string, lineId: string) => void }) {
+export function DoubtsView({ grid, report, overrides, onSee }: { grid: Grid; report: DoubtReport; overrides: Override[]; onSee: (vendorId: string, lineId: string) => void }) {
   const [open, setOpen] = useState<string | null>(report.raised[0]?.id ?? null);
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
   // Decisions persist in this browser (by doubt title) so the award record can show them.
@@ -123,6 +124,14 @@ export function DoubtsView({ grid, report, onSee }: { grid: Grid; report: DoubtR
           </div>
         );
       })}
+      {overrides.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <h3 style={{ fontSize: 18, margin: "8px 0 0" }}>Overrides on record</h3>
+          {overrides.map((o) => (
+            <div key={o.lineId}>{o.lineId}: {name(o.from ?? "")} → {name(o.to)} · {o.who}, {new Date(o.at).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Kolkata" })} · “{o.why}”</div>
+          ))}
+        </div>
+      )}
       <details style={{ color: "var(--color-neutral-800)" }}>
         <summary style={{ cursor: "pointer", color: "var(--color-accent-800)" }}>The {logged} checked and logged</summary>
         <ul style={{ margin: "8px 0 0", paddingLeft: 18 }}>
