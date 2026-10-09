@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/broadsheet-b2904ec4-9842-45c9-b4be-2ac94f55f925/styles.css">
+<script src="_ds/broadsheet-b2904ec4-9842-45c9-b4be-2ac94f55f925/_ds_bundle.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+</helmet>
+<div style="position:relative; z-index:40; font-size:13px; line-height:1.4; color:var(--color-text);">
+  <button onClick="{{ toggle }}" title="Workspace menu" style="{{ btnS }}">P</button>
+  <sc-if value="{{ open }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ close }}" style="position:fixed; inset:0; z-index:1;"></div>
+    <div style="position:absolute; left:52px; top:0; z-index:2; width:340px; background:var(--color-bg); box-shadow:var(--shadow-lg); padding:18px 20px 16px; display:flex; flex-direction:column; gap:16px;">
+      <div style="display:flex; flex-direction:column; gap:2px;">
+        <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Current event</span>
+        <span style="font-size:16px; font-weight:600;">Corrugated boxes, FY27 H2</span>
+        <span style="font-size:12px; color:var(--color-neutral-700);">SE-2026-041 · Comparing · award by 15 Oct</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:2px;">
+        <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700); padding-bottom:2px;">Switch event</span>
+        <sc-for list="{{ recent }}" as="e" hint-placeholder-count="3">
+          <a href="Shared Screens.dc.html#events" style="display:flex; flex-direction:column; padding:6px 8px; margin:0 -8px; text-decoration:none; color:var(--color-text); line-height:1.3;" style-hover="background:var(--color-accent-100);"><span>{{ e.name }}</span><span style="font-size:12px; color:var(--color-neutral-700);">{{ e.id }} · {{ e.status }}</span></a>
+        </sc-for>
+        <a href="Shared Screens.dc.html#events" style="padding-top:4px; font-size:13px;">All events…</a>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Signed in as</span>
+        <span style="display:flex; flex-direction:column; line-height:1.3;"><span style="font-weight:600;">{{ who }}</span><span style="font-size:12px; color:var(--color-neutral-700);">{{ role }} · Sahyadri Appliances</span></span>
+        <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--color-neutral-700);">
+          <span>Demo: view as</span>
+          <div class="seg"><button onClick="{{ asBuyer }}" style="{{ buyerS }}">Vikram · buyer</button><button onClick="{{ asVp }}" style="{{ vpS }}">Anita · VP</button></div>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:2px;">
+        <a href="Shared Screens.dc.html#rules" style="display:flex; align-items:center; gap:8px; padding:6px 8px; margin:0 -8px; text-decoration:none; color:var(--color-text);" style-hover="background:var(--color-accent-100);"><i class="ph-duotone ph-scales" style="font-size:18px; color:var(--color-neutral-700);"></i>Evaluation rules for this event</a>
+        <a href="Shared Screens.dc.html#login" style="display:flex; align-items:center; gap:8px; padding:6px 8px; margin:0 -8px; text-decoration:none; color:var(--color-text);" style-hover="background:var(--color-accent-100);"><i class="ph-duotone ph-sign-out" style="font-size:18px; color:var(--color-neutral-700);"></i>Sign out</a>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:420,&quot;height&quot;:520}}">
+class Component extends DCLogic {
+  state = { open: false, role: (() => { try { return localStorage.getItem('parakh-role') || 'Buyer'; } catch (e) { return 'Buyer'; } })() };
+  componentDidMount() { this._r = e => this.setState({ role: e.detail }); window.addEventListener('parakh-role', this._r); }
+  componentWillUnmount() { window.removeEventListener('parakh-role', this._r); }
+  setRole(r) { try { localStorage.setItem('parakh-role', r); } catch (e) {} window.dispatchEvent(new CustomEvent('parakh-role', { detail: r })); this.setState({ role: r }); }
+  renderVals() {
+    const S = this.state, vp = S.role === 'VP';
+    const seg = on => ({ border: 0, padding: '5px 10px', font: 'inherit', fontSize: 12, cursor: 'pointer', whiteSpace: 'nowrap', background: on ? 'var(--color-accent)' : 'transparent', color: on ? 'var(--color-bg)' : 'inherit' });
+    return {
+      open: S.open, toggle: () => this.setState({ open: !S.open }), close: () => this.setState({ open: false }),
+      btnS: { width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center', border: 0, borderRadius: 'var(--radius-md)', font: 'inherit', fontSize: 22, fontWeight: 600, cursor: 'pointer', color: 'var(--color-text)', background: S.open ? 'var(--color-accent-100)' : 'transparent' },
+      recent: [{ id: 'SE-2026-044', name: 'BOPP tape & stretch film', status: 'Collecting replies' }, { id: 'SE-2026-038', name: 'Moulded pulp trays', status: 'Awaiting approval' }, { id: 'SE-2025-037', name: 'Corrugated boxes, FY26 H2', status: 'Awarded' }],
+      who: vp ? 'Anita Kulkarni' : 'Vikram Deshpande', role: vp ? 'VP Supply Chain' : 'Category buyer, Packaging',
+      asBuyer: () => this.setRole('Buyer'), asVp: () => this.setRole('VP'), buyerS: seg(!vp), vpS: seg(vp)
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -20,14 +20,39 @@ The `.dc.html` files are self-contained "Design Component" pages. Open them in a
 Target viewport: **desktop, 1440 px wide** (the app shell has `min-width: 1360px`). Light mode only.
 
 ### App shell and navigation (all screens)
-Every screen shares one shell: a **68 px icon rail** on the left, then the screen content. The rail holds the brand mark "P" (22 px/600, links to Compare), then five items, each a 20 px Phosphor duotone icon over a 10 px label: **Events, RFQ, Replies, Compare, Award**. The active item is `--color-accent`; the others are neutral-700. There is no other navigation chrome.
+Every screen shares one shell: a **68 px icon rail** on the left, then the screen content. The rail holds the brand mark "P" (22 px/600, a button that opens the workspace menu — see below), then five items, each a 20 px Phosphor duotone icon over a 10 px label: **Events, RFQ, Replies, Compare, Award**. The active item is `--color-accent`; the others are neutral-700. There is no other navigation chrome.
 
 **Compare is the home screen** (the app opens on it). The flow:
 1. **Compare** (home) — comparison, doubts, conversation and scenarios.
 2. **Events** — the list of sourcing events. Opening SE-2026-041 returns to Compare.
 3. **RFQ** — co-pilot chat, plus the drafted RFQ.
 4. **Replies** — the five vendor replies, their coverage and quality.
-5. **Award** — the recommendation and a frozen snapshot. "Ask a what-if" returns to Compare with scenario 1 applied.
+5. **Award** — the recommendation and a frozen snapshot. "Ask a what-if" returns to Compare with "Cheapest per line, quality-cleared only" applied.
+
+### Workspace menu — `WorkspaceMenu.dc.html` (child component, mounted in the rail of every screen)
+- **Trigger:** the "P" button, 44 × 44, radius `--radius-md`. Its background is accent-100 while the menu is open.
+- **Popover:** 340 px wide, `left: 52px; top: 0`, bg `--color-bg`, `--shadow-lg`, padding `18px 20px 16px`, gap 16. A transparent fixed backdrop closes it when you click outside.
+- **Sections** (each with an 11 px uppercase label):
+  1. **Current event:** name 16 px/600, then "SE-2026-041 · Comparing · award by 15 Oct".
+  2. **Switch event:** three recent events (name, then "ID · status"; hover accent-100), and an "All events…" link.
+  3. **Signed in as:** name (600) and "role · Sahyadri Appliances". A "Demo: view as" `.seg` switches between Vikram · buyer and Anita · VP.
+  4. **Links:** "Evaluation rules for this event" (`ph-scales`, goes to `Shared Screens#rules`, the RFQ Evaluation rules tab) and "Sign out" (`ph-sign-out`, goes to `#login`).
+- **Role:** stored in `localStorage['parakh-role']` (`'Buyer' | 'VP'`) and broadcast as a `window` `CustomEvent('parakh-role')`. Effects:
+  - The chat's "Asking as" control follows the role, and setting it there updates the menu.
+  - On the award record, the primary button is **"Send to Anita for approval"** for the buyer and **"Approve award"** for the VP.
+- **Production:** the role comes from the signed-in user's permissions. The demo switch is for showing both views only.
+
+### Sign in — `Shared Screens.dc.html#login`
+- **Shown after "Sign out".** The icon rail is hidden on this screen.
+- **Layout:** a flush-left column, vertically centred, padding-left 14vw, max-width 620 px.
+- **Content, top to bottom:**
+  - "Parakh" 26 px/600
+  - H1 "Sign in" 40 px
+  - subline "Your sourcing workspace at Sahyadri Appliances."
+  - a Work email field
+  - primary button "Continue with company sign-in" (nowrap; returns to Compare)
+  - a 12 px caption: "Single sign-on · no separate password"
+  - a 12 px note: "You've been signed out. Your checks, scenarios and draft emails are saved with the event."
 
 Screen headers follow one pattern: an 11 px uppercase meta line, then a 26 px H1. Content starts 8 px from the rail.
 
@@ -79,16 +104,33 @@ This is the core screen. Start states are available via hash: `#compare` (source
 | Doubt | **only filled state**: bg accent-2-100, text accent-2-800, 600, suffix "?" | "could change who wins" |
 | Lowest | 600 weight | "bold = cheapest on the line" |
 
-**Scenario bar** (always visible): "TABLE SHOWS" label, then pill tabs in a horizontally scrolling row (no wrap): **As quoted**, plus one per asked scenario ("Scenario 1 · Quality-cleared, cheapest per line", …). Active pill = accent fill with bg-coloured text; inactive = transparent with a 1 px divider inset and accent-800 text; radius `--radius-md`. On the right: a segmented **Table | Chart** control and "Export view".
+**Report toolbar** (always visible, padding `2px 28px 10px 8px`). This replaces the old scenario pills.
+- **Row 1, dropdowns** (native `<select class="input">`, 34 px high, 13 px; each has an 11 px uppercase label above it):
+  - **Scenario** (340 px): the six strategies listed under "Scenarios" below, always available.
+  - **Won by** (150 px): Any vendor, or one vendor.
+  - **Board** (110 px): All boxes / 3-ply / 5-ply.
+  - **Sort by** (220 px): Line number · Rupees at stake in doubts · Award value, highest first · Closest calls (gap to 2nd) · Furthest above should-cost.
+  - Right-aligned: the segmented **Table | Chart** control and "Export view".
+- **Row 2, "Show" quick filters** (single-select chips, 12.5 px, radius `--radius-md`; active = accent fill, inactive = 1 px divider inset with accent-800 text). Each chip shows its count:
+  - All lines
+  - With doubts
+  - Winner changed (only while a scenario is active)
+  - Winner not verified by you
+  - Unusual price
+  - Missing quotes
+  - Last year's prices
+- **Right of row 2:** "Showing 12 of 30 lines · ₹x L" and a ghost "Clear filters" button (keeps the sort).
+- **When filtered:** the footer totals only the shown lines ("Shown lines · value"). If no lines match, the grid shows "No lines match these filters."
+- **Behaviour:** filters apply to the active scenario's winners, and excluded vendors are ignored when testing a line. Asking a question in the chat adds its scenario to the dropdown and selects it.
 
 **Scenario strip** (only when a scenario is active): bg accent-100, grid `1.8fr 1fr auto`, gap 24 px, 12.5 px text.
-- Column 1: "SCENARIO n · RULES APPLIED", with the rules R1–R5 in two columns.
+- Column 1: "<SCENARIO TITLE> · RULES APPLIED", with the rules R1–R5 in two columns.
 - Column 2: "EXCLUDED, AND WHY" (vendor name 600 — reason), plus "Asked by Anita Kulkarni, VP Supply Chain".
 - Column 3: total 24 px/600, the delta vs cheapest overall in accent-800, the split ("Shree Balaji 11 · Vardhman 14 · Kaveri 5 lines"), and a ghost button "Back to as quoted".
 
 **Grid** (`flex: 1 0 460px; min-height:460px`; scrolls internally):
 - **Columns:** `40px | minmax(170px,1fr) | 44px | 64px | repeat(5, minmax(76px,96px)) | 104px` → Line, Box & spec (name plus an 11 px spec line, ellipsis), Qty, Should-cost, 5 vendors, Lowest.
-- **Sticky header** (bg `--color-bg`, 1 px `--color-text` bottom rule). Each vendor header is right-aligned: short name 13 px/600; format icon + format name 11 px; quality line "Quality 86 ✓" / "Quality 58 ✕" / "No questionnaire"; an 11 px column note (e.g. "USD @ ₹88.20, −2.5% ‡", "27 of 30 quoted"). Excluded vendors drop to opacity 0.45 and the note reads "Excluded in scenario n".
+- **Sticky header** (bg `--color-bg`, 1 px `--color-text` bottom rule). Each vendor header is right-aligned: short name 13 px/600; format icon + format name 11 px; quality line "Quality 95 ✓" / "Quality 20 ✕" / "No questionnaire"; an 11 px column note (e.g. "USD @ ₹88.20, −2.5% ‡", "27 of 30 quoted"). Excluded vendors drop to opacity 0.45 and the note reads "Excluded on quality".
 - **Rows:** minimum 38 px high, with a bottom rule `color-mix(text 8%)`. The selected row gets a neutral-200 background.
 - **Cells:** right-aligned 13.5 px `<button>`s with padding 0 10 px, styled per the legend. The selected cell gets a 2 px accent outline, offset −2. Excluded-vendor cells drop to opacity 0.4, and a doubt fill is dropped when its vendor is excluded.
 - **Lowest column:** winner's short name; in a scenario, "was <vendor>" appears in 11 px accent-800 when the winner changed.
@@ -102,7 +144,7 @@ This is the core screen. Start states are available via hash: `#compare` (source
 **Right panel** — tabs "Conversation" and "Source · L14 Anand" (the label reflects the selected cell). 14 px, with icons.
 - **Conversation:**
   - Thread padding 16/22 px, gap 18 px. Parakh messages: label 11 px uppercase accent-700, body 14 px.
-  - When a message produced a scenario, it carries a result card (bg `--color-bg`, `--shadow-sm`, padding 12/14) containing: "SCENARIO n · APPLIED TO THE TABLE", total 20 px/600 + delta, the split, "4 rules · 2 vendors excluded", and buttons Table / Chart / Export (secondary, 12 px).
+  - When a message produced a scenario, it carries a result card (bg `--color-bg`, `--shadow-sm`, padding 12/14) containing: "<SCENARIO TITLE> · APPLIED TO THE TABLE", total 20 px/600 + delta, the split, "4 rules · 2 vendors excluded", and buttons Table / Chart / Export (secondary, 12 px).
   - Human messages are right-aligned italic 15 px; the label shows the name plus a role tag (VP = `tag-accent-2`, Buyer = `tag-neutral`).
   - Composer: suggestion chips (unasked scenarios), an "Asking as" segmented control (Vikram · buyer / Anita · VP), and a textarea plus an icon send button.
 - **Source:** see SourceDoc below, plus "Same line, every vendor" (one clickable row per vendor: name, state label, price; the current vendor is highlighted accent-100).
@@ -132,6 +174,30 @@ Props: `vid` (vendor id SB/VP/KP/AC/RB) and `li` (line index 0–29). The layout
   - "Snapshot at decision", marked with a lock icon and "Frozen 9 Oct 2026, 16:42 · snapshot 7c41e9 · later revisions will not change these numbers". Its table has columns Line, Box, Awarded to, ₹/box, Qty, Value, Source. Clicking a row selects it.
 - **Right trace panel**, 470 px sticky on surface: SourceDoc for the selected row.
 
+### Verified by you (buyer sign-off)
+- **Source panel:** under SourceDoc, an unverified, quoted cell shows a primary button "I've checked this" and a secondary button "Check & open next winner", plus a 12 px note. For a doubt the note reads "Confirms the number matches the document. Doubt n stays open until it is resolved." Once verified, a row on accent-100 shows a 22 px seal-check icon, "Verified by you", "Vikram Deshpande · 9 Oct, 15:41 · recorded on the award", and an Undo button.
+- **Grid:** verified cells get a 12 px `ph-seal-check` in accent-700 before the number. The legend has a new entry, "Verified by you".
+- **Tab row (right):** "**8 of 30** winning prices verified by you / 8 of 147 of all quoted prices", plus a "Check next winner" button that jumps to the next unverified winner in the active scenario.
+- **Award record:** a new snapshot column, "Checked by you" ("✓ 9 Oct, 15:41" or "not yet"), and a KPI "x of 30 awarded prices checked by Vikram".
+- **Storage:** `localStorage['parakh-verified']` maps `"VID:lineIndex"` to a timestamp, seeded with 8 entries. Production should store the user, the time and the snapshot/version of the cell that was verified. Undo is allowed until the award is frozen.
+
+### RFQ → Evaluation rules tab (`Shared Screens.dc.html#rfq`, 4th tab)
+- **Intro:** a lock-open icon and a sentence: rules lock when the RFQ is sent; later changes need a reason and are shown to the VP; Shared rules go to vendors, internal ones never do.
+- **Plain-words box** (surface fill): an input plus a primary "Draft rule" button with a sparkle icon. Caption: "Parakh drafts the rule; code runs it. You see the rule and its effect before it applies." The co-pilot chat shows an example (rejection rate scored out of 15). The rows it changed get accent-100 and a "changed by chat" tag.
+- **Five sections.** Each has an H3 20 px, a tag and a 12.5 px note:
+  1. **Quality score** (`tag-accent`, "Shared with vendors"): a table with columns `30px | 1.3fr | 120px | 1.6fr | 70px` → #, Question, Type (Mandatory in accent-2-800/600, or Scored), Marking (editable), Points (editable). Then "100 points in total", an editable pass mark (70), and the clearing rule. Points: 10, 10, 10, 10, 10, 10, 10, 15, 10, 5.
+  2. **Price basis** (Shared).
+  3. **Conversions** (`tag-neutral`, Internal).
+  4. **Should-cost** (Internal · never sent).
+  5. **Doubts** (`tag-outline`, Company default, read-only with a lock icon).
+- **Rule rows** use the grid `1.2fr | 1.5fr | 140px`: name (600) with a 12 px "how" line, an editable value (or a locked value), and "used by" (e.g. "30 prices · Vardhman").
+- **Production:**
+  - Rules are versioned and locked when the RFQ is sent.
+  - Every "Calculate" step in SourceDoc should link to the rule and version it used.
+  - The award snapshot stores those rule versions.
+
+**Quality scores under this scheme (demo):** Shree Balaji 95, Vardhman 95, Kaveri 75 (all cleared); Anand 20 (both mandatory items failed, not cleared); Rohit Box did not return the questionnaire.
+
 ## Interactions & behaviour
 - **Click any price** → select the cell (outline + row tint), switch the right panel to Source, and render SourceDoc for that vendor and line. "Same line, every vendor" rows switch the vendor.
 - **Ask a question** (suggestion chip, or send) → append a human message (with the current "Asking as" identity) and a Parakh answer with a result card. Add a scenario pill, make it active, set the view to Table, and switch the panel to Conversation. The thread auto-scrolls to the bottom.
@@ -148,13 +214,20 @@ Component state (comparison screen):
 - `sel: { vid, li } | null`, the selected cell
 - `pane: 'conv' | 'src'`
 - `scen: 'base' | 'S1' | 'S2' | 'S3'`, the active scenario
-- `asked: [{ id, asker: 'VP' | 'Buyer', text }]`, which drives both the thread and the pills
+- `asked: [{ id, asker: 'VP' | 'Buyer', text }]`, which drives both the thread and the Scenario dropdown
+- `f: { show, win, ply, sort }`, the report toolbar filters
+- `verified: { 'VID:li': timestamp }`, the buyer sign-off (persisted)
 - `asker`, `view: 'table' | 'chart'`, `openD`, `q`, `legend`
 
-**Scenarios** (see `defs()` and `solve()` in the logic block):
-- **S1** — eligible = questionnaire returned, score ≥ 70, both mandatory items passed (excludes Anand: 58, no ISO; and Rohit Box: not returned). Each line goes to the lowest eligible price.
-- **S2** — S1, plus open doubts priced against us: Vardhman without the 2.5% discount (`gross`), Rohit freight +₹0.38, L19 at ₹37.20, no 3-ply substitute.
-- **S3** — S1, plus a cap of 40% of award value per vendor. Greedily move the cheapest-to-move line from the over-cap vendor to its next-cheapest eligible option until no vendor is over the cap.
+**Scenarios** — a fixed library of general award strategies, listed in the Scenario dropdown in this order (see `defs()` and `solve()` in the logic block). Each has a plain title plus a one-sentence description, shown in 13 px neutral-800 under the toolbar's dropdown row. Every scenario except "As quoted" applies the quality gate: questionnaire returned, score ≥ pass mark, both mandatory items passed.
+- **As quoted — cheapest per line, all vendors** (`base`): each line to its lowest price, doubts priced as read. The cheapest possible result; useful for comparison, rarely what you'd award.
+- **Cheapest per line, quality-cleared only** (`S1`): each line to the lowest eligible price.
+- **Two vendors only, lowest total** (`S5`): tries every pair of eligible vendors that together cover all 30 lines; each line goes to the cheaper of the pair; the pair with the lowest total wins. Rule R5 lists the best three pairs with their totals and how many pairs were tried.
+- **One vendor for everything, lowest total** (`S4`): only eligible vendors who quoted all 30 lines qualify; the lowest total wins. R5 lists every candidate's total.
+- **Spread the risk, no vendor above 40%** (`S3`): cheapest per line, then greedily move the cheapest-to-move line from any vendor above 40% of award value to its next-cheapest eligible option, until no vendor is above the cap.
+- **Worst case on open doubts** (`S2`): cheapest per line with every open doubt resolved against us — Vardhman without the 2.5% discount (`gross`), Rohit freight +₹0.38, L19 at ₹37.20, no 3-ply substitute. Shows the most the doubts can cost.
+
+Scenario labels are always descriptive; there is no "Scenario 1/2/3" numbering. A scenario reached through a chat question shows "· asked in chat" in the dropdown, and the strip shows "Asked by <name>, <role>". In production the chat should map a question onto one of these strategies, or onto a new combination of the same building blocks: eligibility gate, vendor count limit, share cap, doubt pricing.
 
 **Data** (`data.js` → `window.KD`). This is mock data, but its shape is a good starting schema:
 - `lines[30]`: id, name, ply, flute, dims, gsm, bf, print, qty. `sc` is should-cost = board kg × ₹41 (3-ply) / ₹44 (5-ply) + print; `kg` comes from blank area × GSM.
@@ -210,8 +283,9 @@ Formatting: Indian grouping (`en-IN`), "₹x.xx L" for lakhs and "₹x.xx Cr" fo
 ## Files
 - `Overview.dc.html` — one-page summary of the direction (idea, cell states, trade-offs, links)
 - `Comparison - Ledger.dc.html` — **home screen**; screens 4, 5, 6 (comparison, doubts, conversation and scenarios). Start here.
-- `Shared Screens.dc.html` — screens 1, 2, 3, 7 (events, RFQ co-pilot, replies, award record); switch with the hash `#events`, `#rfq`, `#responses`, `#award`
+- `Shared Screens.dc.html` — screens 1, 2, 3, 7 (events, RFQ co-pilot, replies, award record); switch with the hash `#events`, `#rfq`, `#rules` (RFQ → Evaluation rules), `#responses`, `#award`, `#login`
 - `SourceDoc.dc.html` — the source/trace panel component
+- `WorkspaceMenu.dc.html` — the "P" workspace menu (event switcher, role, rules, sign out)
 - `data.js` — the mock dataset, conversion maths, doubts and baseline/quality solvers
 - `_ds/…/styles.css` — design tokens and component classes; `_ds_bundle.js` is the design-system bundle
 - `support.js` — the prototype runtime only; not part of the design
