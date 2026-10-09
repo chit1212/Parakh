@@ -459,17 +459,12 @@ export default function ComparePage() {
         <Legend open={legendOpen} toggle={() => setLegendUser(!legendOpen)} />
 
         <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "4px 28px 10px 8px" }}>
-          {/* Filters fold away like "How to read a price"; the line shows what is applied either way. */}
+          {/* Filters fold away like "How to read a price". */}
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <button onClick={() => setFiltersOpen(!filtersOpen)} aria-expanded={filtersOpen}
               style={{ flex: "none", display: "flex", alignItems: "center", gap: 6, background: "none", border: 0, padding: 0, font: "inherit", ...label11, color: filtersOpen ? label11.color : "var(--color-accent-800)" }}>
               {filtersOpen ? <CaretDown weight="duotone" /> : <CaretRight weight="duotone" />}Filters
             </button>
-            {!filtersOpen && (
-              <span style={{ color: "var(--color-neutral-800)", fontSize: 12.5, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: "0 1 auto" }} title={isScenario ? active.title : "As quoted"}>
-                {isScenario ? active.title : "As quoted"} · {f.win ? `won by ${grid.vendors.find((v) => v.id === f.win)?.short}` : "any vendor"} · {SHOW.find(([k]) => k === f.show)![1].toLowerCase()}
-              </span>
-            )}
             {filtered && <button className="btn btn-ghost" onClick={() => setF(NO_FILTER)} style={{ padding: "2px 8px", flex: "none", whiteSpace: "nowrap" }}>Clear filters</button>}
             <div style={{ marginLeft: "auto", flex: "none", display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ color: "var(--color-neutral-700)", whiteSpace: "nowrap" }}>Showing {shown.length} of {grid.lines.length} lines · {shownValue >= 1e7 ? crore(shownValue) : lakh(shownValue)}</span>
