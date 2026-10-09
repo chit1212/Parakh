@@ -25,8 +25,8 @@ const SUGGESTIONS = [
   "Keep it to quality-cleared vendors, but don’t let any one vendor take more than 40% of the value.",
 ];
 
-export function Conversation({ msgs, results, titles, people, asker, setAsker, busy, q, setQ, onAsk, onShow, opening, vendorNames }: {
-  msgs: ChatMsg[]; results: ScenarioResult[]; titles: string[]; people: People; asker: "buyer" | "vp"; setAsker: (a: "buyer" | "vp") => void;
+export function Conversation({ msgs, results, titles, people, asker, busy, q, setQ, onAsk, onShow, opening, vendorNames }: {
+  msgs: ChatMsg[]; results: ScenarioResult[]; titles: string[]; people: People; asker: "buyer" | "vp";
   busy: boolean; q: string; setQ: (s: string) => void; onAsk: (text: string) => void; onShow: (i: number, view: "table" | "chart") => void;
   opening: string; vendorNames: Record<string, string>;
 }) {
@@ -36,7 +36,6 @@ export function Conversation({ msgs, results, titles, people, asker, setAsker, b
     if (el) el.scrollTop = el.scrollHeight;
   }, [msgs.length, busy]);
   const asked = new Set(msgs.filter((m) => m.role === "user").map((m) => m.text));
-  const seg = (on: boolean) => ({ border: 0, padding: "6px 12px", font: "inherit", fontSize: 13, background: on ? "var(--color-accent)" : "transparent", color: on ? "var(--color-bg)" : "inherit", whiteSpace: "nowrap" as const });
 
   return (
     <>
@@ -60,11 +59,10 @@ export function Conversation({ msgs, results, titles, people, asker, setAsker, b
                 const d = r.award.total - r.base.total;
                 return (
                   <div key={si} style={{ background: "var(--color-bg)", boxShadow: "var(--shadow-sm)", padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6 }}>
-                    <span style={{ ...label, color: "var(--color-accent-800)" }}>Scenario {si + 1} · applied to the table</span>
-                    <span style={{ fontSize: 13, color: "var(--color-neutral-800)" }}>{titles[si]}</span>
+                    <span style={{ ...label, color: "var(--color-accent-800)" }}>{titles[si]} · applied to the table</span>
                     <span style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
                       <span style={{ fontSize: 20, fontWeight: 600 }}>{crore(r.award.total)}</span>
-                      <span style={{ color: "var(--color-accent-800)" }}>{d >= 0 ? "+" : "−"}{lakh(Math.abs(d))} vs as quoted</span>
+                      <span style={{ color: "var(--color-accent-800)" }}>{d >= 0 ? "+" : "−"}{lakh(Math.abs(d))} vs cheapest overall</span>
                     </span>
                     <span style={{ color: "var(--color-neutral-800)" }}>{Object.entries(r.award.byVendor).filter(([, b]) => b.lines).map(([v, b]) => `${vendorNames[v]} ${b.lines}`).join(" · ")} lines</span>
                     <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{r.rules.length} rules · {r.excluded.length ? `${r.excluded.length} vendor${r.excluded.length > 1 ? "s" : ""} excluded` : "no vendors excluded"} · {r.changed.length} lines change hands</span>
@@ -86,13 +84,9 @@ export function Conversation({ msgs, results, titles, people, asker, setAsker, b
             <button key={s} disabled={busy} onClick={() => onAsk(s)} style={{ background: "var(--color-bg)", border: 0, padding: "4px 10px", font: "inherit", fontSize: 12, color: "var(--color-accent-800)", borderRadius: "var(--radius-md)", textAlign: "left" }}>{s}</button>
           ))}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--color-neutral-700)" }}>
-          <span>Asking as</span>
-          <div style={{ display: "inline-flex", border: "1px solid var(--color-divider)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
-            <button onClick={() => setAsker("buyer")} style={seg(asker === "buyer")}>{people.buyer.split(" ")[0]} · buyer</button>
-            <button onClick={() => setAsker("vp")} style={seg(asker === "vp")}>{people.vp.split(" ")[0]} · VP</button>
-          </div>
-        </div>
+        <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>
+          Asking as {asker === "vp" ? `${people.vp}, VP` : `${people.buyer}, buyer`} · switch in the P menu
+        </span>
         <form style={{ display: "flex", gap: 8 }} onSubmit={(e) => { e.preventDefault(); if (q.trim() && !busy) onAsk(q.trim()); }}>
           <textarea className="input" style={{ minHeight: 58, background: "var(--color-bg)" }} placeholder="Ask a what-if, e.g. cap any one vendor at 40%" value={q}
             onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (q.trim() && !busy) onAsk(q.trim()); } }} />

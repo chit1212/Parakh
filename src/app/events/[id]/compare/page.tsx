@@ -12,7 +12,10 @@ import { DECISIONS_KEY, DoubtsView } from "@/components/DoubtsView";
 import { freeze, OVERRIDES_KEY, SNAPSHOT_KEY, type Override, type Snapshot } from "@/lib/award";
 import { download } from "@/lib/download";
 import { useRouter } from "next/navigation";
-import { runScenario, type ScenarioResult, type ScenarioRules } from "@/lib/scenario";
+import { LIBRARY, runScenario, sameRules, type ScenarioResult, type ScenarioRules } from "@/lib/scenario";
+import { useScheme } from "@/components/useScheme";
+import { useRole } from "@/components/useRole";
+import { checkKey, stamp, useVerified, type Check, type Checks } from "@/components/useVerified";
 import { useReadings } from "@/components/useReadings";
 import { findDoubts, type Doubt, type DoubtReport } from "@/lib/doubts";
 import { qualityOf, type Quality } from "@/lib/quality";
@@ -41,13 +44,13 @@ const paneS = (on: boolean): React.CSSProperties => ({
   color: on ? "var(--color-text)" : "var(--color-neutral-700)", fontWeight: on ? 600 : 400, boxShadow: on ? "inset 0 -2px 0 var(--color-text)" : "none",
 });
 
-function ScenarioStrip({ r, n, grid, askedBy, onBack, backLabel }: { r: ScenarioResult; n: number | null; grid: Grid; askedBy: string; onBack: () => void; backLabel: string }) {
+function ScenarioStrip({ r, title, grid, askedBy, onBack, backLabel }: { r: ScenarioResult; title: string; grid: Grid; askedBy: string | null; onBack: () => void; backLabel: string }) {
   const d = r.award.total - r.base.total;
   const lbl = { ...label11, color: "var(--color-accent-800)" };
   return (
     <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1.8fr) minmax(0,1fr) auto", gap: 24, padding: "10px 28px 12px 8px", fontSize: 12.5, background: "var(--color-accent-100)", marginBottom: 4 }}>
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-        <span style={lbl}>{n ? `Scenario ${n}` : "As quoted, with your overrides"} · rules applied</span>
+        <span style={lbl}>{title} · rules applied</span>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: "4px 18px" }}>
           {r.rules.map((t, i) => (
             <div key={i} style={{ display: "grid", gridTemplateColumns: "24px 1fr", gap: 4, lineHeight: 1.35 }}>
@@ -60,11 +63,11 @@ function ScenarioStrip({ r, n, grid, askedBy, onBack, backLabel }: { r: Scenario
         <span style={lbl}>Excluded, and why</span>
         {r.excluded.length ? r.excluded.map((x) => <div key={x.vendorId}><span style={{ fontWeight: 600 }}>{x.name}</span>: {x.why}</div>) : <div>No vendor excluded.</div>}
         {r.notes.map((t, i) => <div key={i} style={{ color: "var(--color-neutral-800)" }}>{t}</div>)}
-        <span style={{ fontSize: 12, color: "var(--color-neutral-700)", paddingTop: 4 }}>{askedBy}</span>
+        {askedBy && <span style={{ fontSize: 12, color: "var(--color-neutral-700)", paddingTop: 4 }}>{askedBy}</span>}
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end", textAlign: "right" }}>
         <span style={{ fontSize: 24, fontWeight: 600, lineHeight: 1.15 }}>{crore(r.award.total)}</span>
-        <span style={{ color: "var(--color-accent-800)" }}>{d >= 0 ? "+" : "−"}{lakh(Math.abs(d))} ({d >= 0 ? "+" : "−"}{Math.abs((d / r.base.total) * 100).toFixed(1)}%) vs as quoted</span>
+        <span style={{ color: "var(--color-accent-800)" }}>{d >= 0 ? "+" : "−"}{lakh(Math.abs(d))} ({d >= 0 ? "+" : "−"}{Math.abs((d / r.base.total) * 100).toFixed(1)}%) vs cheapest overall</span>
         <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{grid.vendors.filter((v) => r.award.byVendor[v.id].lines).map((v) => `${v.short} ${r.award.byVendor[v.id].lines}`).join(" · ")} lines</span>
         <button className="btn btn-ghost" onClick={onBack}>{backLabel}</button>
       </div>
@@ -208,20 +211,32 @@ const STATE_LABEL: Record<GridCell["kind"], string> = {
   checked: "checked", converted: "converted", last_year: "last year’s rate", not_quoted: "not quoted", unclear: "not on the basis",
 };
 
+type Show = "all" | "doubts" | "changed" | "unverified" | "unusual" | "missing" | "lastyear";
+type Sort = "line" | "stake" | "value" | "closest" | "above";
+interface Asked { title: string; rules: ScenarioRules; asker: "buyer" | "vp"; libKey: string | null }
+const SHOW: [Show, string][] = [["all", "All lines"], ["doubts", "With doubts"], ["changed", "Winner changed"], ["unverified", "Winner not verified by you"], ["unusual", "Unusual price"], ["missing", "Missing quotes"], ["lastyear", "Last year’s prices"]];
+const SORTS: [Sort, string][] = [["line", "Line number"], ["stake", "Rupees at stake in doubts"], ["value", "Award value, highest first"], ["closest", "Closest calls (gap to 2nd)"], ["above", "Furthest above should-cost"]];
+const NO_FILTER = { show: "all" as Show, win: "", ply: "" };
+
 export default function ComparePage() {
   const { data, state } = useReadings();
+  const [scheme] = useScheme();
+  const [role] = useRole();
+  const [checks, setCheck] = useVerified();
   const [sel, setSel] = useState<{ v: string; l: string } | null>(null);
-  const [legend, setLegend] = useState(true);
+  const [legendUser, setLegendUser] = useState<boolean | null>(null);
   const [tab, setTab] = useState<"compare" | "doubts">("compare");
   const [pane, setPane] = useState<"conv" | "src">("conv");
   const [view, setView] = useState<"table" | "chart">("table");
   const [msgs, setMsgs] = useState<ChatMsg[]>([]);
-  const [asked, setAsked] = useState<{ title: string; rules: ScenarioRules; asker: "buyer" | "vp" }[]>([]);
-  const [active, setActive] = useState<number | null>(null);
-  const [asker, setAsker] = useState<"buyer" | "vp">("vp");
+  const [asked, setAsked] = useState<Asked[]>([]);
+  // The view on screen: a library strategy ("base", "S1", …) or a scenario asked in chat ("asked:3").
+  const [scen, setScen] = useState<string>("base");
+  const [f, setF] = useState<{ show: Show; win: string; ply: string; sort: Sort }>({ ...NO_FILTER, sort: "line" });
   const [busy, setBusy] = useState(false);
   const [q, setQ] = useState("");
   const router = useRouter();
+  const asker: "buyer" | "vp" = role === "VP" ? "vp" : "buyer";
 
   const readings = useMemo(
     () => (data ? data.replies.map((r) => state[r.id]?.reading).filter((r): r is ReplyReading => Boolean(r && r.status !== "error")) : []),
@@ -233,8 +248,8 @@ export default function ComparePage() {
     return buildGrid(data.event, readings, { sheets: data.historySheets }, files, data.lastYear);
   }, [data, readings, state]);
 
-  // Quality (code, from the questionnaire as read) and the doubts that could change a winner.
-  const quality = useMemo(() => (data ? data.event.vendors.map((v) => qualityOf(data.event, v.id, readings)) : []), [data, readings]);
+  // Quality (code, from the questionnaire as read, marked against the buyer's scheme) and the doubts that could change a winner.
+  const quality = useMemo(() => (data ? data.event.vendors.map((v) => qualityOf(data.event, v.id, readings, scheme)) : []), [data, readings, scheme]);
   const report = useMemo(
     () => (data && grid ? findDoubts(data.event, grid, quality.filter((q) => q.cleared).map((q) => q.vendorId)) : null),
     [data, grid, quality],
@@ -246,6 +261,16 @@ export default function ComparePage() {
       const changed = new Set(d.changes.map((c) => c.lineId));
       for (const l of d.lineIds) if (changed.has(l) && !m.has(cellKey(d.vendorId, l))) m.set(cellKey(d.vendorId, l), { d, rank: i + 1 });
     });
+    return m;
+  }, [report]);
+  // Rupees at stake in raised doubts, per line.
+  const stakeAt = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const d of report?.raised ?? []) {
+      const per = new Map<string, number>();
+      for (const c of d.changes) per.set(c.lineId, Math.max(per.get(c.lineId) ?? 0, c.stake));
+      for (const [l, x] of per) m.set(l, (m.get(l) ?? 0) + x);
+    }
     return m;
   }, [report]);
 
@@ -263,13 +288,24 @@ export default function ComparePage() {
     setOverridesState(o);
     try { localStorage.setItem(OVERRIDES_KEY, JSON.stringify(o)); } catch { /* kept for this visit */ }
   };
-  // The view on screen: a scenario or as quoted, with the buyer's overrides applied on top.
+
+  // The active strategy: its title, rules, and who asked for it in chat (if anyone).
+  const active = useMemo(() => {
+    if (scen.startsWith("asked:")) {
+      const a = asked[Number(scen.slice(6))];
+      if (a) return { title: a.title, desc: "Asked in chat; solved in code with the rules below.", rules: a.rules, asker: a.asker as "buyer" | "vp" | null };
+    }
+    const lib = LIBRARY.find((x) => x.key === scen) ?? LIBRARY[0];
+    const by = [...asked].reverse().find((a) => a.libKey === lib.key);
+    return { title: lib.title, desc: lib.desc, rules: lib.rules, asker: by?.asker ?? null };
+  }, [scen, asked]);
+  const isScenario = scen !== "base";
+  // The view on screen, with the buyer's overrides applied on top.
   const cur = useMemo<ScenarioResult | null>(() => {
     if (!data || !grid) return null;
-    const base = active != null ? asked[active]?.rules : null;
-    if (!base && !overrides.length) return null;
-    return runScenario(data.event, grid, quality, { ...(base ?? { eligible: "all" }), overrides: overrides.map((o) => ({ lineId: o.lineId, vendorId: o.to })) });
-  }, [data, grid, quality, asked, active, overrides]);
+    if (!isScenario && !overrides.length) return null;
+    return runScenario(data.event, grid, quality, { ...active.rules, overrides: overrides.map((o) => ({ lineId: o.lineId, vendorId: o.to })) });
+  }, [data, grid, quality, active, isScenario, overrides]);
 
   const ask = async (text: string) => {
     const who = asker;
@@ -281,15 +317,22 @@ export default function ComparePage() {
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
-        body: JSON.stringify({ messages: next.map((m) => ({ role: m.role, text: m.text, asker: m.asker === "vp" ? `${data!.event.vp} (VP)` : m.asker ? `${data!.event.buyer} (buyer)` : undefined })) }),
+        body: JSON.stringify({ scheme, messages: next.map((m) => ({ role: m.role, text: m.text, asker: m.asker === "vp" ? `${data!.event.vp} (VP)` : m.asker ? `${data!.event.buyer} (buyer)` : undefined })) }),
       });
       const j = await res.json();
       if (j.error) { setMsgs((m) => [...m, { role: "assistant", text: j.error, error: true }]); return; }
-      const added = (j.scenarios as (ScenarioRules & { title: string })[]).map(({ title, ...rules }) => ({ title, rules, asker: who }));
+      const added: Asked[] = (j.scenarios as (ScenarioRules & { title: string })[]).map(({ title, ...rules }) => {
+        const lib = LIBRARY.find((x) => sameRules(x.rules, rules));
+        return { title: lib?.title ?? title, rules, asker: who, libKey: lib?.key ?? null };
+      });
       const first = asked.length;
       setAsked((a) => [...a, ...added]);
       setMsgs((m) => [...m, { role: "assistant", text: j.answer, model: j.model, scenarios: added.map((_, i) => first + i) }]);
-      if (added.length) { setActive(first + added.length - 1); setView(j.view ?? "table"); setLegend(false); setTab("compare"); }
+      if (added.length) {
+        const last = added[added.length - 1];
+        setScen(last.libKey ?? `asked:${first + added.length - 1}`);
+        setView(j.view ?? "table"); setTab("compare");
+      }
     } catch {
       setMsgs((m) => [...m, { role: "assistant", text: "Something went wrong while answering. Nothing was changed; try again in a minute.", error: true }]);
     } finally {
@@ -297,12 +340,69 @@ export default function ComparePage() {
     }
   };
 
-  // The table as shown (as quoted, or the active scenario), frozen with every number's source.
-  const snapshotNow = (): Snapshot => {
+  const award = cur?.award ?? grid?.asQuoted ?? null;
+  const excluded = useMemo(() => new Set(cur?.excluded.map((e) => e.vendorId) ?? []), [cur]);
+
+  // Report toolbar: which lines show, in what order. Filters test the active view's winners and ignore excluded vendors.
+  const tests = useMemo(() => {
+    if (!grid || !award) return null;
+    const live = grid.vendors.filter((v) => !excluded.has(v.id));
+    const base = grid.asQuoted;
+    const any = (l: string, t: (c: GridCell) => boolean) => live.some((v) => t(grid.cells[cellKey(v.id, l)]));
+    return {
+      doubts: (l: string) => live.some((v) => doubtAt.has(cellKey(v.id, l))),
+      changed: (l: string) => !!cur && award.per[l]?.vendorId !== base.per[l]?.vendorId,
+      unverified: (l: string) => !!award.per[l] && !checks[checkKey(award.per[l]!.vendorId, l)],
+      unusual: (l: string) => any(l, (c) => c.band != null),
+      missing: (l: string) => any(l, (c) => c.perBox == null),
+      lastyear: (l: string) => any(l, (c) => c.kind === "last_year"),
+    } as Record<Exclude<Show, "all">, (l: string) => boolean>;
+  }, [grid, award, cur, excluded, doubtAt, checks]);
+
+  const plys = grid ? [...new Set(grid.lines.map((l) => l.plyN))].sort() : [];
+  const pre = grid && award ? grid.lines.filter((l) => (!f.win || award.per[l.id]?.vendorId === f.win) && (!f.ply || String(l.plyN) === f.ply)) : [];
+  const counts = Object.fromEntries(SHOW.map(([k]) => [k, k === "all" ? pre.length : pre.filter((l) => tests?.[k](l.id)).length])) as Record<Show, number>;
+  const shown = (() => {
+    if (!grid || !award) return [];
+    const keep = pre.filter((l) => f.show === "all" || tests?.[f.show](l.id));
+    const val = (id: string, qty: number) => (award.per[id] ? award.per[id]!.perBox * qty : -1);
+    const gap = (id: string) => {
+      const ps = grid.vendors.filter((v) => !excluded.has(v.id)).map((v) => grid.cells[cellKey(v.id, id)]).filter((c) => c.canWin && c.perBox != null).map((c) => c.perBox!).sort((a, b) => a - b);
+      return ps.length > 1 ? (ps[1] - ps[0]) / ps[0] : Infinity;
+    };
+    const above = (id: string) => { const w = award.per[id]; return w ? grid.cells[cellKey(w.vendorId, id)].deviation ?? -Infinity : -Infinity; };
+    const by: Record<Sort, (a: (typeof keep)[number], b: (typeof keep)[number]) => number> = {
+      line: () => 0,
+      stake: (a, b) => (stakeAt.get(b.id) ?? 0) - (stakeAt.get(a.id) ?? 0),
+      value: (a, b) => val(b.id, b.qty) - val(a.id, a.qty),
+      closest: (a, b) => gap(a.id) - gap(b.id),
+      above: (a, b) => above(b.id) - above(a.id),
+    };
+    return [...keep].sort(by[f.sort]);
+  })();
+  const filtered = f.show !== "all" || !!f.win || !!f.ply;
+
+  // "Verified by you": winners in the active view, and every quoted price.
+  const winners = grid && award ? grid.lines.filter((l) => award.per[l.id]) : [];
+  const winChecked = winners.filter((l) => checks[checkKey(award!.per[l.id]!.vendorId, l.id)]).length;
+  const quoted = grid ? Object.values(grid.cells).filter((c) => c.perBox != null) : [];
+  const quotedChecked = quoted.filter((c) => checks[checkKey(c.vendorId, c.lineId)]).length;
+  const nextWinner = (after?: string) => {
+    if (!award) return;
+    const order = shown.length ? shown : grid!.lines;
+    const i = after ? order.findIndex((l) => l.id === after) : -1;
+    const rest = [...order.slice(i + 1), ...order.slice(0, i + 1)];
+    const l = rest.find((x) => award.per[x.id] && !checks[checkKey(award.per[x.id]!.vendorId, x.id)] && x.id !== after);
+    if (l) { setSel({ v: award.per[l.id]!.vendorId, l: l.id }); setPane("src"); setTab("compare"); }
+  };
+  const me = role === "VP" ? `${data?.event.vp}` : `${data?.event.buyer}`;
+
+  // The table as shown (as quoted, or the active strategy), frozen with every number's source.
+  const snapshotNow = (only?: string[]): Snapshot => {
     let decisions: Record<string, string> = {};
     try { decisions = JSON.parse(localStorage.getItem(DECISIONS_KEY) ?? "{}"); } catch { /* none */ }
-    return freeze({ ev: data!.event, grid: grid!, quality, report: report!, lastYear: data!.lastYear, decisions,
-      scenario: cur ? { title: `${active != null ? asked[active].title : "As quoted"}${overrides.length ? `, with ${overrides.length} override${overrides.length > 1 ? "s" : ""}` : ""}`, result: cur } : null,
+    return freeze({ ev: data!.event, grid: grid!, quality, report: report!, lastYear: data!.lastYear, decisions, checks, only,
+      scenario: cur ? { title: `${isScenario ? active.title : "As quoted"}${overrides.length ? `, with ${overrides.length} override${overrides.length > 1 ? "s" : ""}` : ""}`, result: cur } : null,
       overrides });
   };
 
@@ -311,9 +411,14 @@ export default function ComparePage() {
   for (const r of data?.replies ?? []) for (const f of [...(r.cover ? [r.cover] : []), ...r.files]) paths[`${r.id}|${f.name.toLowerCase()}`] = f.path;
   paths[`history|se-2025-037_award_summary.xlsx`] = "dataset/04_history/SE-2025-037_Award_Summary.xlsx";
 
-  if (!data || !grid || !report) return <div style={{ padding: 40, color: "var(--color-neutral-700)" }}>Loading the event…</div>;
+  if (!data || !grid || !report || !award) return <div style={{ padding: 40, color: "var(--color-neutral-700)" }}>Loading the event…</div>;
   const ev = data.event;
   const pending = data.replies.filter((r) => !state[r.id] || state[r.id].stage !== "done").length;
+  const legendOpen = legendUser ?? !isScenario;
+  const shownValue = shown.reduce((a, l) => a + (award.per[l.id] ? award.per[l.id]!.perBox * l.qty : 0), 0);
+  const askedLabel = (a: Asked) => (a.asker === "vp" ? `Asked by ${ev.vp}, ${ev.vpRole}` : `Asked by ${ev.buyer}, buyer`);
+  const sel11 = { ...label11, display: "flex", flexDirection: "column" as const, gap: 4 };
+  const selS: React.CSSProperties = { minHeight: 34, height: 34, padding: "4px 8px", fontSize: 13, background: "var(--color-bg)" };
 
   return (
     <div style={{ display: "flex", height: "100vh", minWidth: 1360, fontSize: 13, lineHeight: 1.4, fontVariantNumeric: "tabular-nums", overflow: "hidden" }}>
@@ -341,30 +446,73 @@ export default function ComparePage() {
             Doubts <span style={{ color: "var(--color-accent-2-700)" }}>{report.raised.length}</span> · {lakh(report.raised.reduce((a, d) => a + d.stake, 0))} at stake
           </button>
           {pending > 0 && <span style={{ color: "var(--color-neutral-700)" }}>Reading {pending} more repl{pending === 1 ? "y" : "ies"}…</span>}
+          <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12, fontSize: 12.5 }}>
+            <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", lineHeight: 1.25 }}>
+              <span><b>{winChecked} of {winners.length}</b> winning prices verified by you</span>
+              <span style={{ color: "var(--color-neutral-700)", fontSize: 11.5 }}>{quotedChecked} of {quoted.length} of all quoted prices</span>
+            </span>
+            <button className="btn btn-secondary" style={{ padding: "4px 10px", fontSize: 12.5 }} disabled={winChecked === winners.length} onClick={() => nextWinner(sel?.l)}>
+              <SealCheck size={14} weight="duotone" />Check next winner
+            </button>
+          </span>
         </div>
 
         {tab === "doubts" ? (
           <DoubtsView grid={grid} report={report} overrides={overrides} onSee={(v, l) => { setSel({ v, l }); setTab("compare"); }} />
         ) : (
         <>
-        <Legend open={legend} toggle={() => setLegend(!legend)} />
+        <Legend open={legendOpen} toggle={() => setLegendUser(!legendOpen)} />
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px 14px", padding: "2px 28px 8px 8px" }}>
-          <span style={{ ...label11, flex: "none" }}>Table shows</span>
-          <div style={{ flex: 1, minWidth: 0, display: "flex", gap: 8, overflowX: "auto", padding: 2 }}>
-            <button onClick={() => setActive(null)} style={pill(active == null)}>As quoted</button>
-            {asked.map((a, i) => <button key={i} onClick={() => setActive(i)} style={pill(active === i)}>Scenario {i + 1} · {a.title}</button>)}
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: "2px 28px 10px 8px" }}>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: 12, flexWrap: "wrap" }}>
+            <label style={sel11}>Scenario
+              <select className="input" style={{ ...selS, width: 320 }} value={scen} onChange={(e) => { setScen(e.target.value); setView("table"); }}>
+                {LIBRARY.map((x) => <option key={x.key} value={x.key}>{x.title}{asked.some((a) => a.libKey === x.key) ? " · asked in chat" : ""}</option>)}
+                {asked.map((a, i) => (a.libKey ? null : <option key={`a${i}`} value={`asked:${i}`}>{a.title} · asked in chat</option>))}
+              </select>
+            </label>
+            <label style={sel11}>Won by
+              <select className="input" style={{ ...selS, width: 150 }} value={f.win} onChange={(e) => setF({ ...f, win: e.target.value })}>
+                <option value="">Any vendor</option>
+                {grid.vendors.map((v) => <option key={v.id} value={v.id}>{v.short}</option>)}
+              </select>
+            </label>
+            <label style={sel11}>Board
+              <select className="input" style={{ ...selS, width: 110 }} value={f.ply} onChange={(e) => setF({ ...f, ply: e.target.value })}>
+                <option value="">All boxes</option>
+                {plys.map((p) => <option key={p} value={String(p)}>{p}-ply</option>)}
+              </select>
+            </label>
+            <label style={sel11}>Sort by
+              <select className="input" style={{ ...selS, width: 200 }} value={f.sort} onChange={(e) => setF({ ...f, sort: e.target.value as Sort })}>
+                {SORTS.map(([k, t]) => <option key={k} value={k}>{t}</option>)}
+              </select>
+            </label>
+            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ flex: "none", display: "inline-flex", border: "1px solid var(--color-divider)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
+                <button onClick={() => setView("table")} style={segS(view === "table")}>Table</button>
+                <button onClick={() => setView("chart")} style={segS(view === "chart")}>Chart</button>
+              </div>
+              <button className="btn btn-ghost" style={{ whiteSpace: "nowrap" }} title="Download the lines shown, as shown (Excel)" onClick={() => download(snapshotNow(shown.map((l) => l.id)), "xlsx")}><Export size={16} weight="duotone" />Export view</button>
+            </div>
           </div>
-          <div style={{ flex: "none", display: "inline-flex", border: "1px solid var(--color-divider)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
-            <button onClick={() => setView("table")} style={segS(view === "table")}>Table</button>
-            <button onClick={() => setView("chart")} style={segS(view === "chart")}>Chart</button>
+          <span style={{ fontSize: 13, color: "var(--color-neutral-800)", maxWidth: 900 }}>{active.desc}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+            <span style={{ ...label11, marginRight: 4 }}>Show</span>
+            {SHOW.filter(([k]) => k !== "changed" || isScenario || overrides.length > 0).map(([k, t]) => (
+              <button key={k} onClick={() => setF({ ...f, show: k })} style={{ ...pill(f.show === k), fontSize: 12.5, padding: "4px 9px" }}>
+                {t} <span style={{ opacity: 0.75 }}>{counts[k]}</span>
+              </button>
+            ))}
+            <span style={{ marginLeft: "auto", color: "var(--color-neutral-700)", whiteSpace: "nowrap" }}>Showing {shown.length} of {grid.lines.length} lines · {shownValue >= 1e7 ? crore(shownValue) : lakh(shownValue)}</span>
+            <button className="btn btn-ghost" disabled={!filtered} onClick={() => setF({ ...NO_FILTER, sort: f.sort })} style={{ padding: "2px 8px" }}>Clear filters</button>
           </div>
         </div>
 
-        {cur && (active != null || overrides.length > 0) && (
-          <ScenarioStrip r={cur} n={active != null ? active + 1 : null} grid={grid}
-            askedBy={active != null ? (asked[active].asker === "vp" ? `Asked by ${ev.vp}, ${ev.vpRole}` : `Asked by ${ev.buyer}, buyer`) : `Overrides by ${ev.buyer}, buyer`}
-            onBack={() => (active != null ? setActive(null) : setOverrides([]))} backLabel={active != null ? "Back to as quoted" : "Clear overrides"} />
+        {cur && (isScenario || overrides.length > 0) && (
+          <ScenarioStrip r={cur} title={isScenario ? active.title : "As quoted, with your overrides"} grid={grid}
+            askedBy={isScenario ? (active.asker ? askedLabel({ asker: active.asker } as Asked) : null) : `Overrides by ${ev.buyer}, buyer`}
+            onBack={() => (isScenario ? setScen("base") : setOverrides([]))} backLabel={isScenario ? "Back to as quoted" : "Clear overrides"} />
         )}
 
         <div style={{ flex: "1 0 460px", minHeight: 460, display: "flex" }}>
@@ -372,8 +520,9 @@ export default function ComparePage() {
             {view === "chart" ? (
               <ChartView grid={grid} r={cur} />
             ) : (
-              <GridTable grid={grid} sel={sel} quality={quality} doubtAt={doubtAt} award={cur?.award ?? grid.asQuoted} base={cur ? grid.asQuoted : null}
-                excluded={new Set(cur?.excluded.map((e) => e.vendorId) ?? [])} scenarioNo={active != null ? active + 1 : null} onSelect={(v, l) => { setSel({ v, l }); setPane("src"); }} />
+              <GridTable grid={grid} lines={shown} filtered={filtered} sel={sel} quality={quality} doubtAt={doubtAt} award={award} base={cur ? grid.asQuoted : null}
+                excluded={excluded} excludedWhy={new Map(cur?.excluded.map((e) => [e.vendorId, quality.some((q) => q.vendorId === e.vendorId && !q.cleared) && cur.rules.some((r) => r.startsWith("Eligible:")) ? "Excluded on quality" : "Excluded in this view"]) ?? [])}
+                checks={checks} onSelect={(v, l) => { setSel({ v, l }); setPane("src"); }} />
             )}
           </div>
         </div>
@@ -390,15 +539,17 @@ export default function ComparePage() {
           </button>
         </div>
         {pane === "conv" ? (
-          <Conversation msgs={msgs} results={results} titles={asked.map((a) => a.title)} people={{ buyer: ev.buyer, vp: ev.vp }} asker={asker} setAsker={setAsker}
-            busy={busy} q={q} setQ={setQ} onAsk={ask} onShow={(i, v) => { setActive(i); setView(v); setTab("compare"); }}
+          <Conversation msgs={msgs} results={results} titles={asked.map((a) => a.title)} people={{ buyer: ev.buyer, vp: ev.vp }} asker={asker}
+            busy={busy} q={q} setQ={setQ} onAsk={ask} onShow={(i, v) => { setScen(asked[i]?.libKey ?? `asked:${i}`); setView(v); setTab("compare"); }}
             vendorNames={Object.fromEntries(grid.vendors.map((v) => [v.id, v.short]))}
-            opening={`Quotes from ${new Set(readings.filter((r) => r.status === "read" && r.vendorId).map((r) => r.vendorId)).size} of ${ev.vendors.length} vendors are read and on one basis. ${report.raised.length} doubts could change a winner (${lakh(report.raised.reduce((a, d) => a + d.stake, 0))} at stake); see the Doubts tab. Ask me anything about this table; every answer is solved in code and applied to it as a scenario you can keep, compare and switch between.`} />
+            opening={`Quotes from ${new Set(readings.filter((r) => r.status === "read" && r.vendorId).map((r) => r.vendorId)).size} of ${ev.vendors.length} vendors are read and on one basis. ${report.raised.length} doubts could change a winner (${lakh(report.raised.reduce((a, d) => a + d.stake, 0))} at stake); see the Doubts tab. Ask me anything about this table; every answer is solved in code and added to the Scenario list, so you can keep, compare and switch between them.`} />
         ) : (
         <div style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "16px 22px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
           {sel ? (
             <SourcePanel grid={grid} sel={sel} readings={readings} paths={paths} doubt={doubtAt.get(cellKey(sel.v, sel.l))} report={report}
-              shown={cur?.award ?? grid.asQuoted} override={overrides.find((o) => o.lineId === sel.l)} buyer={ev.buyer}
+              shown={award} override={overrides.find((o) => o.lineId === sel.l)} buyer={ev.buyer}
+              check={checks[checkKey(sel.v, sel.l)] ?? null} me={me}
+              onCheck={(c, next) => { setCheck(checkKey(sel.v, sel.l), c); if (next) nextWinner(sel.l); }}
               onOverride={(o) => setOverrides([...overrides.filter((x) => x.lineId !== o.lineId), ...(o.to ? [o] : [])])} onSelect={(v) => setSel({ v, l: sel.l })} onClose={() => setSel(null)} />
           ) : (
             <p style={{ margin: 0, color: "var(--color-neutral-700)", maxWidth: 320 }}>
@@ -441,15 +592,23 @@ function Legend({ open, toggle }: { open: boolean; toggle: () => void }) {
       {item(<span style={{ ...chip, color: "var(--color-neutral-500)" }}>—</span>, "Not quoted", "vendor skipped this line")}
       {item(<span style={{ ...chip, boxShadow: "none", background: "var(--color-accent-2-100)", color: "var(--color-accent-2-800)", fontWeight: 600 }}>24.60?</span>, "Doubt", "could change who wins", "var(--color-accent-2-800)")}
       {item(<span style={{ ...chip, fontWeight: 600 }}>24.60</span>, "Lowest", "bold = cheapest on the line")}
+      {item(<span style={{ ...chip, display: "inline-flex", alignItems: "center", gap: 3, justifyContent: "flex-end" }}><SealCheck size={12} weight="duotone" color="var(--color-accent-700)" />24.60</span>, "Verified by you", "you checked it against the document")}
     </div>
   );
 }
 
-function GridTable({ grid, sel, quality, doubtAt, award, base, excluded, scenarioNo, onSelect }: {
-  grid: Grid; sel: { v: string; l: string } | null; quality: Quality[]; doubtAt: Map<string, { d: Doubt; rank: number }>;
-  award: Award; base: Award | null; excluded: Set<string>; scenarioNo: number | null; onSelect: (v: string, l: string) => void;
+function GridTable({ grid, lines, filtered, sel, quality, doubtAt, award, base, excluded, excludedWhy, checks, onSelect }: {
+  grid: Grid; lines: Grid["lines"]; filtered: boolean; sel: { v: string; l: string } | null; quality: Quality[]; doubtAt: Map<string, { d: Doubt; rank: number }>;
+  award: Award; base: Award | null; excluded: Set<string>; excludedWhy: Map<string, string>; checks: Checks; onSelect: (v: string, l: string) => void;
 }) {
   const muted = { fontSize: 11, color: "var(--color-neutral-700)" };
+  // The footer totals the lines shown.
+  const foot = { byVendor: Object.fromEntries(grid.vendors.map((v) => [v.id, { lines: 0, value: 0 }])) as Award["byVendor"], total: 0 };
+  for (const l of lines) {
+    const w = award.per[l.id];
+    if (!w) continue;
+    foot.byVendor[w.vendorId].lines++; foot.byVendor[w.vendorId].value += w.perBox * l.qty; foot.total += w.perBox * l.qty;
+  }
   return (
     <>
       <div style={{ position: "sticky", top: 0, zIndex: 2, background: "var(--color-bg)", display: "grid", gridTemplateColumns: COLS, alignItems: "end", padding: "8px 0", borderBottom: "1px solid var(--color-text)" }}>
@@ -465,16 +624,17 @@ function GridTable({ grid, sel, quality, doubtAt, award, base, excluded, scenari
               <span style={{ display: "flex", alignItems: "center", gap: 4, ...muted }}><Icon weight="duotone" />{v.format}</span>
               {(() => {
                 const q = quality.find((x) => x.vendorId === v.id);
-                return <span style={{ fontSize: 11 }} title={q?.why}>{!q?.returned ? "No questionnaire" : `Quality ${q.cleared ? "✓" : "✕"}`}</span>;
+                return <span style={{ fontSize: 11 }} title={q?.why}>{!q?.returned ? "No questionnaire" : `Quality ${q.score} ${q.cleared ? "✓" : "✕"}`}</span>;
               })()}
-              <span style={{ fontSize: 10.5, color: "var(--color-neutral-700)", lineHeight: 1.25 }}>{excluded.has(v.id) ? `Excluded in scenario ${scenarioNo}` : v.note}</span>
+              <span style={{ fontSize: 10.5, color: "var(--color-neutral-700)", lineHeight: 1.25 }}>{excluded.has(v.id) ? excludedWhy.get(v.id) ?? "Excluded in this view" : v.note}</span>
             </div>
           );
         })}
         <span style={{ ...muted, paddingLeft: 12 }}>Lowest</span>
       </div>
 
-      {grid.lines.map((l) => {
+      {!lines.length && <div style={{ padding: "28px 0", color: "var(--color-neutral-700)" }}>No lines match these filters.</div>}
+      {lines.map((l) => {
         const w = award.per[l.id];
         return (
           <div key={l.id} style={{ display: "grid", gridTemplateColumns: COLS, alignItems: "stretch", borderBottom: "1px solid color-mix(in srgb, var(--color-text) 8%, transparent)", background: sel?.l === l.id ? "var(--color-neutral-200)" : "transparent" }}>
@@ -486,7 +646,7 @@ function GridTable({ grid, sel, quality, doubtAt, award, base, excluded, scenari
             <span style={{ textAlign: "right", color: "var(--color-neutral-700)", alignSelf: "center" }}>{Math.round(l.qty / 1000)}k</span>
             <span style={{ textAlign: "right", color: "var(--color-neutral-700)", paddingRight: 6, alignSelf: "center" }}>{num2(l.shouldCost)}</span>
             {grid.vendors.map((v) => (
-              <Cell key={v.id} c={grid.cells[cellKey(v.id, l.id)]} out={excluded.has(v.id)} doubt={doubtAt.has(cellKey(v.id, l.id)) && !excluded.has(v.id)} win={w?.vendorId === v.id} selected={sel?.v === v.id && sel.l === l.id} onClick={() => onSelect(v.id, l.id)} tip={`${v.short} · ${l.id}: ${grid.cells[cellKey(v.id, l.id)].norm.asWritten}`} />
+              <Cell key={v.id} c={grid.cells[cellKey(v.id, l.id)]} checked={!!checks[checkKey(v.id, l.id)]} out={excluded.has(v.id)} doubt={doubtAt.has(cellKey(v.id, l.id)) && !excluded.has(v.id)} win={w?.vendorId === v.id} selected={sel?.v === v.id && sel.l === l.id} onClick={() => onSelect(v.id, l.id)} tip={`${v.short} · ${l.id}: ${grid.cells[cellKey(v.id, l.id)].norm.asWritten}`} />
             ))}
             <span style={{ display: "flex", flexDirection: "column", justifyContent: "center", paddingLeft: 12, lineHeight: 1.2 }}>
               <span>{w ? grid.vendors.find((v) => v.id === w.vendorId)?.short : "—"}</span>
@@ -499,9 +659,9 @@ function GridTable({ grid, sel, quality, doubtAt, award, base, excluded, scenari
       })}
 
       <div style={{ display: "grid", gridTemplateColumns: COLS, padding: "10px 0 24px", borderTop: "1px solid var(--color-text)", alignItems: "baseline" }}>
-        <span /><span style={{ fontWeight: 600 }}>Lines won · award value</span><span /><span />
+        <span /><span style={{ fontWeight: 600 }}>{filtered ? "Shown lines · value" : "Lines won · award value"}</span><span /><span />
         {grid.vendors.map((v) => {
-          const b = award.byVendor[v.id];
+          const b = foot.byVendor[v.id];
           return (
             <span key={v.id} style={{ textAlign: "right", paddingRight: 10, display: "flex", flexDirection: "column" }}>
               <span style={{ fontWeight: 600 }}>{b.lines || "—"}</span>
@@ -509,13 +669,13 @@ function GridTable({ grid, sel, quality, doubtAt, award, base, excluded, scenari
             </span>
           );
         })}
-        <span style={{ paddingLeft: 12, fontWeight: 600 }}>{crore(award.total)}</span>
+        <span style={{ paddingLeft: 12, fontWeight: 600 }}>{foot.total >= 1e7 ? crore(foot.total) : lakh(foot.total)}</span>
       </div>
     </>
   );
 }
 
-function Cell({ c, out, doubt, win, selected, onClick, tip }: { c: GridCell; out: boolean; doubt: boolean; win: boolean; selected: boolean; onClick: () => void; tip: string }) {
+function Cell({ c, checked, out, doubt, win, selected, onClick, tip }: { c: GridCell; checked: boolean; out: boolean; doubt: boolean; win: boolean; selected: boolean; onClick: () => void; tip: string }) {
   const k = c.kind;
   const ns = {
     color: doubt ? "var(--color-accent-2-800)" : k === "not_quoted" || k === "unclear" ? "var(--color-neutral-500)" : k === "last_year" ? "var(--color-neutral-800)" : "var(--color-text)",
@@ -528,9 +688,10 @@ function Cell({ c, out, doubt, win, selected, onClick, tip }: { c: GridCell; out
   return (
     <button
       onClick={onClick}
-      title={tip}
+      title={checked ? `${tip} · verified by you` : tip}
       style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", height: "100%", minHeight: 38, padding: "0 10px", border: 0, font: "inherit", fontSize: 13.5, background: doubt ? "var(--color-accent-2-100)" : "transparent", outline: selected ? "2px solid var(--color-accent)" : "none", outlineOffset: -2, color: "inherit", opacity: out ? 0.4 : 1 }}
     >
+      {checked && c.perBox != null && <SealCheck size={12} weight="duotone" color="var(--color-accent-700)" style={{ marginRight: 3, flex: "none" }} aria-label="Verified by you" />}
       <span style={ns}>
         {c.perBox == null ? (k === "unclear" ? "n/a" : "—") : num2(c.perBox)}
         {mark && <sup style={{ fontSize: k === "last_year" ? 8 : 10, fontStyle: "normal", fontWeight: 600, marginLeft: 1, letterSpacing: "0.04em", display: "inline-block" }}>{mark}</sup>}
@@ -539,10 +700,11 @@ function Cell({ c, out, doubt, win, selected, onClick, tip }: { c: GridCell; out
   );
 }
 
-function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, override, buyer, onOverride, onSelect, onClose }: {
+function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, override, buyer, check, me, onCheck, onOverride, onSelect, onClose }: {
   grid: Grid; sel: { v: string; l: string }; readings: ReplyReading[]; paths: Record<string, string>;
   doubt: { d: Doubt; rank: number } | undefined; report: DoubtReport; onSelect: (v: string) => void; onClose: () => void;
   shown: Award; override: Override | undefined; buyer: string; onOverride: (o: Override) => void;
+  check: Check | null; me: string; onCheck: (c: Check | null, next: boolean) => void;
 }) {
   const line = grid.lines.find((l) => l.id === sel.l)!;
   const c = grid.cells[cellKey(sel.v, sel.l)];
@@ -634,6 +796,26 @@ function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, overrid
           filePath={paths[`${n.replyId}|${n.source.file.toLowerCase()}`] ?? paths[`history|${n.source.file.toLowerCase()}`] ?? null}
         />
       )}
+      {c.perBox != null && (check ? (
+        <div style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--color-accent-100)", padding: "8px 10px" }}>
+          <SealCheck size={22} weight="duotone" color="var(--color-accent-700)" />
+          <span style={{ display: "flex", flexDirection: "column", marginRight: "auto", lineHeight: 1.3 }}>
+            <span style={{ fontWeight: 600 }}>Verified by you</span>
+            <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{check.who} · {stamp(check.at)} · recorded on the award</span>
+          </span>
+          <button className="btn btn-ghost" onClick={() => onCheck(null, false)}>Undo</button>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button className="btn btn-primary" onClick={() => onCheck({ at: new Date().toISOString(), who: me }, false)}><SealCheck size={16} weight="duotone" />I’ve checked this</button>
+            <button className="btn btn-secondary" onClick={() => onCheck({ at: new Date().toISOString(), who: me }, true)}>Check &amp; open next winner</button>
+          </div>
+          <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>
+            {doubt ? `Confirms the number matches the document. Doubt ${doubt.rank} stays open until it is resolved.` : "Confirms the number matches the document. Recorded with your name, and copied onto the award when you freeze it."}
+          </span>
+        </div>
+      ))}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>

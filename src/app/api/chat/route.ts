@@ -7,7 +7,11 @@ import { loadEventState } from "@/lib/event";
 import { crore, lakh, where } from "@/lib/format";
 import { callBudget, RateLimitedError, visitorOf } from "@/lib/guard";
 import { QuotaError, withModels } from "@/lib/reader/call";
-import { runScenario, type ScenarioRules } from "@/lib/scenario";
+import { LIBRARY, runScenario, type ScenarioRules } from "@/lib/scenario";
+import { qualityOf } from "@/lib/quality";
+import { DEFAULT_SCHEME, schemeProblems, type QualityScheme } from "@/lib/qualityScheme";
+import { loadDemoInbox } from "@/lib/inbox";
+import { loadSavedReadings } from "@/lib/saved";
 
 export const runtime = "nodejs";
 export const maxDuration = 120;
@@ -25,6 +29,7 @@ const RULES_SCHEMA = {
     acceptHeld: { type: "boolean", description: "Let substitute specs and prices far below should-cost win as quoted." },
     worstCase: { type: "boolean", description: "Price every open doubt against the buyer." },
     cap: { type: "number", description: "Maximum share of award value for any one vendor, 0 to 1 (e.g. 0.4)." },
+    maxVendors: { type: "integer", description: "Award to at most this many vendors (e.g. 1 for a single vendor, 2 for two). Code tries every set of that size and picks the lowest total that covers every line." },
     overrides: { type: "array", items: { type: "object", properties: { lineId: { type: "string" }, vendorId: { type: "string" } }, required: ["lineId", "vendorId"] }, description: "Lines the user fixes to a vendor." },
   },
   required: ["title", "eligible"],
@@ -38,9 +43,14 @@ const TOOLS: FunctionDeclaration[] = [
 ];
 
 export async function POST(req: Request) {
-  const { messages } = (await req.json().catch(() => ({}))) as { messages?: Msg[] };
+  const { messages, scheme: asked } = (await req.json().catch(() => ({}))) as { messages?: Msg[]; scheme?: QualityScheme };
   if (!messages?.length) return Response.json({ error: "Ask a question." }, { status: 400 });
-  const { ev, grid, quality, report } = await loadEventState();
+  const state = await loadEventState();
+  const { ev, grid, report } = state;
+  // The buyer's marking scheme, if it is a valid one; quality is re-marked against it in code.
+  const scheme = asked && Array.isArray(asked.rules) && !schemeProblems(asked, ev.questions.map((x) => x.id)).length ? asked : DEFAULT_SCHEME;
+  const quality = scheme === DEFAULT_SCHEME ? state.quality
+    : await (async () => { const inbox = await loadDemoInbox(); const rs = Object.values(await loadSavedReadings(inbox)); return ev.vendors.map((v) => qualityOf(ev, v.id, rs, scheme)); })();
   const name = (v: string) => grid.vendors.find((x) => x.id === v)?.short ?? v;
   const budget = callBudget(visitorOf(req));
   const scenarios: (ScenarioRules & { title: string })[] = [];
@@ -63,7 +73,7 @@ export async function POST(req: Request) {
       scenarios.push(rules);
       const d = r.award.total - r.base.total;
       return {
-        appliedToTable: `Scenario ${scenarios.length}`,
+        appliedToTable: rules.title,
         total: crore(r.award.total),
         vsAsQuoted: `${d >= 0 ? "+" : "−"}${lakh(Math.abs(d))} (${d >= 0 ? "+" : "−"}${Math.abs((d / r.base.total) * 100).toFixed(1)}%)`,
         split: grid.vendors.filter((v) => r.award.byVendor[v.id].lines).map((v) => `${v.short} ${r.award.byVendor[v.id].lines} lines, ${lakh(r.award.byVendor[v.id].value)}`),
@@ -89,6 +99,8 @@ Rules you never break:
 - For any what-if, call run_scenario with rules that match the question; the table updates to it. For several what-ifs, call it once per scenario.
 - The AI never decides the award: recommend, and say the buyer decides.
 - Answer in 2 to 4 plain sentences: the result, the cost against as quoted, who was excluded and why, and any doubt that still matters. Lines changing hands are shown to the user in the table; mention only the notable ones.
+- The buyer's Scenario list already holds these strategies; when a question matches one, use exactly its rules: ${LIBRARY.map((x) => `"${x.title}" = ${JSON.stringify(x.rules)}`).join("; ")}. Otherwise combine the same building blocks (eligibility, exclusions, vendor limit, share cap, doubt pricing, discounts, freight).
+- Quality is scored out of 100 against the buyer's marking scheme (pass mark ${scheme.passMark}); both mandatory items must pass.
 - Vendor ids: ${grid.vendors.map((v) => `${v.id} = ${v.name}`).join(", ")}.
 - If a question cannot be answered with the tools, say what is missing; never guess.`;
 

@@ -14,6 +14,7 @@ export function SourceDoc({ replyId, source, raw, lineId, filePath }: {
   const [view, setView] = useState<SourceView | null>(null);
   const [failed, setFailed] = useState(false);
   const box = useRef<HTMLDivElement>(null);
+  const [pinRow, setPinRow] = useState(false);
   const key = JSON.stringify([replyId, source, raw, lineId]);
 
   // Uploaded files stay in the buyer's browser session; the server keeps no copy to draw.
@@ -33,11 +34,28 @@ export function SourceDoc({ replyId, source, raw, lineId, filePath }: {
 
   // Bring the highlighted place into view inside the document box.
   useEffect(() => {
+    setPinRow(false);
+    const val = box.current?.querySelector("[data-value]") as HTMLElement | null;
+    if (val && box.current) {
+      // A PDF or Word row can be wider than the panel: keep the value in view, and if that hides the
+      // start of the row, show the whole row above the page so the buyer still sees what it is.
+      const b = box.current.getBoundingClientRect(), r = val.getBoundingClientRect();
+      const lefts = [...box.current.querySelectorAll("[data-hit]")].map((h) => h.getBoundingClientRect().left);
+      const rowLeft = Math.min(...lefts) - b.left + box.current.scrollLeft;
+      const need = Math.max(0, r.right - b.left + box.current.scrollLeft + 16 - box.current.clientWidth);
+      box.current.scrollTop += r.top - b.top - b.height / 3;
+      box.current.scrollLeft = need;
+      setPinRow(need > rowLeft - 8);
+      return;
+    }
     const el = box.current?.querySelector("[data-hit]") as HTMLElement | null;
     if (el && box.current) {
       const b = box.current.getBoundingClientRect(), r = el.getBoundingClientRect();
+      // Pinned sheet columns (row numbers, item name) stay on the left; land the hit just past them.
+      const pins = [...box.current.querySelectorAll("thead [data-pin]")].map((p) => p.getBoundingClientRect().right - b.left);
+      const pinned = pins.length ? Math.max(...pins) : 0;
       box.current.scrollTop += r.top - b.top - b.height / 3;
-      box.current.scrollLeft += r.left - b.left - 20;
+      box.current.scrollLeft += r.left - b.left - Math.max(pinned + 12, 20);
     }
   }, [view]);
 
@@ -65,6 +83,7 @@ export function SourceDoc({ replyId, source, raw, lineId, filePath }: {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       {head}
+      {pinRow && <RowStrip v={view} />}
       <div ref={box} style={frame}>
         {view.kind === "sheet" && <Sheet v={view} />}
         {view.kind === "doc" && <Doc v={view} />}
@@ -92,18 +111,33 @@ function caption(v: SourceView): string {
 function Sheet({ v }: { v: Extract<SourceView, { kind: "sheet" }> }) {
   const cell = { padding: "3px 6px", borderRight: "1px solid var(--color-neutral-300)", borderBottom: "1px solid var(--color-neutral-300)", whiteSpace: "nowrap" as const, maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis" };
   const rail = { ...cell, background: "var(--color-neutral-200)", color: "var(--color-neutral-700)", textAlign: "center" as const, fontSize: 11 };
+  const RAIL_W = 34;
+  // Keep the item's name in view while the sheet scrolls to the cell: pin the wordiest
+  // column left of the hit on its row (the line's label, not a code), next to the row numbers.
+  const hitRow = v.hit ? v.rows.find((r) => r.n === v.hit!.row) : undefined;
+  const letters = (t: string) => (t.match(/[A-Za-z]/g) ?? []).length;
+  const labelIdx = (hitRow?.cells ?? []).reduce((best, t, i) => (i < v.hit!.col - 1 && letters(t) > 2 && (best < 0 || letters(t) > letters(hitRow!.cells[best])) ? i : best), -1);
+  const pin = (left: number, z: number, bg: string) => ({ position: "sticky" as const, left, zIndex: z, background: bg });
+  const railPin = { ...rail, minWidth: RAIL_W, maxWidth: RAIL_W, ...pin(0, 2, "var(--color-neutral-200)") };
+  const labelPin = (bg: string, z: number) => ({ maxWidth: 160, boxShadow: "inset -1px 0 0 var(--color-neutral-400)", ...pin(RAIL_W, z, bg) });
   return (
-    <table style={{ borderCollapse: "collapse", fontSize: 12, fontFamily: "var(--font-body)" }}>
-      <thead style={{ position: "sticky", top: 0, zIndex: 1 }}>
-        <tr><th style={rail} />{v.cols.map((c, i) => <th key={c} style={{ ...rail, fontWeight: v.hit?.col === i + 1 ? 600 : 400 }}>{c}</th>)}</tr>
+    <table style={{ borderCollapse: "separate", borderSpacing: 0, fontSize: 12, fontFamily: "var(--font-body)" }}>
+      <thead style={{ position: "sticky", top: 0, zIndex: 3 }}>
+        <tr>
+          <th data-pin style={{ ...railPin, zIndex: 4 }} />
+          {v.cols.map((c, i) => (
+            <th key={c} data-pin={i === labelIdx || undefined} style={{ ...rail, fontWeight: v.hit?.col === i + 1 ? 600 : 400, ...(i === labelIdx ? labelPin("var(--color-neutral-200)", 4) : {}) }}>{c}</th>
+          ))}
+        </tr>
       </thead>
       <tbody>
         {v.rows.map((r) => (
           <tr key={r.n}>
-            <td style={{ ...rail, fontWeight: v.hit?.row === r.n ? 600 : 400 }}>{r.n}</td>
+            <td style={{ ...railPin, fontWeight: v.hit?.row === r.n ? 600 : 400 }}>{r.n}</td>
             {r.cells.map((t, i) => {
               const hit = v.hit?.row === r.n && v.hit.col === i + 1;
-              return <td key={i} data-hit={hit || undefined} title={t} style={{ ...cell, ...(hit ? HIT : {}), textAlign: /^[\d.,\s]+$/.test(t) ? "right" : "left" }}>{t}</td>;
+              const label = i === labelIdx ? labelPin("var(--color-bg)", 1) : {};
+              return <td key={i} data-hit={hit || undefined} title={t} style={{ ...cell, ...label, ...(hit ? HIT : {}), textAlign: /^[\d.,\s]+$/.test(t) ? "right" : "left" }}>{t}</td>;
             })}
           </tr>
         ))}
@@ -126,7 +160,7 @@ function Doc({ v }: { v: Extract<SourceView, { kind: "doc" }> }) {
             <tbody>
               {b.rows.map((r, ri) => (
                 <tr key={ri} data-hit={r.hit || undefined} style={r.hit ? HIT : undefined}>
-                  {r.cells.map((c, ci) => <td key={ci} style={{ padding: "2px 6px", borderBottom: "1px solid var(--color-neutral-300)", fontWeight: ri === 0 ? 600 : 400, whiteSpace: "nowrap" }}>{c}</td>)}
+                  {r.cells.map((c, ci) => <td key={ci} data-value={(r.hit && r.value === ci) || undefined} style={{ padding: "2px 6px", borderBottom: "1px solid var(--color-neutral-300)", fontWeight: ri === 0 ? 600 : 400, whiteSpace: "nowrap", ...(r.hit && r.value === ci ? { boxShadow: "inset 0 0 0 2px var(--color-accent)" } : {}) }}>{c}</td>)}
                 </tr>
               ))}
             </tbody>
@@ -158,10 +192,26 @@ function Pdf({ v }: { v: Extract<SourceView, { kind: "pdf" }> }) {
   return (
     <div style={{ position: "relative", width: v.width, height: v.height, background: "#fff", fontFamily: "var(--font-body)" }}>
       {v.items.map((it, i) => (
-        <span key={i} data-hit={it.hit || undefined} style={{ position: "absolute", left: it.x, top: it.y, fontSize: Math.max(6, it.h * 0.95), lineHeight: 1, whiteSpace: "pre", ...(it.hit ? { background: "var(--color-accent-200)", outline: "1px solid var(--color-accent)" } : {}) }}>
+        <span key={i} data-hit={it.hit || undefined} data-value={it.value || undefined} style={{ position: "absolute", left: it.x, top: it.y, fontSize: Math.max(6, it.h * 0.95), lineHeight: 1, whiteSpace: "pre", ...(it.hit ? { background: "var(--color-accent-200)", outline: it.value ? "2px solid var(--color-accent)" : "1px solid var(--color-accent)" } : {}) }}>
           {it.str}
         </span>
       ))}
+    </div>
+  );
+}
+
+// The whole row read, in one line, for when it is wider than the panel.
+function RowStrip({ v }: { v: SourceView }) {
+  let parts: { text: string; value: boolean }[] = [];
+  if (v.kind === "pdf") parts = v.items.filter((it) => it.hit).sort((a, b) => a.y - b.y || a.x - b.x).map((it) => ({ text: it.str, value: !!it.value }));
+  if (v.kind === "doc") {
+    const r = v.blocks.flatMap((b) => (b.type === "table" ? b.rows : [])).find((r) => r.hit);
+    if (r) parts = r.cells.map((c, i) => ({ text: c, value: r.value === i })).filter((p) => p.text.trim());
+  }
+  if (!parts.length) return null;
+  return (
+    <div style={{ fontSize: 12, padding: "4px 8px", background: "var(--color-accent-200)", boxShadow: "inset 2px 0 0 var(--color-accent)", display: "flex", flexWrap: "wrap", columnGap: 12 }}>
+      {parts.map((p, i) => <span key={i} style={{ fontWeight: p.value ? 600 : 400 }}>{p.text}</span>)}
     </div>
   );
 }

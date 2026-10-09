@@ -17,7 +17,7 @@
 <div style="display:flex; height:100vh; min-width:1360px; font-size:13px; line-height:1.4; color:var(--color-text); font-variant-numeric:tabular-nums; overflow:hidden;">
 
   <nav style="width:68px; flex:none; display:flex; flex-direction:column; align-items:center; gap:4px; padding:18px 0;">
-    <a href="#" style="font-size:22px; font-weight:600; color:var(--color-text); text-decoration:none; margin-bottom:18px;">P</a>
+    <div style="margin-bottom:14px;"><dc-import name="WorkspaceMenu" hint-size="44px,44px"></dc-import></div>
     <sc-for list="{{ rail }}" as="r" hint-placeholder-count="6">
       <a href="{{ r.href }}" style="{{ r.s }}"><i class="ph-duotone {{ r.icon }}" style="font-size:20px;"></i><span style="font-size:10px;">{{ r.label }}</span></a>
     </sc-for>
@@ -37,6 +37,11 @@
     <div style="display:flex; align-items:center; gap:22px; padding:0 28px 0 8px;">
       <button onClick="{{ toCompare }}" style="{{ tabC }}">Comparison</button>
       <button onClick="{{ toDoubts }}" style="{{ tabD }}" title="Doubts">Doubts <span style="color:var(--color-accent-2-700);">{{ doubtCount }}</span> · {{ stakeL }} at stake</button>
+      <span style="margin-left:auto; display:flex; align-items:center; gap:10px; font-size:13px;">
+        <i class="ph-duotone ph-seal-check" style="font-size:18px; color:var(--color-accent-700);"></i>
+        <span style="display:flex; flex-direction:column; line-height:1.25;"><span><span style="font-weight:600;">{{ winVerTxt }}</span> winning prices verified by you</span><span style="font-size:11px; color:var(--color-neutral-700);">{{ allVerTxt }} of all quoted prices</span></span>
+        <button class="btn btn-secondary" onClick="{{ nextWinner }}" style="padding:4px 10px; font-size:12px; white-space:nowrap;">{{ nextWinnerTxt }}</button>
+      </span>
     </div>
 
     <sc-if value="{{ isCompare }}" hint-placeholder-val="{{ true }}">
@@ -53,19 +58,45 @@
         <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider); color:var(--color-neutral-500);">—</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Not quoted</span><span style="color:var(--color-neutral-700);">vendor skipped this line</span></span></span>
         <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; background:var(--color-accent-2-100); color:var(--color-accent-2-800); font-weight:600;">24.60?</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600; color:var(--color-accent-2-800);">Doubt</span><span style="color:var(--color-neutral-700);">could change who wins</span></span></span>
         <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider); font-weight:600;">24.60</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Lowest</span><span style="color:var(--color-neutral-700);">bold = cheapest on the line</span></span></span>
+        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; display:flex; gap:3px; justify-content:flex-end; align-items:center; box-shadow:inset 0 0 0 1px var(--color-divider);"><i class="ph-duotone ph-seal-check" style="font-size:12px; color:var(--color-accent-700);"></i>24.60</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Verified by you</span><span style="color:var(--color-neutral-700);">you checked it against the source</span></span></span>
       </div>
       </sc-if>
 
-      <div style="display:flex; align-items:center; gap:10px 14px; padding:2px 28px 8px 8px;">
-        <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700); flex:none;">Table shows</span>
-        <div style="flex:1; min-width:0; display:flex; gap:8px; overflow-x:auto; padding:2px;">
-          <sc-for list="{{ scenTabs }}" as="t" hint-placeholder-count="2">
-            <button onClick="{{ t.go }}" style="{{ t.s }}">{{ t.label }}</button>
-          </sc-for>
+      <div style="display:flex; flex-direction:column; gap:8px; padding:2px 28px 10px 8px;">
+        <div style="display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap;">
+          <label style="display:flex; flex-direction:column; gap:2px; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Scenario
+            <select class="input" style="min-height:34px; padding:4px 8px; font-size:13px; letter-spacing:0; text-transform:none; color:var(--color-text); width:340px;" value="{{ scenVal }}" onChange="{{ onScen }}">
+              <sc-for list="{{ scenOpts }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
+            </select>
+          </label>
+          <label style="display:flex; flex-direction:column; gap:2px; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Won by
+            <select class="input" style="min-height:34px; padding:4px 8px; font-size:13px; letter-spacing:0; text-transform:none; color:var(--color-text); width:150px;" value="{{ winVal }}" onChange="{{ onWin }}">
+              <sc-for list="{{ winOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
+            </select>
+          </label>
+          <label style="display:flex; flex-direction:column; gap:2px; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Board
+            <select class="input" style="min-height:34px; padding:4px 8px; font-size:13px; letter-spacing:0; text-transform:none; color:var(--color-text); width:110px;" value="{{ plyVal }}" onChange="{{ onPly }}">
+              <option value="all">All boxes</option><option value="3">3-ply</option><option value="5">5-ply</option>
+            </select>
+          </label>
+          <label style="display:flex; flex-direction:column; gap:2px; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Sort by
+            <select class="input" style="min-height:34px; padding:4px 8px; font-size:13px; letter-spacing:0; text-transform:none; color:var(--color-text); width:220px;" value="{{ sortVal }}" onChange="{{ onSort }}">
+              <sc-for list="{{ sortOpts }}" as="o" hint-placeholder-count="5"><option value="{{ o.v }}">{{ o.t }}</option></sc-for>
+            </select>
+          </label>
+          <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+            <div class="seg"><button onClick="{{ viewTable }}" style="{{ segT }}">Table</button><button onClick="{{ viewChart }}" style="{{ segC }}">Chart</button></div>
+            <button class="btn btn-secondary" style="padding:6px 10px; white-space:nowrap;"><i class="ph-duotone ph-file-xls" style="font-size:15px;"></i>Export view</button>
+          </div>
         </div>
-        <div style="flex:none; display:flex; gap:8px; align-items:center;">
-          <div class="seg"><button onClick="{{ viewTable }}" style="{{ segT }}">Table</button><button onClick="{{ viewChart }}" style="{{ segC }}">Chart</button></div>
-          <button class="btn btn-secondary" style="padding:6px 10px; white-space:nowrap;"><i class="ph-duotone ph-file-xls" style="font-size:15px;"></i>Export view</button>
+        <span style="font-size:13px; color:var(--color-neutral-800); max-width:920px; text-wrap:pretty;">{{ scenDesc }}</span>
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700); margin-right:4px;">Show</span>
+          <sc-for list="{{ chips }}" as="c" hint-placeholder-count="6">
+            <button onClick="{{ c.go }}" style="{{ c.s }}">{{ c.t }} <span style="{{ c.ns }}">{{ c.n }}</span></button>
+          </sc-for>
+          <span style="margin-left:auto; color:var(--color-neutral-700); font-size:12px;">{{ showingTxt }}</span>
+          <sc-if value="{{ isFiltered }}" hint-placeholder-val="{{ false }}"><button class="btn btn-ghost" onClick="{{ clearFilters }}" style="padding:2px 8px; font-size:12px;">Clear filters</button></sc-if>
         </div>
       </div>
 
@@ -111,6 +142,7 @@
               </sc-for>
               <span style="font-size:11px; color:var(--color-neutral-700); padding-left:12px;">Lowest</span>
             </div>
+            <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}"><p style="margin:0; padding:24px 0; color:var(--color-neutral-700);">No lines match these filters.</p></sc-if>
             <sc-for list="{{ rows }}" as="row" hint-placeholder-count="12">
               <div style="{{ row.s }}">
                 <span style="color:var(--color-neutral-700);">{{ row.id }}</span>
@@ -118,13 +150,13 @@
                 <span style="text-align:right; color:var(--color-neutral-700);">{{ row.qty }}</span>
                 <span style="text-align:right; color:var(--color-neutral-700); padding-right:6px;">{{ row.sc }}</span>
                 <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="5">
-                  <button onClick="{{ c.open }}" style="{{ c.s }}" title="{{ c.tip }}"><span style="{{ c.ns }}">{{ c.txt }}<sup style="{{ c.ms }}">{{ c.mark }}</sup></span></button>
+                  <button onClick="{{ c.open }}" style="{{ c.s }}" title="{{ c.tip }}"><i class="ph-duotone ph-seal-check" style="{{ c.vs }}"></i><span style="{{ c.ns }}">{{ c.txt }}<sup style="{{ c.ms }}">{{ c.mark }}</sup></span></button>
                 </sc-for>
                 <span style="display:flex; flex-direction:column; padding-left:12px; line-height:1.2;"><span>{{ row.win }}</span><span style="font-size:11px; color:var(--color-accent-800);">{{ row.was }}</span></span>
               </div>
             </sc-for>
             <div style="{{ footS }}">
-              <span></span><span style="font-weight:600;">Lines won · award value</span><span></span><span></span>
+              <span></span><span style="font-weight:600;">{{ footLabel }}</span><span></span><span></span>
               <sc-for list="{{ foot }}" as="f" hint-placeholder-count="5">
                 <span style="text-align:right; padding-right:10px; display:flex; flex-direction:column;"><span style="font-weight:600;">{{ f.lines }}</span><span style="font-size:11px; color:var(--color-neutral-700);">{{ f.value }}</span></span>
               </sc-for>
@@ -276,6 +308,22 @@
                   <button class="btn btn-ghost btn-icon" onClick="{{ closeSel }}" title="Close"><i class="ph-duotone ph-x" style="font-size:18px;"></i></button>
                 </div>
                 <dc-import name="SourceDoc" vid="{{ selVid }}" li="{{ selLi }}" hint-size="100%,560px"></dc-import>
+                <sc-if value="{{ selVerified }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--color-accent-100);">
+                    <i class="ph-duotone ph-seal-check" style="font-size:22px; color:var(--color-accent-700);"></i>
+                    <span style="display:flex; flex-direction:column; line-height:1.3; margin-right:auto;"><span style="font-weight:600; color:var(--color-accent-800);">Verified by you</span><span style="font-size:12px; color:var(--color-neutral-800);">Vikram Deshpande · {{ selVTime }} · recorded on the award</span></span>
+                    <button class="btn btn-ghost" onClick="{{ unverify }}">Undo</button>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ selUnverified }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex; flex-direction:column; gap:8px;">
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                      <button class="btn btn-primary" onClick="{{ verify }}"><i class="ph-duotone ph-seal-check" style="font-size:16px;"></i>I’ve checked this</button>
+                      <button class="btn btn-secondary" onClick="{{ verifyNext }}">Check &amp; open next winner</button>
+                    </div>
+                    <span style="font-size:12px; color:var(--color-neutral-700); text-wrap:pretty;">{{ verifyNote }}</span>
+                  </div>
+                </sc-if>
                 <div style="display:flex; flex-direction:column; gap:4px;">
                   <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Same line, every vendor</span>
                   <sc-for list="{{ selPeers }}" as="p" hint-placeholder-count="5">
@@ -297,18 +345,27 @@ class Component extends DCLogic {
   constructor(p) {
     super(p); const s = (location.hash.slice(1)) || (p && p.startScreen) || 'compare';
     this.state = { tab: s === 'doubts' ? 'doubts' : 'compare', sel: s === 'compare' ? { vid: 'AC', li: 13 } : null, pane: s === 'compare' ? 'src' : 'conv',
-      scen: s === 'analyst' ? 'S1' : 'base', asked: [{ id: 'S1', asker: 'VP' }], asker: 'VP', view: 'table', openD: 'D1', q: '' };
+      scen: s === 'analyst' ? 'S1' : 'base', asked: [{ id: 'S1', asker: 'VP' }], asker: (() => { try { return localStorage.getItem('parakh-role') || 'Buyer'; } catch (e) { return 'Buyer'; } })(), view: 'table', openD: 'D1', q: '' };
     this.threadRef = React.createRef();
+    this.state.verified = this.loadV();
   }
-  componentDidMount() { if (!window.KD) { this._t = setInterval(() => { if (window.KD) { clearInterval(this._t); this.forceUpdate(); this.scroll(); } }, 120); } else this.scroll(); }
+  setRole(r) { try { localStorage.setItem('parakh-role', r); } catch (e) {} window.dispatchEvent(new CustomEvent('parakh-role', { detail: r })); }
+  loadV() { try { const v = JSON.parse(localStorage.getItem('parakh-verified') || 'null'); if (v) return v; } catch (e) {}
+    const seed = { 'SB:0': '9 Oct, 15:41', 'VP:0': '9 Oct, 15:41', 'KP:0': '9 Oct, 15:42', 'AC:0': '9 Oct, 15:42', 'RB:0': '9 Oct, 15:43', 'RB:1': '9 Oct, 15:46', 'SB:2': '9 Oct, 15:49', 'VP:4': '9 Oct, 15:52' };
+    localStorage.setItem('parakh-verified', JSON.stringify(seed)); return seed; }
+  setV(key, on) { const v = { ...this.state.verified }; if (on) v[key] = new Date().toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false }).replace(' at', ','); else delete v[key];
+    localStorage.setItem('parakh-verified', JSON.stringify(v)); return v; }
+  componentDidMount() { this._role = e => this.setState({ asker: e.detail }); window.addEventListener('parakh-role', this._role); if (!window.KD) { this._t = setInterval(() => { if (window.KD) { clearInterval(this._t); this.forceUpdate(); this.scroll(); } }, 120); } else this.scroll(); }
   componentDidUpdate(pp, ps) { if (ps.asked !== this.state.asked || ps.pane !== this.state.pane) this.scroll(); }
-  componentWillUnmount() { clearInterval(this._t); }
+  componentWillUnmount() { clearInterval(this._t); window.removeEventListener('parakh-role', this._role); }
   scroll() { setTimeout(() => { const el = this.threadRef.current; if (el) el.scrollTop = el.scrollHeight; }, 60); }
   defs() {
     return {
-      S1: { name: 'Scenario 1', title: 'Quality-cleared, cheapest per line', short: 'Split cheapest per line, quality-cleared only', q: 'What if we split it, cheapest per line, but only among vendors who cleared the quality questionnaire?', elig: true },
-      S2: { name: 'Scenario 2', title: 'Quality-cleared, doubts at worst case', short: 'Same, but assume open doubts go against us', q: 'Same split, but assume every open doubt goes against us.', elig: true, worst: true },
-      S3: { name: 'Scenario 3', title: 'Quality-cleared, no vendor above 40%', short: 'Cap any one vendor at 40% of the value', q: 'Keep it to quality-cleared vendors, but don’t let any one vendor take more than 40% of the value.', elig: true, cap: 0.4 }
+      S1: { id: 'S1', name: 'Cheapest per line, quality-cleared only', title: 'Cheapest per line, quality-cleared only', desc: 'Each line goes to its lowest price, but only vendors who passed the quality questionnaire can win. The usual starting point for a defensible award.', short: 'Split cheapest per line, quality-cleared only', q: 'What if we split it, cheapest per line, but only among vendors who cleared the quality questionnaire?', elig: true },
+      S5: { id: 'S5', name: 'Two vendors only, lowest total', title: 'Two vendors only, lowest total', desc: 'Award to the best pair of quality-cleared vendors: every pair that covers all lines is tried, each line goes to the cheaper of the two, and the cheapest pair wins. Keeps a second source without managing five.', short: 'Best pair of vendors', elig: true, pair: true },
+      S4: { id: 'S4', name: 'One vendor for everything, lowest total', title: 'One vendor for everything, lowest total', desc: 'A single quality-cleared vendor takes every line. Only vendors who quoted all lines qualify; the lowest total wins. Simplest to run, no second source.', short: 'Single vendor', elig: true, single: true },
+      S3: { id: 'S3', name: 'Spread the risk, no vendor above 40%', title: 'Spread the risk, no vendor above 40%', desc: 'Cheapest per line among quality-cleared vendors, but no vendor may take more than 40% of award value. Lines move to the next-cheapest vendor, cheapest moves first.', short: 'Cap any one vendor at 40% of the value', q: 'Keep it to quality-cleared vendors, but don’t let any one vendor take more than 40% of the value.', elig: true, cap: 0.4 },
+      S2: { id: 'S2', name: 'Worst case on open doubts', title: 'Worst case on open doubts', desc: 'Cheapest per line among quality-cleared vendors, with every open doubt resolved against us: conditional discounts dropped, freight at the high estimate, unclear readings at the higher figure. Shows the most the doubts can cost.', short: 'Same, but assume open doubts go against us', q: 'Same split, but assume every open doubt goes against us.', elig: true, worst: true }
     };
   }
   worstP(c) { if (c.p == null) return null; if (c.vid === 'VP') return c.gross; if (c.kind !== 'doubt') return c.p; return { D1: null, D3: c.p + 0.38, D4: c.alt, D5: c.p + 1.10 }[c.doubt] ?? c.p; }
@@ -316,13 +373,20 @@ class Component extends DCLogic {
     const K = window.KD; if (!d) return K.baseline;
     const elig = d.elig ? K.vendors.filter(v => v.q.cleared).map(v => v.id) : K.vendors.map(v => v.id);
     const opts = K.lines.map(l => elig.map(id => { const c = K.cells[id][l.i]; return { vid: id, p: d.worst ? this.worstP(c) : c.p }; }).filter(o => o.p != null).sort((a, b) => a.p - b.p));
-    const pick = opts.map(() => 0); let moved = 0;
+    const pick = opts.map(() => 0); let moved = 0, chosen = null, considered = [];
+    if (d.single || d.pair) {
+      const combos = d.single ? elig.map(id => [id]) : elig.flatMap((a, x) => elig.slice(x + 1).map(b => [a, b]));
+      const ok = combos.filter(c => K.lines.every(l => opts[l.i].some(o => c.includes(o.vid))));
+      considered = ok.map(c => ({ c, tot: K.lines.reduce((t, l) => t + opts[l.i].find(o => c.includes(o.vid)).p * l.qty, 0) })).sort((a, b) => a.tot - b.tot);
+      chosen = considered[0].c; K.lines.forEach(l => { pick[l.i] = opts[l.i].findIndex(o => chosen.includes(o.vid)); });
+      considered.skipped = combos.filter(c => !ok.includes(c));
+    }
     const tally = () => { let total = 0; const by = {}; K.vendors.forEach(v => by[v.id] = { lines: 0, value: 0 }); K.lines.forEach(l => { const o = opts[l.i][pick[l.i]]; total += o.p * l.qty; by[o.vid].lines++; by[o.vid].value += o.p * l.qty; }); return { total, by }; };
     if (d.cap) for (let it = 0; it < 60; it++) { const t = tally(); const over = K.vendors.find(v => t.by[v.id].value > d.cap * t.total); if (!over) break;
       let best = null; K.lines.forEach(l => { const k = pick[l.i]; if (opts[l.i][k].vid !== over.id || !opts[l.i][k + 1]) return; const cost = (opts[l.i][k + 1].p - opts[l.i][k].p) * l.qty; if (!best || cost < best.cost) best = { i: l.i, cost }; });
       if (!best) break; pick[best.i]++; moved++; }
     const t = tally();
-    return { per: K.lines.map(l => { const o = opts[l.i][pick[l.i]]; return { i: l.i, vid: o.vid, p: o.p, changed: o.vid !== K.baseline.per[l.i].vid }; }), total: t.total, by: t.by, moved };
+    return { per: K.lines.map(l => { const o = opts[l.i][pick[l.i]]; return { i: l.i, vid: o.vid, p: o.p, changed: o.vid !== K.baseline.per[l.i].vid }; }), total: t.total, by: t.by, moved, chosen, considered };
   }
   renderVals() {
     const K = window.KD, S = this.state;
@@ -339,28 +403,49 @@ class Component extends DCLogic {
     const cols = '40px minmax(170px,1fr) 44px 64px repeat(5, minmax(76px,96px)) 104px';
     const open = (vid, li) => () => this.setState({ sel: { vid, li }, view: 'table', pane: 'src' });
     const heads = K.vendors.map(v => { const ex = elig && !elig.includes(v.id);
-      return { short: v.short, icon: v.icon, fmt: v.fmt, qLabel: v.q.returned ? `Quality ${v.q.score} ${v.q.cleared ? '✓' : '✕'}` : 'No questionnaire', note: ex ? 'Excluded in ' + def.name.toLowerCase() : v.colNote,
+      return { short: v.short, icon: v.icon, fmt: v.fmt, qLabel: v.q.returned ? `Quality ${v.q.score} ${v.q.cleared ? '✓' : '✕'}` : 'No questionnaire', note: ex ? 'Excluded on quality' : v.colNote,
         s: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', textAlign: 'right', gap: 1, paddingRight: 10, opacity: ex ? 0.45 : 1 } }; });
-    const rows = K.lines.map(l => { const w = sol.per[l.i]; const isSelRow = sel && sel.li === l.i;
+    const F = S.f || { show: 'all', win: 'all', ply: 'all', sort: 'line' };
+    const lineDoubt = i => K.vendors.some(v => { const c = K.cells[v.id][i]; return c.kind === 'doubt' && !(elig && !elig.includes(v.id)); });
+    const lineStake = i => K.doubts.filter(d => d.lines.includes(i) && !(elig && !elig.includes(d.vid))).reduce((t, d) => { const q = d.lines.reduce((a, j) => a + K.lines[j].qty, 0); return t + d.stake * K.lines[i].qty / q; }, 0);
+    const eligCells = i => K.vendors.filter(v => !(elig && !elig.includes(v.id))).map(v => K.cells[v.id][i]);
+    const gap2 = i => { const ps = eligCells(i).map(c => c.p).filter(p => p != null).sort((a, b) => a - b); return ps.length > 1 ? (ps[1] - ps[0]) * K.lines[i].qty : Infinity; };
+    const tests = { all: () => true, doubt: l => lineDoubt(l.i), changed: l => sol.per[l.i].changed, oor: l => eligCells(l.i).some(c => c.oor), miss: l => eligCells(l.i).some(c => c.p == null), ly: l => eligCells(l.i).some(c => c.kind === 'ly'), unver: l => !S.verified[sol.per[l.i].vid + ':' + l.i] };
+    const base1 = K.lines.filter(l => (F.win === 'all' || sol.per[l.i].vid === F.win) && (F.ply === 'all' || String(l.ply) === F.ply));
+    let vis = base1.filter(tests[F.show] || tests.all);
+    const sorters = { line: (a, b) => a.i - b.i, stake: (a, b) => lineStake(b.i) - lineStake(a.i) || a.i - b.i, value: (a, b) => sol.per[b.i].p * b.qty - sol.per[a.i].p * a.qty, close: (a, b) => gap2(a.i) - gap2(b.i), sc: (a, b) => sol.per[b.i].p / b.sc - sol.per[a.i].p / a.sc };
+    vis = vis.slice().sort(sorters[F.sort] || sorters.line);
+    const setF = p => this.setState({ f: { ...F, ...p } });
+    const rows = vis.map(l => { const w = sol.per[l.i]; const isSelRow = sel && sel.li === l.i;
       const cells = K.vendors.map(v => { const c = K.cells[v.id][l.i], ex = elig && !elig.includes(v.id), win = w.vid === v.id, isSel = sel && sel.vid === v.id && sel.li === l.i;
         const k = c.kind, doubt = k === 'doubt' && !ex;
         const ns = { color: k === 'miss' ? 'var(--color-neutral-500)' : doubt ? 'var(--color-accent-2-800)' : k === 'ly' ? 'var(--color-neutral-800)' : 'var(--color-text)', fontStyle: k === 'ly' ? 'italic' : 'normal', fontWeight: win || doubt ? 600 : 400,
           textDecoration: (c.kind === 'conv' || (c.kind !== 'ok' && c.kind !== 'miss' && (v.id === 'VP' || v.id === 'KP' || v.id === 'RB')) && k !== 'ly') ? 'underline dotted var(--color-neutral-600)' : 'none', textUnderlineOffset: 3 };
         const mark = k === 'ly' ? 'LY' : k === 'oor' ? (c.ratio > 1 ? '↑' : '↓') : k === 'doubt' ? '?' : '';
-        return { open: open(v.id, l.i), txt: c.p == null ? '—' : K.num(c.p), mark, ns, tip: `${v.short} · ${l.id}: ${c.raw}`,
+        const vf = !!S.verified[v.id + ':' + l.i];
+        return { vs: { fontSize: 12, color: 'var(--color-accent-700)', marginRight: 3, flex: 'none', display: vf ? 'inline-block' : 'none', fontStyle: 'normal' }, open: open(v.id, l.i), txt: c.p == null ? '—' : K.num(c.p), mark, ns, tip: `${v.short} · ${l.id}: ${c.raw}`,
           ms: { fontSize: k === 'ly' ? 8 : 10, fontStyle: 'normal', fontWeight: 600, marginLeft: 1, letterSpacing: '0.04em', textDecoration: 'none', display: 'inline-block' },
           s: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', height: '100%', minHeight: 38, padding: '0 10px', border: 0, font: 'inherit', fontSize: 13.5, cursor: 'pointer', opacity: ex ? 0.4 : 1,
             background: doubt ? 'var(--color-accent-2-100)' : 'transparent', outline: isSel ? '2px solid var(--color-accent)' : 'none', outlineOffset: -2 } }; });
       const bw = K.baseline.per[l.i];
       return { id: l.id, name: l.name, spec: l.spec, qty: l.qtyK + 'k', sc: K.num(l.sc), cells, win: K.VI[w.vid].short, was: def && w.changed ? 'was ' + K.VI[bw.vid].short : '',
         s: { display: 'grid', gridTemplateColumns: cols, alignItems: 'stretch', borderBottom: '1px solid color-mix(in srgb, var(--color-text) 8%, transparent)', background: isSelRow ? 'var(--color-neutral-200)' : 'transparent' } }; });
-    const foot = K.vendors.map(v => ({ lines: sol.by[v.id].lines || '—', value: sol.by[v.id].lines ? K.lakh(sol.by[v.id].value) : '' }));
+    const fBy = {}; K.vendors.forEach(v => fBy[v.id] = { lines: 0, value: 0 }); let fTot = 0; vis.forEach(l => { const w = sol.per[l.i]; fBy[w.vid].lines++; fBy[w.vid].value += w.p * l.qty; fTot += w.p * l.qty; });
+    const filtered = vis.length !== 30;
+    const foot = K.vendors.map(v => { const b = filtered ? fBy[v.id] : sol.by[v.id]; return { lines: b.lines || '—', value: b.lines ? K.lakh(b.value) : '' }; });
+    const chipDefs = [['all', 'All lines'], ['doubt', 'With doubts'], ['changed', 'Winner changed'], ['unver', 'Winner not verified by you'], ['oor', 'Unusual price'], ['miss', 'Missing quotes'], ['ly', 'Last year’s prices']].filter(c => c[0] !== 'changed' || def);
+    const chips = chipDefs.map(c => { const on = F.show === c[0]; return { t: c[1], n: base1.filter(tests[c[0]]).length, go: () => setF({ show: c[0] }),
+      s: { whiteSpace: 'nowrap', border: 0, padding: '4px 10px', font: 'inherit', fontSize: 12.5, cursor: 'pointer', borderRadius: 'var(--radius-md)', background: on ? 'var(--color-accent)' : 'transparent', color: on ? 'var(--color-bg)' : 'var(--color-accent-800)', boxShadow: on ? 'none' : 'inset 0 0 0 1px var(--color-divider)' },
+      ns: { opacity: 0.75, marginLeft: 2 } }; });
     const pct = x => (x / K.baseline.total * 100).toFixed(1);
     const dTxt = s2 => { const d = s2.total - K.baseline.total; return (d >= 0 ? '+' : '−') + K.lakh(Math.abs(d)) + ' (' + (d >= 0 ? '+' : '−') + Math.abs(+pct(d)) + '%) vs cheapest overall'; };
     const split = s2 => K.vendors.filter(v => s2.by[v.id].lines).map(v => `${v.short} ${s2.by[v.id].lines}`).join(' · ') + ' lines';
     const rulesFor = d => { const r = [{ n: 'R1', t: 'Basis unchanged: per box, ₹, delivered Chakan, GST extra.' }];
       if (d.elig) r.push({ n: 'R2', t: 'Eligible: questionnaire returned, score 70 or more, both mandatory items passed.' });
-      r.push({ n: 'R3', t: 'Each line goes to the lowest eligible price.' });
+      const sd = solFor(d.id), nm = c => c.map(id => K.VI[id].short).join(' + ');
+      if (d.single) { r.push({ n: 'R3', t: 'One vendor takes every line; only vendors who quoted all 30 lines qualify. Lowest total wins.' }); r.push({ n: 'R5', t: 'Compared: ' + sd.considered.map(x => nm(x.c) + ' ' + K.crore(x.tot)).join(' · ') + '.' }); }
+      else if (d.pair) { r.push({ n: 'R3', t: 'At most two vendors. Each pair that covers all 30 lines is tried; each line goes to the cheaper of the pair; lowest total wins.' }); r.push({ n: 'R5', t: 'Best: ' + sd.considered.slice(0, 3).map(x => nm(x.c) + ' ' + K.crore(x.tot)).join(' · ') + ' (' + sd.considered.length + ' pairs tried).' }); }
+      else r.push({ n: 'R3', t: 'Each line goes to the lowest eligible price.' });
       r.push(d.worst ? { n: 'R4', t: 'Open doubts priced against us: Vardhman without the 2.5% footnote discount, freight ₹0.80, ₹37.20 on L19, no 3-ply substitute.' } : { n: 'R4', t: 'Open doubts priced as read; flagged where they still matter.' });
       if (d.cap) r.push({ n: 'R5', t: `No vendor above ${d.cap * 100}% of award value; lines move to the next-cheapest eligible vendor, cheapest moves first.` });
       return r; };
@@ -370,9 +455,9 @@ class Component extends DCLogic {
       S1: () => { let risk = 0; s1.per.forEach(x => { if (x.vid !== 'VP') return; const alt = Math.min(...quals.filter(id => id !== 'VP').map(id => K.cells[id][x.i].p)); if (K.cells.VP[x.i].gross > alt) risk++; });
         return `Split three ways — Shree Balaji ${s1.by.SB.lines} lines, Vardhman ${s1.by.VP.lines}, Kaveri ${s1.by.KP.lines}. It costs ${K.lakh(s1.total - K.baseline.total)} more than cheapest-per-line, because the two vendors left out held 26 of the 30 lines. Four of the five open doubts stop mattering. One still does: ${risk} of Vardhman’s lines assume the 2.5% footnote discount.`; },
       S2: () => { const s2 = solFor('S2'), lost = s1.per.filter((x, i) => x.vid === 'VP' && s2.per[i].vid !== 'VP').length;
-        return `If Vardhman’s footnote discount doesn’t apply, Vardhman loses ${lost} line${lost === 1 ? '' : 's'} and keeps ${s2.by.VP.lines}. Total ${K.crore(s2.total)} — ${K.lakh(s2.total - s1.total)} above Scenario 1. That is the most the open doubts can cost us inside the quality-cleared set.`; },
+        return `If Vardhman’s footnote discount doesn’t apply, Vardhman loses ${lost} line${lost === 1 ? '' : 's'} and keeps ${s2.by.VP.lines}. Total ${K.crore(s2.total)} — ${K.lakh(s2.total - s1.total)} above the quality-cleared split. That is the most the open doubts can cost us inside the quality-cleared set.`; },
       S3: () => { const s3 = solFor('S3'), top = K.vendors.map(v => ({ v, sh: s3.by[v.id].value / s3.total })).sort((a, b) => b.sh - a.sh)[0];
-        return `In Scenario 1 Vardhman takes ${(s1.by.VP.value / s1.total * 100).toFixed(0)}% of the value. Capping at 40% moves ${s3.moved} line${s3.moved === 1 ? '' : 's'} to the next-cheapest cleared vendor, for ${K.lakh(s3.total - s1.total)} more than Scenario 1. Largest share is now ${top.v.short} at ${(top.sh * 100).toFixed(0)}%.`; }
+        return `In the quality-cleared split Vardhman takes ${(s1.by.VP.value / s1.total * 100).toFixed(0)}% of the value. Capping at 40% moves ${s3.moved} line${s3.moved === 1 ? '' : 's'} to the next-cheapest cleared vendor, for ${K.lakh(s3.total - s1.total)} more than the quality-cleared split. Largest share is now ${top.v.short} at ${(top.sh * 100).toFixed(0)}%.`; }
     };
     const who = a => a === 'VP' ? { who: 'Anita Kulkarni', role: 'VP', tagCls: 'tag tag-accent-2' } : { who: 'Vikram Deshpande', role: 'Buyer', tagCls: 'tag tag-neutral' };
     const msgs = [{ isBot: true, isHuman: false, hasScen: false, text: `All five replies are read and on one basis. ${K.doubts.length} doubts could change a winner (${K.lakh(K.totalStake)} at stake) — see the Doubts tab. Ask me anything about this table; every answer is applied to it as a scenario you can keep, compare and export.` }];
@@ -384,28 +469,45 @@ class Component extends DCLogic {
     const nextId = ['S1', 'S2', 'S3'].find(id => !S.asked.some(x => x.id === id));
     const sugg = ['S1', 'S2', 'S3'].filter(id => !S.asked.some(x => x.id === id)).map(id => ({ t: D[id].short, go: () => askId(id) }));
     const scTab = on => ({ flex: 'none', whiteSpace: 'nowrap', background: on ? 'var(--color-accent)' : 'transparent', color: on ? 'var(--color-bg)' : 'var(--color-accent-800)', border: 0, boxShadow: on ? 'none' : 'inset 0 0 0 1px var(--color-divider)', padding: '5px 10px', font: 'inherit', fontSize: 13, cursor: 'pointer', borderRadius: 'var(--radius-md)' });
-    const scenTabs = [{ label: 'As quoted', go: () => this.setState({ scen: 'base' }), s: scTab(S.scen === 'base') }].concat(S.asked.map(a => ({ label: `${D[a.id].name} · ${D[a.id].title}`, go: () => this.setState({ scen: a.id }), s: scTab(S.scen === a.id) })));
+    const scenTabs = [{ label: 'As quoted', go: () => this.setState({ scen: 'base' }), s: scTab(S.scen === 'base') }].concat(S.asked.map(a => ({ label: D[a.id].title, go: () => this.setState({ scen: a.id }), s: scTab(S.scen === a.id) })));
     const mx = Math.max(...K.vendors.map(v => Math.max(K.baseline.by[v.id].value, sol.by[v.id].value)));
     const bar = (x, c) => ({ display: 'block', height: 12, width: Math.max(2, x / mx * 100) + '%', maxWidth: 'calc(100% - 70px)', background: c });
     const bars = K.vendors.map(v => ({ name: v.short, sub: elig && !elig.includes(v.id) ? 'excluded' : sol.by[v.id].lines + ' lines', bs: bar(K.baseline.by[v.id].value, 'var(--color-neutral-400)'), ss: bar(sol.by[v.id].value, 'var(--color-accent)'), bv: K.baseline.by[v.id].value ? K.lakh(K.baseline.by[v.id].value) : '—', sv: sol.by[v.id].value ? K.lakh(sol.by[v.id].value) : '—' }));
     const changed = sol.per.filter(x => x.changed).map(x => { const b = K.baseline.per[x.i], l = K.lines[x.i]; return { id: l.id, from: K.VI[b.vid].short, to: K.VI[x.vid].short, d: K.num(x.p - b.p), dv: K.lakh((x.p - b.p) * l.qty) }; });
     const sl = sel ? K.lines[sel.li] : null;
     const selPeers = sel ? K.vendors.map(v => { const c = K.cells[v.id][sel.li]; const lbl = { ok: 'checked', conv: 'converted', ly: 'last year’s price', oor: 'unusual price', miss: 'not quoted', doubt: 'doubt' }[c.kind];
-      return { name: v.short, state: lbl, price: c.p == null ? '—' : K.inr(c.p), open: open(v.id, sel.li), s: { display: 'grid', gridTemplateColumns: '1fr 1fr 80px', gap: 8, padding: '5px 6px', background: v.id === sel.vid ? 'var(--color-accent-100)' : 'transparent', border: 0, font: 'inherit', color: 'inherit', textAlign: 'left', cursor: 'pointer' } }; }) : [];
+      return { name: v.short, state: lbl + (S.verified[v.id + ':' + sel.li] ? ' · verified by you' : ''), price: c.p == null ? '—' : K.inr(c.p), open: open(v.id, sel.li), s: { display: 'grid', gridTemplateColumns: '1fr 1fr 80px', gap: 8, padding: '5px 6px', background: v.id === sel.vid ? 'var(--color-accent-100)' : 'transparent', border: 0, font: 'inherit', color: 'inherit', textAlign: 'left', cursor: 'pointer' } }; }) : [];
     const doubtRows = K.doubts.map(d => ({ ...d, routeLabel: d.route === 'vendor' ? 'Vendor — email drafted' : 'You — judgement', open: S.openD === d.id, hasEmail: !!d.email, hasOptions: !!d.options, opts: d.options || [], toggle: () => this.setState({ openD: S.openD === d.id ? null : d.id }) }));
     const seg = on => ({ border: 0, padding: '6px 12px', font: 'inherit', fontSize: 13, cursor: 'pointer', background: on ? 'var(--color-accent)' : 'transparent', color: on ? 'var(--color-bg)' : 'inherit', whiteSpace: 'nowrap' });
     const paneS = on => ({ display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', background: 'none', border: 0, padding: '4px 0', font: 'inherit', fontSize: 14, cursor: 'pointer', color: on ? 'var(--color-text)' : 'var(--color-neutral-700)', fontWeight: on ? 600 : 400, boxShadow: on ? 'inset 0 -2px 0 var(--color-text)' : 'none' });
     const askedEntry = S.asked.find(a => a.id === S.scen);
+    const V = S.verified, vk = sel ? sel.vid + ':' + sel.li : null, selCell = sel ? K.cells[sel.vid][sel.li] : null;
+    const winners = sol.per.map(x => ({ vid: x.vid, li: x.i }));
+    const winVer = winners.filter(w => V[w.vid + ':' + w.li]).length;
+    const quotedN = K.vendors.reduce((n, v) => n + K.cells[v.id].filter(c => c.p != null).length, 0);
+    const nextW = winners.find(w => !V[w.vid + ':' + w.li] && !(sel && w.vid === sel.vid && w.li === sel.li));
+    const goNext = (vmap) => { const nw = winners.find(w => !(vmap || V)[w.vid + ':' + w.li]); this.setState({ ...(vmap ? { verified: vmap } : {}), sel: nw ? { vid: nw.vid, li: nw.li } : sel, pane: 'src', view: 'table' }); };
+    const selDoubt = selCell && selCell.kind === 'doubt' ? K.doubts.find(d => d.id === selCell.doubt) : null;
     return { ...base, scen: !!def, headS: { position: 'sticky', top: 0, zIndex: 2, background: 'var(--color-bg)', display: 'grid', gridTemplateColumns: cols, alignItems: 'end', padding: '8px 0', borderBottom: '1px solid var(--color-text)' },
+      footLabel: filtered ? 'Shown lines · value' : 'Lines won · award value', noRows: !vis.length, isFiltered: filtered, showingTxt: `Showing ${vis.length} of 30 lines${filtered ? ' · ' + K.lakh(fTot) : ''}`, chips,
+      clearFilters: () => this.setState({ f: { show: 'all', win: 'all', ply: 'all', sort: F.sort } }),
+      scenDesc: def ? def.desc : 'Every line to its lowest price across all five vendors, doubts priced as read. The floor — useful for comparison, rarely what you would award.', scenVal: S.scen, onScen: e => this.setState({ scen: e.target.value }), scenOpts: [{ v: 'base', t: 'As quoted — cheapest per line, all vendors' }].concat(['S1', 'S5', 'S4', 'S3', 'S2'].map(id => ({ v: id, t: D[id].title + (S.asked.some(a => a.id === id) ? ' · asked in chat' : '') }))),
+      winVal: F.win, onWin: e => setF({ win: e.target.value }), winOpts: [{ v: 'all', t: 'Any vendor' }].concat(K.vendors.map(v => ({ v: v.id, t: v.short + (sol.by[v.id].lines ? '' : ' (none)') }))),
+      plyVal: F.ply, onPly: e => setF({ ply: e.target.value }),
+      sortVal: F.sort, onSort: e => setF({ sort: e.target.value }), sortOpts: [{ v: 'line', t: 'Line number' }, { v: 'stake', t: 'Rupees at stake in doubts' }, { v: 'value', t: 'Award value, highest first' }, { v: 'close', t: 'Closest calls (gap to 2nd)' }, { v: 'sc', t: 'Furthest above should-cost' }],
       footS: { display: 'grid', gridTemplateColumns: cols, padding: '10px 0 24px', borderTop: '1px solid var(--color-text)', alignItems: 'baseline' }, heads, rows, foot, total: K.crore(sol.total),
       showGrid: S.view === 'table', showChart: S.view === 'chart', legendOpen: S.legend ?? !def, legendShut: !(S.legend ?? !def), toggleLegend: () => this.setState({ legend: !(S.legend ?? !def) }), scenTabs, scenName: def ? def.name : 'As quoted',
-      rules: def ? rulesFor(def) : [], excluded: K.vendors.filter(v => !v.q.cleared).map(v => ({ name: v.name, why: v.q.returned ? `scored ${v.q.score}; no ISO 9001 certificate, test report dated Jan 2025.` : 'questionnaire not returned (replied by email only).' })),
+      rules: def ? rulesFor(def) : [], excluded: K.vendors.filter(v => !v.q.cleared).map(v => ({ name: v.name, why: v.q.returned ? `scored ${v.q.score} of 100 and failed both mandatory items — no ISO 9001 certificate, test report dated Jan 2025.` : 'questionnaire not returned (replied by email only).' })),
       askedBy: askedEntry ? `Asked by ${who(askedEntry.asker).who}, ${askedEntry.asker === 'VP' ? 'VP Supply Chain' : 'buyer'}` : '',
       scenTotal: K.crore(sol.total), scenDelta: def ? dTxt(sol) : '', scenSplit: split(sol), bars, changed, noChanged: !changed.length,
       viewTable: () => this.setState({ view: 'table' }), viewChart: () => this.setState({ view: 'chart' }), segT: seg(S.view === 'table'), segC: seg(S.view === 'chart'), clearScen: () => this.setState({ scen: 'base' }),
       isConv: S.pane === 'conv', isSrc: S.pane === 'src', toConv: () => this.setState({ pane: 'conv' }), toSrc: () => this.setState({ pane: 'src' }), paneConvS: paneS(S.pane === 'conv'), paneSrcS: paneS(S.pane === 'src'),
       srcTabLabel: sel ? `Source · ${K.lines[sel.li].id} ${K.VI[sel.vid].short}` : 'Source',
-      msgs, sugg, asBuyer: () => this.setState({ asker: 'Buyer' }), asVp: () => this.setState({ asker: 'VP' }), asBuyerS: seg(S.asker === 'Buyer'), asVpS: seg(S.asker === 'VP'),
+      msgs, sugg, asBuyer: () => this.setRole('Buyer'), asVp: () => this.setRole('VP'), asBuyerS: seg(S.asker === 'Buyer'), asVpS: seg(S.asker === 'VP'),
+      winVerTxt: `${winVer} of 30`, allVerTxt: `${Object.keys(V).length} of ${quotedN}`, nextWinnerTxt: nextW ? 'Check next winner' : 'All winners checked', nextWinner: () => goNext(),
+      selVerified: !!(vk && V[vk]), selUnverified: !!(sel && !V[vk] && selCell.p != null), selVTime: vk && V[vk] ? V[vk] : '',
+      verify: () => this.setState({ verified: this.setV(vk, true) }), unverify: () => this.setState({ verified: this.setV(vk, false) }), verifyNext: () => goNext(this.setV(vk, true)),
+      verifyNote: selDoubt ? `Confirms the number matches the document. Doubt ${selDoubt.rank} stays open until it is resolved.` : 'Records your name and the time against this price. It appears on the award record.',
       hasSel: !!sel, noSel: !sel, selLine: sl || {}, selVid: sel ? sel.vid : 'SB', selLi: sel ? sel.li : 0, selPeers, closeSel: () => this.setState({ sel: null }),
       doubtCount: K.doubts.length, stakeL: K.lakh(K.totalStake), doubtRows, loggedCount: K.loggedCount, noop: () => {},
       q: S.q, onQ: e => this.setState({ q: e.target.value }), ask: () => nextId ? askId(nextId) : this.setState({ q: '' })

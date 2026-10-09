@@ -15,14 +15,25 @@
 <style>body{margin:0;background:var(--color-bg)}a{color:var(--color-accent)}a:hover{color:var(--color-accent-600)}</style>
 </helmet>
 <div style="display:flex; height:100vh; min-width:1360px; font-size:13px; line-height:1.45; color:var(--color-text); font-variant-numeric:tabular-nums; overflow:hidden;">
+  <sc-if value="{{ notLogin }}" hint-placeholder-val="{{ true }}">
   <nav style="width:68px; flex:none; display:flex; flex-direction:column; align-items:center; gap:4px; padding:18px 0;">
-    <a href="Comparison - Ledger.dc.html" style="font-size:22px; font-weight:600; color:var(--color-text); text-decoration:none; margin-bottom:18px;">P</a>
+    <div style="margin-bottom:14px;"><dc-import name="WorkspaceMenu" hint-size="44px,44px"></dc-import></div>
     <sc-for list="{{ rail }}" as="r" hint-placeholder-count="5">
       <a href="{{ r.href }}" style="{{ r.s }}"><i class="ph-duotone {{ r.icon }}" style="font-size:20px;"></i><span style="font-size:10px;">{{ r.label }}</span></a>
     </sc-for>
   </nav>
+  </sc-if>
 
   <main style="flex:1; min-width:0; overflow:auto;">
+    <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+      <div style="min-height:100%; display:flex; flex-direction:column; justify-content:center; gap:18px; padding:40px 40px 40px 14vw; max-width:620px;">
+        <span style="font-size:26px; font-weight:600;">Parakh</span>
+        <div style="display:flex; flex-direction:column; gap:6px;"><h1 style="font-size:40px; line-height:1.1; margin:0;">Sign in</h1><p style="margin:0; font-size:16px; color:var(--color-neutral-800);">Your sourcing workspace at Sahyadri Appliances.</p></div>
+        <div class="field"><label>Work email</label><input class="input" value="vikram.deshpande@sahyadri-appliances.in" onChange="{{ noop }}"></div>
+        <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-start;"><a class="btn btn-primary" href="Comparison - Ledger.dc.html" style="color:var(--color-bg); white-space:nowrap; flex:none;">Continue with company sign-in</a><span style="font-size:12px; color:var(--color-neutral-700);">Single sign-on · no separate password</span></div>
+        <span style="font-size:12px; color:var(--color-neutral-700);">You’ve been signed out. Your checks, scenarios and draft emails are saved with the event.</span>
+      </div>
+    </sc-if>
     <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
       <div style="padding:18px 40px 40px 8px; display:flex; flex-direction:column; gap:18px; max-width:1180px;">
         <div style="display:flex; align-items:flex-end; gap:16px;">
@@ -108,6 +119,59 @@
               </div>
             </sc-for>
           </sc-if>
+          <sc-if value="{{ rfqR }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-direction:column; gap:26px; max-width:1040px;">
+              <div style="display:flex; align-items:center; gap:10px; color:var(--color-neutral-800);">
+                <i class="ph-duotone ph-lock-simple-open" style="font-size:18px; color:var(--color-neutral-700);"></i>
+                <span>How replies will be read, converted, checked and scored. Rules lock when you send; changes after that need a reason and are shown to the VP. <strong>Shared</strong> rules go to vendors with the RFQ; <strong>internal</strong> ones never do.</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:8px; background:var(--color-surface); padding:14px 16px;">
+                <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-accent-700);">Write or change a rule in plain words</span>
+                <div style="display:flex; gap:8px;">
+                  <input class="input" style="background:var(--color-bg);" placeholder="e.g. Treat any price more than 15% under should-cost as a doubt">
+                  <button class="btn btn-primary" style="white-space:nowrap;"><i class="ph-duotone ph-sparkle" style="font-size:16px;"></i>Draft rule</button>
+                </div>
+                <span style="font-size:12px; color:var(--color-neutral-700);">Parakh drafts the rule; code runs it. You see the rule and its effect before it applies.</span>
+              </div>
+
+              <sc-for list="{{ ruleSecs }}" as="sec" hint-placeholder-count="5">
+                <section style="display:flex; flex-direction:column; gap:6px;">
+                  <div style="display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;">
+                    <h3 style="font-size:20px; margin:0;">{{ sec.title }}</h3>
+                    <span class="{{ sec.tagCls }}">{{ sec.tag }}</span>
+                    <span style="color:var(--color-neutral-700); font-size:12.5px;">{{ sec.note }}</span>
+                  </div>
+                  <sc-if value="{{ sec.isQuality }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:grid; grid-template-columns:30px minmax(0,1.3fr) 120px minmax(0,1.6fr) 70px; gap:0 12px; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; color:var(--color-neutral-700); padding:6px 0; border-bottom:1px solid var(--color-text);">
+                      <span>#</span><span>Question</span><span>Type</span><span>Marking</span><span style="text-align:right;">Points</span>
+                    </div>
+                    <sc-for list="{{ qScheme }}" as="q" hint-placeholder-count="10">
+                      <div style="{{ q.s }}">
+                        <span style="color:var(--color-neutral-700);">{{ q.n }}</span>
+                        <span style="display:flex; flex-direction:column; line-height:1.3;">{{ q.t }}<span style="font-size:10.5px; color:var(--color-accent-800);">{{ q.tag }}</span></span>
+                        <span style="{{ q.typeS }}">{{ q.type }}</span>
+                        <input class="input" style="min-height:30px; padding:3px 8px; font-size:13px;" value="{{ q.mark }}" onChange="{{ noop }}">
+                        <input class="input" style="min-height:30px; padding:3px 8px; font-size:13px; text-align:right;" value="{{ q.pts }}" onChange="{{ noop }}">
+                      </div>
+                    </sc-for>
+                    <div style="display:flex; gap:28px; align-items:center; padding-top:8px; flex-wrap:wrap;">
+                      <span><span style="font-weight:600;">100</span> points in total</span>
+                      <span style="display:flex; align-items:center; gap:8px;">Pass mark <input class="input" style="width:64px; min-height:30px; padding:3px 8px; text-align:right;" value="70" onChange="{{ noop }}"></span>
+                      <span style="color:var(--color-neutral-800);">Cleared = both mandatory items pass <em>and</em> score ≥ pass mark. Not returned = not cleared.</span>
+                    </div>
+                  </sc-if>
+                  <sc-for list="{{ sec.rules }}" as="r" hint-placeholder-count="3">
+                    <div style="display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1.5fr) 140px; gap:0 16px; align-items:center; padding:8px 0; border-bottom:1px solid color-mix(in srgb, var(--color-text) 8%, transparent);">
+                      <span style="display:flex; flex-direction:column; line-height:1.3;"><span style="font-weight:600;">{{ r.name }}</span><span style="font-size:12px; color:var(--color-neutral-700); text-wrap:pretty;">{{ r.how }}</span></span>
+                      <sc-if value="{{ r.editable }}" hint-placeholder-val="{{ true }}"><input class="input" style="min-height:30px; padding:3px 8px; font-size:13px;" value="{{ r.val }}" onChange="{{ noop }}"></sc-if>
+                      <sc-if value="{{ r.locked }}" hint-placeholder-val="{{ false }}"><span style="display:flex; align-items:center; gap:6px; color:var(--color-neutral-800);"><i class="ph-duotone ph-lock-simple" style="color:var(--color-neutral-600);"></i>{{ r.val }}</span></sc-if>
+                      <span style="font-size:12px; color:var(--color-neutral-700); text-align:right;">{{ r.used }}</span>
+                    </div>
+                  </sc-for>
+                </section>
+              </sc-for>
+            </div>
+          </sc-if>
           <sc-if value="{{ rfqT }}" hint-placeholder-val="{{ false }}">
             <div style="display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:14px; max-width:860px;">
               <div class="field"><label>Payment</label><input class="input" value="60 days from GRN" onChange="{{ noop }}"></div>
@@ -164,7 +228,8 @@
               <h1 style="font-size:26px; margin:0;">Split award to three quality-cleared vendors</h1>
             </div>
             <a class="btn btn-secondary" href="Comparison - Ledger.dc.html#analyst" style="white-space:nowrap;">Ask a what-if</a>
-            <button class="btn btn-primary" style="white-space:nowrap;">Approve award</button>
+            <sc-if value="{{ isVp }}" hint-placeholder-val="{{ false }}"><button class="btn btn-primary" style="white-space:nowrap;">Approve award</button></sc-if>
+            <sc-if value="{{ isBuyer }}" hint-placeholder-val="{{ true }}"><button class="btn btn-primary" style="white-space:nowrap;">Send to Anita for approval</button></sc-if>
           </div>
           <p style="margin:0; font-size:16px; max-width:820px; text-wrap:pretty;">{{ awardSummary }}</p>
           <div style="display:flex; gap:48px; flex-wrap:wrap;">
@@ -181,10 +246,10 @@
           <div style="display:flex; flex-direction:column; gap:6px;">
             <div style="display:flex; align-items:baseline; gap:12px;"><h3 style="font-size:20px; margin:0;">Snapshot at decision</h3><span style="display:flex; align-items:center; gap:5px; color:var(--color-neutral-700);"><i class="ph-duotone ph-lock-simple"></i>Frozen 9 Oct 2026, 16:42 · snapshot 7c41e9 · later revisions will not change these numbers</span></div>
             <table class="table" style="font-size:13px;">
-              <thead><tr><th>Line</th><th>Box</th><th>Awarded to</th><th style="text-align:right;">₹/box</th><th style="text-align:right;">Qty</th><th style="text-align:right;">Value</th><th>Source</th></tr></thead>
+              <thead><tr><th>Line</th><th>Box</th><th>Awarded to</th><th style="text-align:right;">₹/box</th><th style="text-align:right;">Qty</th><th style="text-align:right;">Value</th><th>Source</th><th>Checked by you</th></tr></thead>
               <tbody>
                 <sc-for list="{{ awardRows }}" as="r" hint-placeholder-count="12">
-                  <tr onClick="{{ r.go }}" style="{{ r.s }}"><td>{{ r.id }}</td><td>{{ r.name }}</td><td>{{ r.vendor }}</td><td style="text-align:right;">{{ r.p }}</td><td style="text-align:right;">{{ r.qty }}</td><td style="text-align:right;">{{ r.value }}</td><td style="color:var(--color-accent-700);">{{ r.src }}</td></tr>
+                  <tr onClick="{{ r.go }}" style="{{ r.s }}"><td>{{ r.id }}</td><td>{{ r.name }}</td><td>{{ r.vendor }}</td><td style="text-align:right;">{{ r.p }}</td><td style="text-align:right;">{{ r.qty }}</td><td style="text-align:right;">{{ r.value }}</td><td style="color:var(--color-accent-700);">{{ r.src }}</td><td style="{{ r.chkS }}">{{ r.chk }}</td></tr>
                 </sc-for>
               </tbody>
             </table>
@@ -201,13 +266,14 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;rfq&quot;,&quot;responses&quot;,&quot;award&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Screen&quot;}}">
 class Component extends DCLogic {
-  state = { screen: 'home', tab: 'All', rfqTab: 'lines', tr: 0 };
+  state = { screen: 'home', tab: 'All', rfqTab: 'lines', tr: 0, role: (() => { try { return localStorage.getItem('parakh-role') || 'Buyer'; } catch (e) { return 'Buyer'; } })() };
   componentDidMount() {
-    this._h = () => { const h = (location.hash || '').slice(1); this.setState({ screen: ['rfq', 'responses', 'award'].includes(h) ? h : (this.props.startScreen || 'home') }); };
+    this._h = () => { const h = (location.hash || '').slice(1); this.setState({ screen: h === 'rules' ? 'rfq' : ['rfq', 'responses', 'award', 'login'].includes(h) ? h : (this.props.startScreen || 'home'), ...(h === 'rules' ? { rfqTab: 'r' } : {}) }); };
     this._h(); window.addEventListener('hashchange', this._h);
+    this._role = e => this.setState({ role: e.detail }); window.addEventListener('parakh-role', this._role);
     if (!window.KD) this._t = setInterval(() => { if (window.KD) { clearInterval(this._t); this.forceUpdate(); } }, 120);
   }
-  componentWillUnmount() { window.removeEventListener('hashchange', this._h); clearInterval(this._t); }
+  componentWillUnmount() { window.removeEventListener('hashchange', this._h); window.removeEventListener('parakh-role', this._role); clearInterval(this._t); }
   renderVals() {
     const K = window.KD, S = this.state;
     const go = s => () => this.setState({ screen: s });
@@ -215,7 +281,7 @@ class Component extends DCLogic {
     const nav = [['ph-tray', 'Sourcing events', '#', 'home'], ['ph-users-three', 'Vendors', '#'], ['ph-calculator', 'Should-cost library', '#'], ['ph-files', 'Templates', '#'], ['ph-chart-line', 'Reports', '#']].map(n => ({ icon: n[0], label: n[1], href: n[2], go: n[3] ? go(n[3]) : undefined, s: navS(S.screen === 'home' && n[3] === 'home') }));
     const evNav = [['RFQ', '#rfq', 'rfq'], ['Replies', '#responses', 'responses'], ['Comparison', 'Comparison - Ledger.dc.html'], ['Award record', '#award', 'award']].map(n => ({ label: n[0], href: n[1], go: n[2] ? go(n[2]) : undefined, s: { ...navS(S.screen === n[2]), paddingLeft: 14 } }));
     const rail = [['ph-tray', 'Events', '#events', 'home'], ['ph-note-pencil', 'RFQ', '#rfq', 'rfq'], ['ph-envelope-open', 'Replies', '#responses', 'responses'], ['ph-table', 'Compare', 'Comparison - Ledger.dc.html', 'compare'], ['ph-seal-check', 'Award', '#award', 'award']].map(r => ({ icon: r[0], label: r[1], href: r[2], s: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '8px 0', width: 56, textDecoration: 'none', color: S.screen === r[3] ? 'var(--color-accent)' : 'var(--color-neutral-700)' } }));
-    const base = { rail, nav, evNav, inEvent: S.screen !== 'home', isHome: S.screen === 'home', isRfq: S.screen === 'rfq', isResp: S.screen === 'responses', isAward: S.screen === 'award', noop: () => {} };
+    const base = { rail, nav, evNav, inEvent: S.screen !== 'home', isHome: S.screen === 'home', isRfq: S.screen === 'rfq', isResp: S.screen === 'responses', isAward: S.screen === 'award', isLogin: S.screen === 'login', notLogin: S.screen !== 'login', isVp: S.role === 'VP', isBuyer: S.role !== 'VP', noop: () => {} };
     if (!K) return base;
     const tabS = on => ({ whiteSpace: 'nowrap', background: 'none', border: 0, padding: '4px 0', font: 'inherit', fontSize: 14, cursor: 'pointer', color: on ? 'var(--color-text)' : 'var(--color-neutral-700)', fontWeight: on ? 600 : 400, boxShadow: on ? 'inset 0 -2px 0 var(--color-text)' : 'none' });
     const statuses = ['All', 'Drafting', 'Collecting replies', 'Comparing', 'Awaiting approval', 'Awarded', 'Closed'];
@@ -226,12 +292,41 @@ class Component extends DCLogic {
       ['Parakh', 'Drafted 30 lines: 25 carried over from SE-2025-037, 5 new from the PLM bill of materials. L14 is now 5-ply BC, 180/120/150/120/180 GSM, BF 22. Quantities are from the H2 forecast.'],
       ['Parakh', 'Two things to check: L28 has no artwork yet, so I set it to 2-colour. L30 is 1 lakh pieces, three times last year.'],
       ['Vikram', 'L30 is right, warranty sleeves now ship with every SKU. Add a quality questionnaire — ISO and a recent test report are mandatory.'],
-      ['Parakh', 'Added 10 questions, 2 of them mandatory. Vendors can answer in any format; I’ll read whatever comes back.']].map(m => { const u = m[0] === 'Vikram';
+      ['Parakh', 'Added 10 questions, 2 of them mandatory. Vendors can answer in any format; I’ll read whatever comes back.'],
+      ['Vikram', 'Score rejection rate out of 15 — full marks at 0.5% or less.'],
+      ['Parakh', 'Done, in Evaluation rules → Q8. Total is still 100 (I took 5 points off the account-manager question). Scored against last year’s four vendors: 95, 88, 76 and 61 — the same two would clear.']].map(m => { const u = m[0] === 'Vikram';
         return { who: m[0], text: m[1], s: { display: 'flex', flexDirection: 'column', gap: 3, alignItems: u ? 'flex-end' : 'flex-start', paddingLeft: u ? 40 : 0 }, ws: { fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: u ? 'var(--color-neutral-700)' : 'var(--color-accent-700)' }, ps: { margin: 0, fontSize: 14, fontStyle: u ? 'italic' : 'normal', textAlign: u ? 'right' : 'left', textWrap: 'pretty' } }; });
     const rfqRows = K.lines.map(l => { const ch = l.i === 13; return { id: l.id, tag: ch ? 'changed by chat' : l.i >= 25 ? 'new SKU' : '', name: l.name, ply: l.ply, flute: l.flute, dims: l.dims, gsm: l.gsm, bf: l.bf, print: l.print, qtyK: l.qtyK,
       plyS: { minHeight: 30, padding: '3px 8px', fontSize: 13, background: ch ? 'var(--color-accent-100)' : undefined, borderColor: ch ? 'var(--color-accent)' : undefined },
       s: { display: 'grid', gridTemplateColumns: '44px minmax(180px,1.4fr) 50px 50px 120px minmax(150px,1fr) 52px 88px 66px', gap: '0 8px', alignItems: 'center', padding: '4px 0', background: ch ? 'var(--color-accent-100)' : 'transparent' } }; });
-    const rfqTabs = [['lines', 'Line items · 30'], ['q', 'Questionnaire · 10'], ['t', 'Terms']].map(t => ({ label: t[1], go: () => this.setState({ rfqTab: t[0] }), s: tabS(S.rfqTab === t[0]) }));
+    const rfqTabs = [['lines', 'Line items · 30'], ['q', 'Questionnaire · 10'], ['t', 'Terms'], ['r', 'Evaluation rules']].map(t => ({ label: t[1], go: () => this.setState({ rfqTab: t[0] }), s: tabS(S.rfqTab === t[0]) }));
+    const MARK = ['Valid certificate attached — pass / fail', 'Report dated within 12 months — pass / fail', 'All three tests: 10 · burst only: 5 · none: 0', '2+ named mills: 10 · one: 5 · “local”: 0', '≤ 9%: 10 · above: 0', '≥ 400 t: 10 · 300–399 t: 5 · less: 0', '≤ 7 days: 10 · more: 0', '≤ 0.5%: 15 · ≤ 1%: 10 · ≤ 2%: 5 · not stated: 0', '60 days: 10 · 45: 5 · 30: 0', 'Yes: 5 · no: 0'];
+    const PTS = [10, 10, 10, 10, 10, 10, 10, 15, 10, 5];
+    const qScheme = K.questions.map((q, k) => ({ n: k + 1, t: q[0], type: q[1] ? 'Mandatory' : 'Scored', mark: MARK[k], pts: PTS[k], tag: k === 7 || k === 9 ? 'changed by chat' : '',
+      typeS: { color: q[1] ? 'var(--color-accent-2-800)' : 'var(--color-text)', fontWeight: q[1] ? 600 : 400 },
+      s: { display: 'grid', gridTemplateColumns: '30px minmax(0,1.3fr) 120px minmax(0,1.6fr) 70px', gap: '0 12px', alignItems: 'center', padding: '5px 0', borderBottom: '1px solid color-mix(in srgb, var(--color-text) 8%, transparent)', background: k === 7 || k === 9 ? 'var(--color-accent-100)' : 'transparent' } }));
+    const rr = (name, how, val, used, locked) => ({ name, how, val, used, editable: !locked, locked: !!locked });
+    const ruleSecs = [
+      { title: 'Quality score', tag: 'Shared with vendors', tagCls: 'tag tag-accent', note: 'Sent with the questionnaire, so every vendor knows how they will be marked.', isQuality: true, rules: [] },
+      { title: 'Price basis', tag: 'Shared with vendors', tagCls: 'tag tag-accent', note: 'Every reply is brought onto this basis before comparing.', isQuality: false, rules: [
+        rr('Unit and currency', 'What every price in the comparison means.', '₹ per box', 'all 150 prices'),
+        rr('Delivery and tax', 'Freight included; GST shown separately.', 'Delivered Chakan · GST 18% extra', 'all 150 prices') ] },
+      { title: 'Conversions', tag: 'Internal', tagCls: 'tag tag-neutral', note: 'Applied by code when a reply ignores the basis. Every converted price shows its sum.', isQuality: false, rules: [
+        rr('Foreign currency', 'Rate is looked up, never read from the vendor’s document. Conditional discounts are raised as doubts.', 'RBI reference rate on the reply date', '30 prices · Vardhman'),
+        rr('Per 100 / per 1,000 pieces', 'Divide down; add freight quoted in the same unit.', '(price + freight) ÷ pack size', '30 prices · Kaveri'),
+        rr('Per kg', 'Board weight from blank area × GSM, with flute take-up B 1.32 · C 1.45 · E 1.25.', 'weight × rate + print + freight', '30 prices · Rohit Box'),
+        rr('“Freight extra”', 'Estimate, then raise as a doubt if it could change a winner.', 'Last year’s lane average, ₹ per box', '30 prices · Rohit Box'),
+        rr('“Same as last year”', 'Take the price from the last awarded event; new SKUs use the nearest spec and are flagged.', 'SE-2025-037 (Oct 2025)', '25 prices · Rohit Box') ] },
+      { title: 'Should-cost', tag: 'Internal · never sent', tagCls: 'tag tag-neutral', note: 'A sanity check, not a target. Prices outside the band get an ↑ or ↓.', isQuality: false, rules: [
+        rr('Board rate', 'Kraft board, landed, per kg.', '3-ply ₹41/kg · 5-ply ₹44/kg', 'all 30 lines'),
+        rr('Print add-on', 'Per box, by colours.', 'Plain 0 · 1-col ₹0.35 · 2-col ₹0.60 · 4-col ₹1.40', '24 lines'),
+        rr('Band', 'How far a price may sit from should-cost before it is marked unusual.', '± 12%', '9 prices outside today') ] },
+      { title: 'Doubts', tag: 'Company default', tagCls: 'tag tag-outline', note: 'Set by procurement for every event. Read-only here.', isQuality: false, rules: [
+        rr('When to interrupt', 'Raise a doubt only if it could change who wins a line; log the rest.', 'Could change a winner', '5 raised · 19 logged', true),
+        rr('Rupees at stake', 'Used to rank the doubt queue.', 'quantity × (worst case − as read)', '5 doubts', true),
+        rr('Two reads disagree', 'Each document is read twice, independently.', 'Raise as doubt, route to vendor', '1 doubt', true),
+        rr('Spec does not match', 'e.g. 3-ply offered where 5-ply was asked.', 'Raise as doubt, route to you', '1 doubt', true) ] }
+    ];
     const qRows = K.questions.map((q, k) => ({ n: k + 1, t: q[0], mand: q[1] ? 'Mandatory' : 'Scored', ev: k < 2 ? 'Attach document' : 'Free answer' }));
     const resp = K.vendors.map(v => { const miss = K.cells[v.id].filter(c => c.p == null).map(c => K.lines[c.i].id); const dbl = K.doubts.filter(d => d.vid === v.id);
       const conv = { SB: 'No conversion. Matched their item names to our 30 lines by size, ply and BF.', VP: 'USD → ₹ at RBI reference ₹88.20; 2.5% footnote discount applied.', KP: 'Per 100 nos → per box; freight ₹38 per 100 added.', AC: 'Read from photo; perspective corrected. One hand-written correction.', RB: 'Per kg → per box from board weight; print from last year; freight estimated.' }[v.id];
@@ -241,13 +336,15 @@ class Component extends DCLogic {
         qTxt: v.q.returned ? `${v.q.score} / 100 · ${v.q.cleared ? 'cleared' : v.q.mandFail + ' mandatory items failed'}` : 'not returned', docsL: v.docs.map(d => ({ n: d[0], s: d[1] })), noDocs: v.docs.length ? '' : 'No documents attached. Reminder drafted.' }; });
     const Q = K.qual, delta = Q.total - K.baseline.total;
     const ly = K.lines.filter(l => l.lastYear).reduce((s, l) => s + l.lyPrice * l.qty, 0), now = K.lines.filter(l => l.lastYear).reduce((s, l) => s + Q.per[l.i].p * l.qty, 0);
-    const awardRows = Q.per.map((x, k) => { const l = K.lines[x.i], c = K.cells[x.vid][x.i]; return { id: l.id, name: l.name, vendor: K.VI[x.vid].short, p: K.num(x.p), qty: l.qty.toLocaleString('en-IN'), value: K.lakh(x.p * l.qty), src: `${K.VI[x.vid].fmt} · ${c.loc.split(';')[0]}`, go: () => this.setState({ tr: k }),
+    let V = {}; try { V = JSON.parse(localStorage.getItem('parakh-verified') || '{}') || {}; } catch (e) {}
+    const nChk = Q.per.filter(x => V[x.vid + ':' + x.i]).length;
+    const awardRows = Q.per.map((x, k) => { const l = K.lines[x.i], c = K.cells[x.vid][x.i], ck = V[x.vid + ':' + x.i]; return { chk: ck ? '✓ ' + ck : 'not yet', chkS: { whiteSpace: 'nowrap', color: ck ? 'var(--color-accent-800)' : 'var(--color-neutral-600)' }, id: l.id, name: l.name, vendor: K.VI[x.vid].short, p: K.num(x.p), qty: l.qty.toLocaleString('en-IN'), value: K.lakh(x.p * l.qty), src: `${K.VI[x.vid].fmt} · ${c.loc.split(';')[0]}`, go: () => this.setState({ tr: k }),
       s: { cursor: 'pointer', background: S.tr === k ? 'var(--color-accent-100)' : undefined } }; });
     const trx = Q.per[S.tr];
     const res = { D1: 'Moot — Anand excluded on quality.', D4: 'Moot — Anand excluded on quality.', D3: 'Moot — Rohit Box excluded (no questionnaire).', D5: 'Moot — Rohit Box excluded (no questionnaire).', D2: 'Resolved — Vardhman confirmed by email (9 Oct, 11:05): discount applies on the half-year award value.' };
-    return { ...base, tabs, events, rfqChat, rfqRows, rfqTabs, qRows, rfqLines: S.rfqTab === 'lines', rfqQ: S.rfqTab === 'q', rfqT: S.rfqTab === 't', resp,
+    return { ...base, tabs, events, rfqChat, rfqRows, rfqTabs, qRows, rfqLines: S.rfqTab === 'lines', rfqQ: S.rfqTab === 'q', rfqT: S.rfqTab === 't', rfqR: S.rfqTab === 'r', ruleSecs, qScheme, resp,
       awardSummary: `Award each line to the lowest price among vendors who cleared the quality questionnaire: Shree Balaji ${Q.by.SB.lines} lines, Vardhman ${Q.by.VP.lines}, Kaveri ${Q.by.KP.lines}. This costs ${K.lakh(delta)} more than the cheapest-per-line option, which would have given 26 lines to two vendors without a valid ISO certificate or questionnaire.`,
-      kpis: [{ v: K.crore(Q.total), t: 'award value, ex-GST' }, { v: '+' + K.lakh(delta), t: 'vs cheapest per line' }, { v: '+' + ((now / ly - 1) * 100).toFixed(1) + '%', t: 'vs last year, like-for-like 25 lines' }, { v: '3', t: 'vendors · none above 50% of value' }],
+      kpis: [{ v: K.crore(Q.total), t: 'award value, ex-GST' }, { v: '+' + K.lakh(delta), t: 'vs cheapest per line' }, { v: '+' + ((now / ly - 1) * 100).toFixed(1) + '%', t: 'vs last year, like-for-like 25 lines' }, { v: '3', t: 'vendors · none above 50% of value' }, { v: nChk + ' of 30', t: 'awarded prices checked by Vikram' }],
       decisions: K.doubts.map(d => ({ rank: d.rank, title: d.title, res: res[d.id] })), awardRows, trLine: K.lines[trx.i], trVid: trx.vid, trLi: trx.i };
   }
 }

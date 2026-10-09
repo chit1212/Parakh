@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { EnvelopeOpen, NotePencil, SealCheck, Table, Tray } from "@phosphor-icons/react";
 
 import { EVENT_ID as EVENT, HOME } from "@/lib/routes";
+import { WorkspaceMenu } from "./WorkspaceMenu";
 
 export function Rail() {
   const path = usePathname();
@@ -16,10 +17,10 @@ export function Rail() {
     { icon: SealCheck, label: "Award", href: `/events/${EVENT}/award` },
   ];
   return (
-    <nav style={{ width: 68, flex: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "18px 0", position: "sticky", top: 0, height: "100vh" }}>
-      <Link href={HOME} style={{ fontSize: 22, fontWeight: 600, color: "var(--color-text)", textDecoration: "none", marginBottom: 18 }}>P</Link>
+    <nav style={{ width: 68, flex: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "18px 0", position: "sticky", top: 0, height: "100vh", zIndex: 30 }}>
+      <WorkspaceMenu />
       {items.map((r) => {
-        const on = r.href === path;
+        const on = r.href.split("?")[0] === path;
         const s = {
           display: "flex", flexDirection: "column" as const, alignItems: "center", gap: 2, padding: "8px 0", width: 56, textDecoration: "none",
           color: on ? "var(--color-accent)" : r.href ? "var(--color-neutral-700)" : "var(--color-neutral-400)",

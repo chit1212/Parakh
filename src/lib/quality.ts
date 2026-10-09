@@ -1,6 +1,7 @@
 // Quality questionnaire (pass rule from the RFQ), checked in code from what was read.
-// The parts code can check on its own: returned, Q1 a valid ISO 9001 certificate, Q2 a test report
-// within 12 months of the RFQ. The 0-100 score needs a marking scheme the RFQ does not give (L26).
+// Code checks Q1 (a valid ISO 9001 certificate) and Q2 (a test report within 12 months of the RFQ)
+// itself, and marks every answer against the buyer's marking scheme for a score out of 100 (L26).
+import { DEFAULT_SCHEME, markAnswer, type QualityScheme } from "./qualityScheme";
 import type { ReplyReading } from "./reader/pipeline";
 import type { SourcingEvent } from "./types";
 
@@ -9,6 +10,13 @@ export interface Quality {
   returned: boolean;
   iso: { pass: boolean; why: string };
   testReport: { pass: boolean; why: string };
+  /** Score out of 100 against the marking scheme; null if the questionnaire was not returned. */
+  score: number | null;
+  passMark: number;
+  /** Each question as marked: points earned, points possible, and what was read. */
+  items: { id: string; pts: number; of: number; why: string; mandatory: boolean }[];
+  /** Mandatory items that failed. */
+  mandatoryFailed: number;
   cleared: boolean;
   /** One line for the buyer: why the vendor is or is not quality-cleared. */
   why: string;
@@ -21,7 +29,7 @@ const when = (s: string | null | undefined) => {
   return Number.isNaN(t) ? null : { t, text: m! };
 };
 
-export function qualityOf(ev: SourcingEvent, vendorId: string, readings: ReplyReading[]): Quality {
+export function qualityOf(ev: SourcingEvent, vendorId: string, readings: ReplyReading[], scheme: QualityScheme = DEFAULT_SCHEME): Quality {
   const mine = readings.filter((r) => r.vendorId === vendorId && r.status !== "error");
   const answers = mine.flatMap((r) => r.questionnaire);
   const docs = mine.flatMap((r) => r.qualityDocs);
@@ -47,9 +55,20 @@ export function qualityOf(ev: SourcingEvent, vendorId: string, readings: ReplyRe
     : tested ? { pass: false, why: `test report dated ${tested.text}, older than 12 months` }
     : { pass: false, why: "no test report" };
 
-  const cleared = returned && iso.pass && testReport.pass;
+  // Mark every answer against the scheme. Code does the sums; the answers are as read.
+  const items = scheme.rules.map((r) => {
+    const a = answers.find((x) => x.question_id === r.id)?.answer ?? null;
+    const m = !returned ? { pts: 0, why: "not returned" } : markAnswer(r, a, r.how === "check_iso" ? iso : r.how === "check_test_report" ? testReport : undefined);
+    return { id: r.id, pts: m.pts, of: r.points, why: m.why, mandatory: r.mandatory };
+  });
+  const score = returned ? items.reduce((t, x) => t + x.pts, 0) : null;
+  const failed = items.filter((x) => x.mandatory && x.pts === 0);
+  const cleared = returned && !failed.length && score! >= scheme.passMark;
   const why = !returned ? "questionnaire not returned"
-    : cleared ? `${iso.why}; ${testReport.why}`
-    : [iso, testReport].filter((x) => !x.pass).map((x) => x.why).join("; ");
-  return { vendorId, returned, iso, testReport, cleared, why };
+    : cleared ? `scored ${score} of 100 (pass mark ${scheme.passMark}); ${iso.why}; ${testReport.why}`
+    : [
+        score! < scheme.passMark ? `scored ${score}, below the pass mark of ${scheme.passMark}` : `scored ${score}`,
+        ...failed.map((x) => (x.id === scheme.rules.find((r) => r.how === "check_iso")?.id ? iso.why : x.id === scheme.rules.find((r) => r.how === "check_test_report")?.id ? testReport.why : `${x.id} (mandatory): ${x.why}`)),
+      ].join("; ");
+  return { vendorId, returned, iso, testReport, score, passMark: scheme.passMark, items, mandatoryFailed: failed.length, cleared, why };
 }

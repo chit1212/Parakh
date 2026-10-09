@@ -1,11 +1,18 @@
 "use client";
 // L0 RFQ co-pilot (design: Shared Screens #rfq). Chat on the left turns the buyer's words into edits;
 // the draft RFQ on the right stays directly editable. Kept light: the demo RFQ was sent on its issue date.
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PaperPlaneRight } from "@phosphor-icons/react";
 import { Rail } from "@/components/Rail";
 import { useReadings } from "@/components/useReadings";
 import type { DraftRfq, Edit } from "@/lib/rfqDraft";
+import { EvaluationRules } from "@/components/EvaluationRules";
+import { useScheme } from "@/components/useScheme";
+import { buildGrid } from "@/lib/compare";
+import { findDoubts } from "@/lib/doubts";
+import { qualityOf } from "@/lib/quality";
+import type { ReplyReading } from "@/lib/reader/pipeline";
+import { mainFile } from "@/lib/summary";
 
 type Line = DraftRfq["lines"][number] & { tag?: string };
 type Draft = Omit<DraftRfq, "lines"> & { lines: Line[]; from: string };
@@ -15,9 +22,19 @@ const COLS = "44px minmax(200px,1.4fr) minmax(160px,1fr) minmax(220px,1.6fr) 80p
 const inp: React.CSSProperties = { minHeight: 30, padding: "3px 8px", fontSize: 13 };
 
 export default function RfqPage() {
-  const { data } = useReadings();
+  const { data, state } = useReadings();
+  const [scheme] = useScheme();
   const [draft, setDraft] = useState<Draft | null>(null);
-  const [tab, setTab] = useState<"lines" | "q" | "t">("lines");
+  const [tab, setTab] = useState<"lines" | "q" | "t" | "r">("lines");
+  useEffect(() => { if (new URLSearchParams(window.location.search).get("tab") === "rules") setTab("r"); }, []);
+  // The event as read, for the evaluation rules' "used by" counts and the effect of a marking change.
+  const readings = useMemo(() => (data ? data.replies.map((r) => state[r.id]?.reading).filter((r): r is ReplyReading => Boolean(r && r.status !== "error")) : []), [data, state]);
+  const grid = useMemo(() => {
+    if (!data) return null;
+    const files = Object.fromEntries(data.replies.map((r) => [r.id, mainFile(r, state[r.id]?.reading ?? null) ?? undefined]));
+    return buildGrid(data.event, readings, { sheets: data.historySheets }, files, data.lastYear);
+  }, [data, readings, state]);
+  const report = useMemo(() => (data && grid ? findDoubts(data.event, grid, data.event.vendors.map((v) => qualityOf(data.event, v.id, readings, scheme)).filter((q) => q.cleared).map((q) => q.vendorId)) : null), [data, grid, readings, scheme]);
   const [msgs, setMsgs] = useState<{ role: "user" | "assistant"; text: string; model?: string }[]>([]);
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
@@ -130,6 +147,7 @@ export default function RfqPage() {
               <button style={tabS(tab === "lines")} onClick={() => setTab("lines")}>Line items · {draft.lines.length}</button>
               <button style={tabS(tab === "q")} onClick={() => setTab("q")}>Questionnaire · {draft.questions.length}</button>
               <button style={tabS(tab === "t")} onClick={() => setTab("t")}>Terms</button>
+              <button style={tabS(tab === "r")} onClick={() => setTab("r")}>Evaluation rules</button>
             </div>
             {tab === "lines" && (
               <div>
@@ -154,6 +172,7 @@ export default function RfqPage() {
                 <span>{x.type}</span>
               </div>
             ))}
+            {tab === "r" && grid && report && <EvaluationRules ev={ev} grid={grid} readings={readings} report={report} />}
             {tab === "t" && (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 14, maxWidth: 900 }}>
                 {Object.entries(draft.terms).map(([k, v]) => (
