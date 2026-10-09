@@ -379,8 +379,6 @@ export default function ComparePage() {
   // "Verified by you": winners in the active view, and every quoted price.
   const winners = grid && award ? grid.lines.filter((l) => award.per[l.id]) : [];
   const winChecked = winners.filter((l) => checks[checkKey(award!.per[l.id]!.vendorId, l.id)]).length;
-  const quoted = grid ? Object.values(grid.cells).filter((c) => c.perBox != null) : [];
-  const quotedChecked = quoted.filter((c) => checks[checkKey(c.vendorId, c.lineId)]).length;
   const nextWinner = (after?: string) => {
     if (!award) return;
     const order = shown.length ? shown : grid!.lines;
@@ -444,7 +442,6 @@ export default function ComparePage() {
           <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12, fontSize: 12.5 }}>
             <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", lineHeight: 1.25 }}>
               <span><b>{winChecked} of {winners.length}</b> winning prices verified by you</span>
-              <span style={{ color: "var(--color-neutral-700)", fontSize: 11.5 }}>{quotedChecked} of {quoted.length} of all quoted prices</span>
             </span>
             <button className="btn btn-secondary" style={{ padding: "4px 10px", fontSize: 12.5 }} disabled={winChecked === winners.length} onClick={() => nextWinner(sel?.l)}>
               <SealCheck size={14} weight="duotone" />Check next winner
@@ -800,7 +797,7 @@ function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, overrid
           filePath={paths[`${n.replyId}|${n.source.file.toLowerCase()}`] ?? paths[`history|${n.source.file.toLowerCase()}`] ?? null}
         />
       )}
-      {c.perBox != null && (check ? (
+      {c.perBox != null && (check || shown.per[line.id]?.vendorId === sel.v) && (check ? (
         <div style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--color-accent-100)", padding: "8px 10px" }}>
           <SealCheck size={22} weight="duotone" color="var(--color-accent-700)" />
           <span style={{ display: "flex", flexDirection: "column", marginRight: "auto", lineHeight: 1.3 }}>
