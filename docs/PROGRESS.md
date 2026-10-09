@@ -13,7 +13,7 @@ Built:
 - `npm run scorecard` grades the reader against `06_answer_key` (grading only; `test/isolation.test.ts` pins that nothing else reads the key).
 - Per-visitor limit on paid model calls (`src/lib/guard.ts`).
 
-Waiting on: the network secret being added to the cloud environment (next session picks it up), then the first real run of `npm run scorecard` and tuning the prompts against it.
+Waiting on: credit on the Anthropic account. 2026-10-09: the network secret now reaches the API (authenticated), but every call is refused with "credit balance is too low". The corrupt-PDF failure case passes (no model call needed); everything else is blocked. Next: add credit, run `npm run scorecard`, tune the prompts against it.
 
 ## Decisions (technical)
 - "Strict schema" is done with structured outputs (`output_config.format`), the supported way on Sonnet 5.5, which does not accept forced tool choice.

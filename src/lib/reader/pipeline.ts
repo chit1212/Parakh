@@ -253,6 +253,7 @@ export async function readReply(
     return out;
   } catch (e) {
     out.status = "error";
+    out.cached = false;
     out.error = (e as Error).message;
     out.headline = `Reading stopped: ${(e as Error).message}`;
     out.nextStep = { kind: "check_reply", text: "Try reading it again." };
