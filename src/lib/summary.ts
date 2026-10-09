@@ -1,4 +1,5 @@
 // What the browser gets about a reply: names and kinds, never file contents.
+import type { ReplyReading } from "./reader/pipeline";
 import type { Reply, SourcingEvent } from "./types";
 
 export interface FileSummary {
@@ -34,4 +35,13 @@ export function summarise(r: Reply, ev: SourcingEvent): ReplySummary {
     receivedAt: r.receivedAt, from: r.from, subject: r.subject,
     cover: r.cover ? fs(r.cover) : null, files: r.files.map(fs), origin: r.origin,
   };
+}
+
+/** The file that carries the quote: the first attachment the sorter called a quote, else the first file. */
+export function mainFile(r: ReplySummary, reading: ReplyReading | null): FileSummary | null {
+  const quoteName = reading?.classification?.files.find((f) => f.role === "quote")?.name;
+  if (quoteName) return r.files.find((f) => f.name === quoteName) ?? r.files[0] ?? r.cover;
+  // Before the reply is sorted: skip files whose names say they are supporting documents.
+  const support = /certificate|test.?report|questionnaire|iso/i;
+  return r.files.find((f) => !support.test(f.name)) ?? r.files[0] ?? r.cover;
 }

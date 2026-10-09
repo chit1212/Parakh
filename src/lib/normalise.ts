@@ -44,6 +44,9 @@ export interface NormCell {
   flags: string[];
   /** Which reply this came from (a revision supersedes the earlier offer). */
   replyId: string;
+  /** The reader's words for this price and why it answers this line. */
+  vendorWording: string | null;
+  matchReason: string | null;
 }
 
 export interface VendorBasis {
@@ -158,6 +161,7 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
       const cell: NormCell = {
         vendorId, lineId: line.id, status: "unclear", asWritten: "", source: null, verification: null, perBox: null, calc: null,
         lastYear: false, variants: {}, alternatives: [], alternate: null, flags: [], replyId: latest.replyId,
+        vendorWording: null, matchReason: null,
       };
       if (held) cell.flags.push("This reply looks incomplete; held out of the comparison until the buyer decides.");
       const price: Price | undefined = latest.prices.find((p) => p.line_id === line.id && ok(p.verification));
@@ -172,6 +176,8 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
         cell.asWritten = `${money(price.currency, price.raw_value_text)}${UNIT_WORDS[price.unit] ?? ""}${basis === "ex_works" ? ", ex-works" : basis === "delivered" ? ", delivered" : ""}`;
         cell.source = price.source;
         cell.verification = price.verification;
+        cell.vendorWording = price.vendor_wording;
+        cell.matchReason = price.match_reason;
         const r = toPerBox(price.raw_value, price.unit, price.currency, line);
         if ("reason" in r) cell.flags.push(r.reason);
         else base = r;
@@ -193,6 +199,8 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
         cell.asWritten = `${money(rate.currency, rate.value_text)}/kg${rate.from_earlier_record ? " (last year's rate)" : ""}`;
         cell.source = rate.source;
         cell.verification = rate.verification;
+        cell.vendorWording = rate.vendor_wording;
+        cell.matchReason = `A ${line.plyN}-ply rate per kg of box; ${line.id} is ${line.ply}, so it is priced by weight.`;
         cell.lastYear = rate.from_earlier_record;
         cell.flags.push("priced per kg; box weight computed from the RFQ spec");
         if (rate.from_earlier_record) cell.flags.push(`${line.plyN}-ply rate taken from last year's quote ("${rate.pointer ?? "same as last year"}")`);
@@ -206,8 +214,8 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
           if (line.colours > 0) {
             if (!print) { base = null; cell.flags.push(`Printing (${line.colours} colour) is not priced, so the box price is incomplete.`); }
             else {
+              // Printing at last year's rate is noted, but the price is this year's (lastYear marks the board rate only).
               base.v += line.colours * print.value; base.calc += ` + ${fmt(line.colours * print.value)} print`;
-              if (print.from_earlier_record) cell.lastYear = true;
             }
           }
           if (base && line.dieCut) {
@@ -256,7 +264,9 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
         };
       return cell;
     });
-    out.push({ vendorId, replyIds: list.map((r) => r.replyId), freight: fr.add, freightUnknown: fr.unknown, cells });
+    // Unknown freight matters only where a price is not delivered.
+    const freightUnknown = cells.some((c) => c.flags.some((f) => f.startsWith("freight extra, amount not given")));
+    out.push({ vendorId, replyIds: list.map((r) => r.replyId), freight: fr.add, freightUnknown, cells });
   }
   return out;
 }

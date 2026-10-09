@@ -17,7 +17,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const ev = [
     { label: "RFQ", href: null },
     { label: "Replies", href: `/events/${EVENT}/replies` },
-    { label: "Comparison", href: null },
+    { label: "Comparison", href: `/events/${EVENT}/compare` },
     { label: "Doubts", href: null },
     { label: "Award", href: null },
   ];

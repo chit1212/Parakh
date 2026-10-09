@@ -12,6 +12,8 @@ export async function GET() {
   return Response.json({
     event: ev,
     lastYear: history.lines,
+    // The buyer's own records, so code in the browser can resolve "same as last year" too.
+    historySheets: history.sheets,
     replies: inbox.map((r) => summarise(r, ev)),
     saved,
     keyConfigured: hasApiKey(),

@@ -23,7 +23,9 @@ Built:
 ## Milestone 2: Normalising (started)
 - `src/lib/normalise.ts`: code puts every price on INR per box, delivered: per 100 / per kg (weight from the RFQ spec) / USD at the reference rate / freight and handling from the checked terms; conditional discount and "if freight is as last year" kept as separate values; never guesses (unclear unit or currency leaves the cell unpriced with the reason); a revision supersedes the earlier offer and says what changed.
 - Graded by the scorecard: 149 of 150 converted values match the answer key to the paisa (the miss is L19 above); discount 30/30; last-year freight 30/30. `test/normalise.test.ts` pins the arithmetic without the model.
-- Not yet on screen (next: the Comparison screen, then L15 click-to-source).
+- Comparison screen (`/events/SE-2026-041/compare`, `src/lib/compare.ts`): 30 lines x 5 vendors on one basis from the saved readings, cell states (checked, converted, last year, unusual ±12%, not quoted, lowest), winners and award value per vendor. As quoted, all 30 winners and the total (Rs 4,00,77,050) match the answer key (`test/compare.test.ts`). A substitute spec, a price >12% below should-cost, or an incomplete reply is shown but cannot win until the buyer or vendor confirms.
+- Source panel: the cited snippet, as written vs on our basis, and Read / Calculate / Verify / Decide. Next (L15): render the original document with the cell, sentence or photo row highlighted.
+- Design: `design/` is now the Ledger handoff; `design/README.md` is the spec.
 
 ## Decisions (technical)
 - "Strict schema" is Gemini's `responseJsonSchema`, generated from the zod schemas, and the answer is validated again in code.

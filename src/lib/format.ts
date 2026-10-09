@@ -21,3 +21,12 @@ export function readStamp(r: { readAt: string | null; models: string[] }): strin
   if (!r.readAt) return "read in code, no model needed";
   return `read on ${day(r.readAt)} by ${r.models.join(" and ")}`;
 }
+
+/** 4,134.00 (Indian grouping, two decimals). */
+export const num2 = (n: number) => n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+/** ₹41.80 */
+export const inr = (n: number) => `₹${num2(n)}`;
+/** ₹6.99 L (lakhs) */
+export const lakh = (n: number) => `₹${(n / 1e5).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} L`;
+/** ₹4.01 Cr (crores) */
+export const crore = (n: number) => `₹${(n / 1e7).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Cr`;

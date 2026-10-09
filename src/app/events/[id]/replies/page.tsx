@@ -4,7 +4,7 @@ import { Camera, Envelope, File, FileDoc, FilePdf, FileXls, Paperclip, Warning }
 import { Shell } from "@/components/Shell";
 import { useReadings, type ReplyState } from "@/components/useReadings";
 import type { ReplyReading } from "@/lib/reader/pipeline";
-import type { FileSummary, ReplySummary } from "@/lib/summary";
+import { mainFile, type ReplySummary } from "@/lib/summary";
 import { readStamp, where } from "@/lib/format";
 import type { SourcingEvent } from "@/lib/types";
 
@@ -28,14 +28,6 @@ const when = (iso: string | null) =>
   iso ? new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Kolkata" }) : "date unknown";
 
 
-/** The file that carries the quote: the first attachment the sorter called a quote, else the first file. */
-function mainFile(r: ReplySummary, reading: ReplyReading | null): FileSummary | null {
-  const quoteName = reading?.classification?.files.find((f) => f.role === "quote")?.name;
-  if (quoteName) return r.files.find((f) => f.name === quoteName) ?? r.files[0] ?? r.cover;
-  // Before the reply is sorted: skip files whose names say they are supporting documents.
-  const support = /certificate|test.?report|questionnaire|iso/i;
-  return r.files.find((f) => !support.test(f.name)) ?? r.files[0] ?? r.cover;
-}
 
 function needsLook(rd: ReplyReading) {
   const ids = new Set<string>();

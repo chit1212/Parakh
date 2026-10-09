@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ReplyReading, Stage } from "@/lib/reader/pipeline";
 import type { ReplySummary } from "@/lib/summary";
+import type { Sheet } from "@/lib/files/xlsx";
 import type { LastYearLine, SourcingEvent } from "@/lib/types";
 
 export interface ReplyState {
@@ -19,6 +20,7 @@ export interface ReplyState {
 export interface EventData {
   event: SourcingEvent;
   lastYear: LastYearLine[];
+  historySheets: Sheet[];
   replies: ReplySummary[];
   /** Saved readings (data/readings), by reply id. */
   saved: Record<string, ReplyReading>;
