@@ -2,6 +2,7 @@
 // cheapest-overall view and the quality-cleared view; it is raised only if a winner changes there.
 // Everything else is logged. Ranked by rupees at stake; routed to the vendor or the buyer (L13).
 import { asQuotedPrice, cellKey, solve, type Award, type Grid, type PriceRule } from "./compare";
+import { FREIGHT_UNSETTLED } from "./normalise";
 import type { SourcingEvent } from "./types";
 
 export interface LineChange {
@@ -93,6 +94,18 @@ export function findDoubts(ev: SourcingEvent, grid: Grid, cleared: string[]): Do
         ask: "Confirm the freight per box to Chakan, or a delivered price.",
         route: "vendor", tested: `re-solved with last year’s freight added to ${name(v.id)}’s prices`,
       }, (c) => (c.vendorId === v.id && c.canWin ? c.norm.variants.lastYearFreight?.value ?? c.perBox : asQuotedPrice(c)));
+    }
+    // Freight the reply leaves unsettled and no earlier rate to test with: test the prices out of the running.
+    const unsettled = cells.filter((c) => c.perBox != null && !c.norm.variants.lastYearFreight && c.norm.flags.some((f) => FREIGHT_UNSETTLED.test(f)));
+    if (!lyf && unsettled.length) {
+      const why = unsettled[0].norm.flags.find((f) => FREIGHT_UNSETTLED.test(f))!;
+      add({
+        kind: "freight_unknown", vendorId: v.id, lineIds: unsettled.map((c) => c.lineId),
+        title: `${name(v.id)}: freight not settled`,
+        why: `Its prices are compared before freight: ${why}. No earlier freight rate is on record to test with, so code re-solved the table with these prices out of the running.`,
+        ask: "Confirm the freight per box to Chakan, or a delivered price.",
+        route: "vendor", tested: `re-solved without ${name(v.id)}’s prices that lack freight`,
+      }, (c) => (c.vendorId === v.id && unsettled.includes(c) ? null : asQuotedPrice(c)));
     }
     for (const c of cells) {
       const line = ev.lines.find((l) => l.id === c.lineId)!;

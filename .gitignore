@@ -20,3 +20,4 @@ coverage/
 .DS_Store
 __MACOSX/
 npm-debug.log*
+test-round-1.zip
