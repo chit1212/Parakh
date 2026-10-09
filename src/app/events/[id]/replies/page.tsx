@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import { Camera, Envelope, File, FileDoc, FilePdf, FileXls, Paperclip, Warning } from "@phosphor-icons/react";
+import Link from "next/link";
+import { ScreenHead } from "@/components/Rail";
 import { Shell } from "@/components/Shell";
 import { useReadings, type ReplyState } from "@/components/useReadings";
 import type { ReplyReading } from "@/lib/reader/pipeline";
@@ -316,8 +318,9 @@ export default function RepliesPage() {
 
   return (
     <Shell>
-      <div className="eyebrow">{ev.id} · {ev.title}</div>
-      <h1 className="text-[40px] leading-tight mt-[6px]">Replies</h1>
+      <ScreenHead meta={`${ev.id} · ${ev.title}`} title="Replies">
+        <Link href="/scorecard" style={{ fontSize: 13 }}>How well did Parakh read? See the test scorecard</Link>
+      </ScreenHead>
       <p className="text-[15px] max-w-[760px] mt-[6px] text-n-800">
         {data.replies.length} replies in the event inbox, in whatever shape the vendors chose. Each one is read by AI, then every number is
         checked by code against the original file. A value that cannot be found where the reader says never enters the comparison.

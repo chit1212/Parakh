@@ -19,10 +19,22 @@ The `.dc.html` files are self-contained "Design Component" pages. Open them in a
 
 Target viewport: **desktop, 1440 px wide** (the app shell has `min-width: 1360px`). Light mode only.
 
-### 1. Sourcing events (home) — `Shared Screens.dc.html` (default view)
+### App shell and navigation (all screens)
+Every screen shares one shell: a **68 px icon rail** on the left, then the screen content. The rail holds the brand mark "P" (22 px/600, links to Compare), then five items, each a 20 px Phosphor duotone icon over a 10 px label: **Events, RFQ, Replies, Compare, Award**. The active item is `--color-accent`; the others are neutral-700. There is no other navigation chrome.
+
+**Compare is the home screen** (the app opens on it). The flow:
+1. **Compare** (home) — comparison, doubts, conversation and scenarios.
+2. **Events** — the list of sourcing events. Opening SE-2026-041 returns to Compare.
+3. **RFQ** — co-pilot chat, plus the drafted RFQ.
+4. **Replies** — the five vendor replies, their coverage and quality.
+5. **Award** — the recommendation and a frozen snapshot. "Ask a what-if" returns to Compare with scenario 1 applied.
+
+Screen headers follow one pattern: an 11 px uppercase meta line, then a 26 px H1. Content starts 8 px from the rail.
+
+### 1. Sourcing events — `Shared Screens.dc.html#events`
 - **Purpose:** list all sourcing events and open one.
-- **Layout:** left nav 228 px (brand "Parakh" 22 px/600, then nav items with 18 px Phosphor duotone icons: Sourcing events, Vendors, Should-cost library, Templates, Reports; the user block is pinned to the bottom). The main column has padding `24px 40px 40px 12px` and `max-width: 1180px`.
-- **Header:** H1 "Sourcing events" 34 px; subline "Packaging & print · FY27" in neutral-700; search input 280 px; primary button "New event" with a plus icon.
+- **Layout:** the shared icon rail, then a main column with padding `18px 40px 40px 8px` and `max-width: 1180px`.
+- **Header:** meta line "Sahyadri Appliances · Packaging & print · FY27"; H1 "Sourcing events" 26 px; search input 280 px; primary button "New event" with a plus icon.
 - **Status tabs** (gap 22 px, 14 px): All, Drafting, Collecting replies, Comparing, Awaiting approval, Awarded, Closed, each with a count. The active tab is 600 weight with a 2 px inset bottom rule in `--color-text`.
 - **Table** (`.table`): Event (name 15 px/600 plus "ID · category" 12 px neutral-700), Status (tag: Comparing = `tag-accent`, Awaiting approval = `tag-accent-2`, Awarded = `tag-outline`, else `tag-neutral`), Lines, Replies, Value (₹ Cr), Next (due plus a 12 px note), and row actions (Open/Continue/View ghost button, Duplicate icon, More icon).
 - The past event **SE-2025-037** carries the note "Source for 'same as last year' in SE-2026-041". This is what resolves Rohit Box's "rest same as last year".
@@ -43,7 +55,7 @@ One row per vendor in a 3-column grid (`1.3fr 1fr 1fr`, gap 28 px):
 This is the core screen. Start states are available via hash: `#compare` (source panel open on Anand · L14), `#analyst` (VP scenario applied), `#doubts`.
 
 **Shell:** `display:flex; height:100vh`, three parts:
-1. **Icon rail**, 68 px: brand "P" 22 px, then Events, RFQ, Replies, Compare (active, accent), Award. Each is a 20 px icon over a 10 px label.
+1. **Icon rail**, 68 px: the shared rail (see App shell), with Compare active.
 2. **Main**, flex 1, `overflow-y:auto`.
 3. **Right panel**, 440 px, `--color-surface`, full height (shown on the Comparison tab only).
 
@@ -113,7 +125,7 @@ Props: `vid` (vendor id SB/VP/KP/AC/RB) and `li` (line index 0–29). The layout
 
 ### 7. Award record — `Shared Screens.dc.html#award`
 - **Main column:**
-  - Meta line "Award record · SE-2026-041 · for approval by Anita Kulkarni, VP Supply Chain"; H1 "Split award to three quality-cleared vendors" 34 px; buttons "Ask a what-if" (links to the comparison `#analyst`) and **Approve award**.
+  - Meta line "Award record · SE-2026-041 · for approval by Anita Kulkarni, VP Supply Chain"; H1 "Split award to three quality-cleared vendors" 26 px; buttons "Ask a what-if" (links to the comparison `#analyst`) and **Approve award**.
   - A summary paragraph (16 px).
   - KPIs (26 px/600 over a neutral-700 label): award value, delta vs cheapest, vs last year like-for-like, vendor count.
   - "Decisions on record": each doubt and how it was resolved.
@@ -184,7 +196,7 @@ Formatting: Indian grouping (`en-IN`), "₹x.xx L" for lakhs and "₹x.xx Cr" fo
   - md: `0 3px 10px color-mix(#2d2b2b 16%)`
   - lg: `0 12px 32px color-mix(#2d2b2b 22%)`
 - **Type sizes used:**
-  - 34 (page H1), 26 (comparison H1), 24/22/20 (totals, ranks, H3), 18 (panel title)
+  - 26 (every screen's H1), 24/22/20 (totals, ranks, H3), 18 (panel title)
   - 15/14 (tabs, chat), 13.5 (grid cells), 13 (base), 12/11 (meta)
   - 10–11 px uppercase labels with letter-spacing 0.08em
 - **Layout ethos:** no boxes or dividers to structure the page; hierarchy comes from the serif scale and whitespace. Thin rules are used only as table furniture (header and footer rules on the grid).
@@ -197,8 +209,8 @@ Formatting: Indian grouping (`en-IN`), "₹x.xx L" for lakhs and "₹x.xx Cr" fo
 
 ## Files
 - `Overview.dc.html` — one-page summary of the direction (idea, cell states, trade-offs, links)
-- `Comparison - Ledger.dc.html` — screens 4, 5, 6 (comparison, doubts, conversation and scenarios)
-- `Shared Screens.dc.html` — screens 1, 2, 3, 7 (home, RFQ co-pilot, replies, award record); switch with the hash `#rfq`, `#responses`, `#award`
+- `Comparison - Ledger.dc.html` — **home screen**; screens 4, 5, 6 (comparison, doubts, conversation and scenarios). Start here.
+- `Shared Screens.dc.html` — screens 1, 2, 3, 7 (events, RFQ co-pilot, replies, award record); switch with the hash `#events`, `#rfq`, `#responses`, `#award`
 - `SourceDoc.dc.html` — the source/trace panel component
 - `data.js` — the mock dataset, conversion maths, doubts and baseline/quality solvers
 - `_ds/…/styles.css` — design tokens and component classes; `_ds_bundle.js` is the design-system bundle

@@ -2,11 +2,10 @@
 // Comparison (design: "Comparison - Ledger"). Every line by every vendor on one basis, built in
 // code from the readings. Click a price to see where it came from and how it was converted.
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import {
-  CaretDown, CaretRight, Camera, EnvelopeOpen, EnvelopeSimple, File, FileDoc, FileMagnifyingGlass, FilePdf, FileXls,
-  NotePencil, SealCheck, Table, Tray, X,
+  CaretDown, CaretRight, Camera, EnvelopeSimple, File, FileDoc, FileMagnifyingGlass, FilePdf, FileXls, X,
 } from "@phosphor-icons/react";
+import { Rail } from "@/components/Rail";
 import { SourceDoc } from "@/components/SourceDoc";
 import { useReadings } from "@/components/useReadings";
 import { buildGrid, cellKey, type Grid, type GridCell } from "@/lib/compare";
@@ -15,7 +14,6 @@ import type { ReplyReading } from "@/lib/reader/pipeline";
 import { mainFile } from "@/lib/summary";
 import { USD_REFERENCE } from "@/lib/config";
 
-const EVENT = "SE-2026-041";
 const FORMAT_ICON: Record<string, typeof File> = { Excel: FileXls, PDF: FilePdf, Word: FileDoc, Photo: Camera, Email: EnvelopeSimple };
 const COLS = "40px minmax(170px,1fr) 44px 64px repeat(5, minmax(76px,96px)) 104px";
 const label11 = { fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--color-neutral-700)" };
@@ -104,26 +102,6 @@ export default function ComparePage() {
   );
 }
 
-function Rail() {
-  const items = [
-    { icon: Tray, label: "Events", href: null },
-    { icon: NotePencil, label: "RFQ", href: null },
-    { icon: EnvelopeOpen, label: "Replies", href: `/events/${EVENT}/replies` },
-    { icon: Table, label: "Compare", href: `/events/${EVENT}/compare`, on: true },
-    { icon: SealCheck, label: "Award", href: null },
-  ];
-  return (
-    <nav style={{ width: 68, flex: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "18px 0" }}>
-      <Link href={`/events/${EVENT}/replies`} style={{ fontSize: 22, fontWeight: 600, color: "var(--color-text)", textDecoration: "none", marginBottom: 18 }}>P</Link>
-      {items.map((r) => {
-        const s = { display: "flex", flexDirection: "column" as const, alignItems: "center", gap: 2, padding: "8px 0", width: 56, textDecoration: "none",
-          color: r.on ? "var(--color-accent)" : r.href ? "var(--color-neutral-700)" : "var(--color-neutral-400)" };
-        const body = <><r.icon size={20} weight="duotone" /><span style={{ fontSize: 10 }}>{r.label}</span></>;
-        return r.href ? <Link key={r.label} href={r.href} style={s}>{body}</Link> : <span key={r.label} style={s} title="Coming in a later milestone">{body}</span>;
-      })}
-    </nav>
-  );
-}
 
 function Legend({ open, toggle }: { open: boolean; toggle: () => void }) {
   const btn = { display: "flex", alignItems: "center", gap: 6, background: "none", border: 0, padding: 0, font: "inherit", ...label11 };

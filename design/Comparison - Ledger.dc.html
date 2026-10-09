@@ -17,7 +17,7 @@
 <div style="display:flex; height:100vh; min-width:1360px; font-size:13px; line-height:1.4; color:var(--color-text); font-variant-numeric:tabular-nums; overflow:hidden;">
 
   <nav style="width:68px; flex:none; display:flex; flex-direction:column; align-items:center; gap:4px; padding:18px 0;">
-    <a href="Shared Screens.dc.html" style="font-size:22px; font-weight:600; color:var(--color-text); text-decoration:none; margin-bottom:18px;">P</a>
+    <a href="#" style="font-size:22px; font-weight:600; color:var(--color-text); text-decoration:none; margin-bottom:18px;">P</a>
     <sc-for list="{{ rail }}" as="r" hint-placeholder-count="6">
       <a href="{{ r.href }}" style="{{ r.s }}"><i class="ph-duotone {{ r.icon }}" style="font-size:20px;"></i><span style="font-size:10px;">{{ r.label }}</span></a>
     </sc-for>
@@ -327,7 +327,7 @@ class Component extends DCLogic {
   renderVals() {
     const K = window.KD, S = this.state;
     const tabS = on => ({ whiteSpace: 'nowrap', background: 'none', border: 0, padding: '6px 0', font: 'inherit', fontSize: 15, cursor: 'pointer', color: on ? 'var(--color-text)' : 'var(--color-neutral-700)', fontWeight: on ? 600 : 400, boxShadow: on ? 'inset 0 -2px 0 var(--color-text)' : 'none' });
-    const railItems = [['ph-tray', 'Events', 'Shared Screens.dc.html'], ['ph-note-pencil', 'RFQ', 'Shared Screens.dc.html#rfq'], ['ph-envelope-open', 'Replies', 'Shared Screens.dc.html#responses'], ['ph-table', 'Compare', '#'], ['ph-seal-check', 'Award', 'Shared Screens.dc.html#award']];
+    const railItems = [['ph-tray', 'Events', 'Shared Screens.dc.html#events'], ['ph-note-pencil', 'RFQ', 'Shared Screens.dc.html#rfq'], ['ph-envelope-open', 'Replies', 'Shared Screens.dc.html#responses'], ['ph-table', 'Compare', '#'], ['ph-seal-check', 'Award', 'Shared Screens.dc.html#award']];
     const rail = railItems.map(r => ({ icon: r[0], label: r[1], href: r[2], s: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '8px 0', width: 56, textDecoration: 'none', color: r[1] === 'Compare' ? 'var(--color-accent)' : 'var(--color-neutral-700)' } }));
     const base = { rail, threadRef: this.threadRef, toCompare: () => this.setState({ tab: 'compare' }), toDoubts: () => this.setState({ tab: 'doubts' }), tabC: tabS(S.tab === 'compare'), tabD: tabS(S.tab === 'doubts'), isCompare: S.tab === 'compare', isDoubts: S.tab === 'doubts' };
     if (!K) return base;

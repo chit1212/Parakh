@@ -49,7 +49,9 @@ For each reply:
 
 ## Screens (follow the design)
 
-1. **Events:** a list of sourcing events with status tabs and left navigation, including one past event (SE-2025-037).
+Every screen shares the design's 68 px icon rail (Events, RFQ, Replies, Compare, Award); **Compare is the home screen** the app opens on.
+
+1. **Events:** a list of sourcing events with status tabs, including one past event (SE-2025-037).
 2. **RFQ co-pilot (L0):** chat on one side, the RFQ as editable fields on the other (line items, questionnaire, terms). Start from the dataset's RFQ, or clone last year's event. Keep this light.
 3. **Replies:** the five replies plus failure cases, each with format, reading status, coverage ("27 of 30") and progress while reading.
 4. **Comparison:** 30 lines by 5 vendors on one basis, with quality results beside the numbers. Cell states follow the design: verified, converted, last year, outside should-cost, not quoted, decision-changing doubt, lowest on the line. Clicking a number opens the source panel: **the original document with the exact cell, sentence or image area highlighted**, as written vs converted, and the calculation. This is the most important interaction in the product.

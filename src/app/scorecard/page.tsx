@@ -1,6 +1,7 @@
 "use client";
 // L24 test scorecard: the reader's output on every dataset file, graded against the answer key.
 import { useEffect, useState } from "react";
+import { ScreenHead } from "@/components/Rail";
 import { Shell } from "@/components/Shell";
 import { useReadings } from "@/components/useReadings";
 import { readStamp } from "@/lib/format";
@@ -29,8 +30,7 @@ export default function ScorecardPage() {
 
   return (
     <Shell>
-      <div className="eyebrow">Reports · Test scorecard (L24)</div>
-      <h1 className="text-[40px] leading-tight mt-[6px]">How well does Parakh read?</h1>
+      <ScreenHead meta="SE-2026-041 · Test scorecard (L24)" title="How well does Parakh read?" />
       <p className="text-[15px] max-w-[760px] mt-[6px] text-n-800">
         The reader runs on every file in the dataset exactly as the app does, then this page grades its output against the answer key,
         field by field. The answer key is only used here, for grading. The app never reads it.
