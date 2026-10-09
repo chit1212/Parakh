@@ -25,7 +25,7 @@ The brief's hard rule: plumbing can be stubbed (no real email server), but the A
 
 ## Inputs in this folder
 
-- `design/`: the Claude Design export, "Direction A, Ledger." It's the visual reference for layout, typography, the cell-state system and the copy. Match it closely. The "Shared Screens" file has the Events, RFQ, Replies and Award screens.
+- `design/`: the design handoff for "Direction A, Ledger." Start with `design/README.md`: it specifies every screen, size, colour, cell state and interaction. It's the visual reference for layout, typography, the cell-state system and the copy. Match it closely. `Comparison - Ledger.dc.html` has the Comparison, Doubts and Conversation screens; `Shared Screens.dc.html` has the Events, RFQ, Replies and Award screens; `SourceDoc.dc.html` is the source panel. The design's numbers are mock data: every number on screen comes from the pipeline. Where the design conflicts with the decisions on record (the VP's name, "two reads agree", applying Vardhman's conditional discount, an estimated freight for Rohit), the decisions win.
 - `dataset/`: the demo data. Read `dataset/README.md` first. It has the RFQ, the five vendor replies, a revised quote, last year's records, failure files, and `06_answer_key/answer_key.json` with the correct reading of every cell. The answer key is for testing only. The app must never read it to produce results.
 
 ## Stack (keep it simple)
