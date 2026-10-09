@@ -29,7 +29,7 @@ export default function ScorecardPage() {
 
   return (
     <Shell>
-      <div className="eyebrow">Test scorecard · L24</div>
+      <div className="eyebrow">Reports · Test scorecard (L24)</div>
       <h1 className="text-[40px] leading-tight mt-[6px]">How well does Parakh read?</h1>
       <p className="text-[15px] max-w-[760px] mt-[6px] text-n-800">
         The reader runs on every file in the dataset exactly as the app does, then this page grades its output against the answer key,
