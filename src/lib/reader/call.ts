@@ -53,6 +53,8 @@ export async function callStructured<S extends z.ZodType>(opts: {
   maxTokens: number;
   /** Ask for the content again even if a cached answer exists. */
   fresh?: boolean;
+  /** Called before any paid model call (not for cache hits); throw to refuse it. */
+  beforeCall?: () => void;
 }): Promise<CallResult<z.infer<S>>> {
   const key = `${opts.step}-${hashOf(opts.model, opts.effort, opts.system, JSON.stringify(opts.content))}`;
   const t0 = Date.now();
@@ -61,6 +63,7 @@ export async function callStructured<S extends z.ZodType>(opts: {
     if (hit) return { data: hit, usage: null, cached: true, ms: Date.now() - t0 };
   }
 
+  opts.beforeCall?.();
   const isReader = opts.model === MODELS.reader;
   const stream = anthropic().beta.messages.stream({
     model: opts.model,

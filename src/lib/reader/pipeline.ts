@@ -88,7 +88,7 @@ function matchVendor(ev: SourcingEvent, name: string | null) {
 export async function readReply(
   reply: Reply,
   ev: SourcingEvent,
-  opts: { onProgress?: OnProgress; fresh?: boolean } = {},
+  opts: { onProgress?: OnProgress; fresh?: boolean; beforeCall?: () => void } = {},
 ): Promise<ReplyReading> {
   const t0 = Date.now();
   const say = opts.onProgress ?? (() => {});
@@ -127,6 +127,7 @@ export async function readReply(
       effort: "low",
       maxTokens: 4000,
       fresh: opts.fresh,
+      beforeCall: opts.beforeCall,
     });
     track(cls);
     const c = cls.data;
@@ -177,6 +178,7 @@ export async function readReply(
       effort: "medium",
       maxTokens: 32000,
       fresh: opts.fresh,
+      beforeCall: opts.beforeCall,
     }).then((r) => { say("sweeping terms"); return r; });
     const termsP = callStructured({
       step: "terms",
@@ -190,6 +192,7 @@ export async function readReply(
       effort: "medium",
       maxTokens: 24000,
       fresh: opts.fresh,
+      beforeCall: opts.beforeCall,
     });
     const [ex, tm] = await Promise.all([extractP, termsP]);
     track(ex);
