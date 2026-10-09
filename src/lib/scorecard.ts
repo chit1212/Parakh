@@ -92,7 +92,8 @@ export interface Scorecard {
   edges: Check[];
   failures: Check[];
   notYet: string[];
-  costUsd: number;
+  /** Models that produced the graded readings. */
+  models: string[];
 }
 
 const unitOf = (u: string) => (u === "per_piece" ? "per_box" : u);
@@ -235,6 +236,6 @@ export function grade(ev: SourcingEvent, key: Key, readings: ReplyReading[]): Sc
       "Normalised values (per box, INR, delivered): milestone 2",
       "Which expected doubts are escalated vs only logged: milestone 4",
     ],
-    costUsd: readings.flatMap((r) => r.usage).reduce((s, u) => s + u.costUsd, 0),
+    models: [...new Set(readings.flatMap((r) => r.models ?? []))],
   };
 }

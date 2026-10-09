@@ -1,7 +1,8 @@
-// Run the reader on every reply in the demo inbox and grade it against the answer key.
-//   npm run scorecard            uses cached readings when the files and prompts are unchanged
-//   npm run scorecard -- --fresh reads everything again (costs API credit)
-//   npm run scorecard -- --only=4_anand_photo
+// Grade the reader against the answer key.
+//   npm run scorecard             grades the saved readings in data/readings/ (no AI calls)
+//   npm run scorecard -- --live   reads every reply live (uses the local cache when the files and prompts are unchanged)
+//   npm run scorecard -- --live --fresh   reads everything again from scratch (uses free-tier quota)
+//   npm run scorecard -- --live --only=4_anand_photo
 import fs from "node:fs";
 import path from "node:path";
 import { loadEnv } from "./env";
@@ -11,21 +12,34 @@ import { hasApiKey } from "@/lib/ai";
 import { loadDemoInbox } from "@/lib/inbox";
 import { readReply, type ReplyReading } from "@/lib/reader/pipeline";
 import { loadEvent } from "@/lib/rfq";
+import { loadSavedReadings } from "@/lib/saved";
 import { grade, loadKey } from "@/lib/scorecard";
 
 const args = process.argv.slice(2);
 const fresh = args.includes("--fresh");
+const live = args.includes("--live") || fresh;
 const only = args.find((a) => a.startsWith("--only="))?.split("=")[1];
 const pct = (a: number, b: number) => (b ? `${((100 * a) / b).toFixed(1)}%` : "-");
 
 async function main() {
-  if (!hasApiKey()) {
-    console.error("No API key. Put ANTHROPIC_API_KEY=... in .env.local (see README).");
-    process.exit(1);
-  }
   const ev = await loadEvent();
   const inbox = (await loadDemoInbox()).filter((r) => !only || r.id === only);
   const readings: ReplyReading[] = [];
+  if (!live) {
+    const saved = await loadSavedReadings();
+    for (const r of inbox) {
+      const s = saved[r.id];
+      if (s) readings.push(s.reading);
+      console.log(`  ${r.id.padEnd(24)} ${s ? `${s.reading.status.padEnd(11)} read ${s.readAt.slice(0, 10)} by ${s.models.join(", ")}` : "no saved reading"}`);
+    }
+    if (!readings.length) {
+      console.error("No saved readings yet. Run `npm run save-readings` first, or use --live.");
+      process.exit(1);
+    }
+  } else if (!hasApiKey()) {
+    console.error("No API key. Put GEMINI_API_KEY=... in .env.local.");
+    process.exit(1);
+  }
   const queue = [...inbox];
   const worker = async () => {
     for (let r = queue.shift(); r; r = queue.shift()) {
@@ -33,12 +47,13 @@ async function main() {
       const t = Date.now();
       const res = await readReply(reply, ev, { fresh });
       readings.push(res);
-      const cost = res.usage.reduce((s, u) => s + u.costUsd, 0);
-      console.log(`  ${reply.id.padEnd(24)} ${res.status.padEnd(11)} ${((Date.now() - t) / 1000).toFixed(1).padStart(5)}s ${res.cached ? "(cached)" : `$${cost.toFixed(3)}`}  ${res.headline}`);
+      console.log(`  ${reply.id.padEnd(24)} ${res.status.padEnd(11)} ${((Date.now() - t) / 1000).toFixed(1).padStart(5)}s ${res.cached ? "(cached)" : `${res.usage.length} calls`}  ${res.headline}`);
     }
   };
-  console.log(`Reading ${inbox.length} replies...`);
-  await Promise.all([worker(), worker(), worker(), worker()]);
+  if (live) {
+    console.log(`Reading ${inbox.length} replies...`);
+    await Promise.all([worker(), worker()]);
+  }
 
   const out = path.join(process.cwd(), ".cache");
   fs.mkdirSync(out, { recursive: true });
@@ -64,7 +79,7 @@ async function main() {
   console.log("\nFailure cases");
   for (const e of sc.failures) console.log(`  ${e.ok ? "PASS" : "FAIL"}  ${e.name}  [${e.detail}]`);
   console.log(`\nNot graded yet: ${sc.notYet.join("; ")}`);
-  console.log(`API cost this run: $${sc.costUsd.toFixed(3)}`);
+  console.log(`Read by: ${sc.models.join(", ") || "-"}`);
 }
 
 main().catch((e) => {

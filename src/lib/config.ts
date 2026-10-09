@@ -1,10 +1,15 @@
 // One place for every model name and every demo assumption the app relies on.
 
+/**
+ * Google Gemini API, free tier. Swap a model here and nowhere else.
+ * Check Google's model list before changing: free-tier models and their quotas change often.
+ */
 export const MODELS = {
   /** Reading documents (extraction and the terms sweep) and the analyst chat. */
-  reader: "claude-sonnet-5-5",
-  /** Cheap steps: deciding what kind of document an email or file is. */
-  classifier: "claude-haiku-5-5",
+  reader: "gemini-3.8-flash",
+  /** Cheap steps: deciding what kind of document an email or file is. Flash-Lite has its own,
+   *  separate free quota, so sorting replies does not use up the reader's. */
+  classifier: "gemini-3.5-flash-lite",
 } as const;
 
 /**

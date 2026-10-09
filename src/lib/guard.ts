@@ -1,8 +1,10 @@
-// A simple per-visitor limit on paid model calls, so a public link cannot run up a large bill.
+// A simple per-visitor limit on live model calls, so a public link cannot use up the free AI quota.
 // In memory per server instance: enough for a demo, not a billing system.
 const HOUR = 3_600_000;
-const PER_VISITOR_PER_HOUR = Number(process.env.PARAKH_CALLS_PER_HOUR ?? 60);
-const ALL_VISITORS_PER_DAY = Number(process.env.PARAKH_CALLS_PER_DAY ?? 1500);
+// A live reading is about 3 calls. The demo opens with saved readings, so these only meter
+// uploads, "Read again live" and chat questions.
+const PER_VISITOR_PER_HOUR = Number(process.env.PARAKH_CALLS_PER_HOUR ?? 15);
+const ALL_VISITORS_PER_DAY = Number(process.env.PARAKH_CALLS_PER_DAY ?? 200);
 
 const byVisitor = new Map<string, number[]>();
 let day: number[] = [];
@@ -25,9 +27,9 @@ export function callBudget(visitor: string): () => void {
     day = day.filter((t) => now - t < 24 * HOUR);
     const mine = (byVisitor.get(visitor) ?? []).filter((t) => now - t < HOUR);
     if (day.length >= ALL_VISITORS_PER_DAY)
-      throw new RateLimitedError("This demo has reached its reading limit for today. Readings already done still show.");
+      throw new RateLimitedError("This demo has used its live AI allowance for today. Saved readings still show; live reading works again tomorrow.");
     if (mine.length >= PER_VISITOR_PER_HOUR)
-      throw new RateLimitedError("You have reached this demo's reading limit for the hour. Try again later.");
+      throw new RateLimitedError("You have used this demo's live AI allowance for the hour. Saved readings still show; try again later.");
     mine.push(now);
     day.push(now);
     byVisitor.set(visitor, mine);
