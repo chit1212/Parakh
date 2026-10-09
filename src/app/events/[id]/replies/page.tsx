@@ -4,7 +4,7 @@ import { Camera, Envelope, File, FileDoc, FilePdf, FileXls, Paperclip, Warning }
 import Link from "next/link";
 import { ScreenHead } from "@/components/Rail";
 import { Shell } from "@/components/Shell";
-import { useReadings, type EventData, type ReplyState } from "@/components/useReadings";
+import { setEmptyEvent, useReadings, type EventData, type ReplyState } from "@/components/useReadings";
 import { buildGrid, cellKey } from "@/lib/compare";
 import { qualityOf, type Quality } from "@/lib/quality";
 import { useScheme } from "@/components/useScheme";
@@ -391,7 +391,7 @@ function revisionImpact(data: EventData, state: Record<string, ReplyState>, id: 
 }
 
 export default function RepliesPage() {
-  const { data, state, blocked, readOne, upload } = useReadings();
+  const { data, state, blocked, readOne, upload, empty } = useReadings();
   const [scheme] = useScheme();
   if (!data) return <Shell><div className="text-n-700">Loading the event…</div></Shell>;
   const ev = data.event;
@@ -422,6 +422,22 @@ export default function RepliesPage() {
       {!data.keyConfigured && (
         <div className="mt-[var(--space-4)] p-[var(--space-3)] bg-d-100 text-[14px] rounded-[var(--radius-md)]">
           Live reading is off: no Gemini API key is set on the server yet. Saved readings still show.
+        </div>
+      )}
+      <div className="mt-[var(--space-4)] flex items-center gap-[10px] text-[13px]">
+        <span className="text-n-700">Demo event starts with</span>
+        <span style={{ display: "inline-flex", border: "1px solid var(--color-divider)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
+          {([[false, "The five vendors’ replies"], [true, "No replies: I’ll upload them"]] as const).map(([on, t]) => (
+            <button key={t} onClick={() => on !== empty && setEmptyEvent(on)}
+              style={{ border: 0, padding: "5px 10px", font: "inherit", background: empty === on ? "var(--color-accent)" : "transparent", color: empty === on ? "var(--color-bg)" : "inherit" }}>{t}</button>
+          ))}
+        </span>
+        <span className="text-n-700 text-[12px]">Saved in this browser. Your uploads stay either way.</span>
+      </div>
+      {empty && !main.length && !other.length && (
+        <div className="mt-[var(--space-4)] p-[var(--space-3)] bg-[var(--color-accent-100)] text-[14px] max-w-[760px]">
+          The event is empty: the RFQ went to {ev.vendors.length} vendors, and no reply is in yet. Upload a reply below (any format) and watch it read; it joins the comparison as soon as it is done.
+          Test replies are in the repository folder <code>test-uploads/</code>, or use the vendors’ original replies from <code>dataset/03_vendor_replies/</code>.
         </div>
       )}
       <Upload vendors={ev.vendors} onUpload={upload} disabled={!data.keyConfigured} />

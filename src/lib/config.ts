@@ -9,6 +9,12 @@ export const MODELS = {
 } as const;
 
 /**
+ * The analyst chat answers inside a hard deadline, so it uses the fastest models and moves to the
+ * next one at once when one is busy (no long backoff). In order of preference.
+ */
+export const CHAT = { models: ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.5-flash"], deadlineMs: 25_000, perCallMs: 10_000 } as const;
+
+/**
  * If a model stays busy after retries ("high demand"), the call moves to the next one.
  * Each reading records the model that actually answered.
  */

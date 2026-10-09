@@ -73,6 +73,24 @@ const UNIT_WORDS: Record<string, string> = {
 const money = (cur: string, text: string) => (cur === "USD" ? `USD ${text}` : cur === "INR" ? `Rs ${text}` : `${text} (currency not stated)`);
 
 /** Last year's freight for a vendor, from the buyer's record of that vendor's earlier quote. */
+/** Pen digits that are easily mistaken for each other in handwriting. */
+const PEN_PAIRS: [string, string][] = [["1", "7"], ["3", "8"], ["4", "9"], ["5", "6"]];
+
+/** Other readings of a hand-written number: swap one easily-confused digit in the whole-number part. */
+export function penAlternatives(text: string): { value: number; from: string; to: string }[] {
+  const m = text.replace(/,/g, "").match(/^(\d+)(\.\d+)?$/);
+  if (!m) return [];
+  const out: { value: number; from: string; to: string }[] = [];
+  [...m[1]].forEach((d, i) => {
+    for (const [a, b] of PEN_PAIRS) {
+      const to = d === a ? b : d === b ? a : null;
+      if (!to || (i === 0 && to === "0")) continue;
+      out.push({ value: Number(m[1].slice(0, i) + to + m[1].slice(i + 1) + (m[2] ?? "")), from: d, to });
+    }
+  });
+  return out;
+}
+
 export function lastYearFreight(sheets: Sheet[], vendorName: string): { perBox: number; where: string } | null {
   const key = vendorName.toLowerCase().split(" ").slice(0, 2).join(" ");
   const sheet = sheets.find((s) => s.name.toLowerCase().includes(key.split(" ")[0]) && /quote/i.test(s.name));
@@ -202,6 +220,15 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
         for (const a of price.alternative_readings) {
           const ar = toPerBox(a.value, price.unit, price.currency, line);
           if (!("reason" in ar)) cell.alternatives.push({ value: a.value, perBox: ar.v, reason: a.reason });
+        }
+        // A hand-written or hand-corrected number the reader gave no other reading for: code offers the
+        // readings a pen digit is commonly mistaken for, kept only where the result is a plausible price.
+        if (price.legibility !== "clear" && !cell.alternatives.length) {
+          for (const v of penAlternatives(price.raw_value_text)) {
+            const ar = toPerBox(v.value, price.unit, price.currency, line);
+            if ("reason" in ar || ar.v < line.shouldCost * 0.5 || ar.v > line.shouldCost * 1.5) continue;
+            cell.alternatives.push({ value: v.value, perBox: ar.v, reason: `${price.legibility === "corrected_by_hand" ? "Corrected by hand" : "Hard to read"}: the pen ${v.from} could be a ${v.to}. Code's alternative reading, not the reader's.` });
+          }
         }
         // A revision: show what changed against the earlier offer.
         // Against the most recent earlier offer that priced this line.
