@@ -11,11 +11,14 @@ import { SNAPSHOT_KEY, type Snapshot } from "@/lib/award";
 import { download } from "@/lib/download";
 import { crore, inr, lakh } from "@/lib/format";
 import { HOME } from "@/lib/routes";
+import { useRole } from "@/components/useRole";
+import { stamp } from "@/components/useVerified";
 
 const label11 = { fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--color-neutral-700)" };
 
 export default function AwardPage() {
   const { data } = useReadings();
+  const [role] = useRole();
   const [s, setS] = useState<Snapshot | null | undefined>(undefined);
   const [tr, setTr] = useState(0);
   useEffect(() => {
@@ -43,12 +46,16 @@ export default function AwardPage() {
 
   const ev = data?.event;
   const d = s.total - s.cheapestOverall;
+  const awarded = s.rows.filter((r) => r.perBox != null);
+  const checked = awarded.filter((r) => r.checked);
+  const checkers = [...new Set(checked.map((r) => r.checked!.who.split(" ")[0]))];
   const lyPct = s.lastYear ? (s.lastYear.thisYear / s.lastYear.lastYear - 1) * 100 : null;
   const kpis = [
     { v: crore(s.total), t: "award value" },
     { v: `${d >= 0 ? "+" : "−"}${lakh(Math.abs(d))}`, t: "vs cheapest overall" },
     ...(lyPct != null ? [{ v: `${lyPct >= 0 ? "+" : "−"}${Math.abs(lyPct).toFixed(1)}%`, t: `vs last year, like for like (${s.lastYear!.lines} lines)` }] : []),
     { v: String(s.byVendor.length), t: s.byVendor.length === 1 ? "vendor" : "vendors" },
+    { v: `${checked.length} of ${awarded.length}`, t: `awarded prices checked${checkers.length ? ` by ${checkers.join(" and ")}` : " against the document"}` },
   ];
   const summary = `${s.basis}. ${s.byVendor.map((v) => `${v.vendor} ${v.lines} line${v.lines === 1 ? "" : "s"} (${lakh(v.value)})`).join(", ")}. `
     + (s.excluded.length ? `Left out: ${s.excluded.map((x) => `${x.name} (${x.why})`).join("; ")}. ` : "")
@@ -69,9 +76,15 @@ export default function AwardPage() {
         <button className="btn btn-secondary" style={{ whiteSpace: "nowrap" }} onClick={() => download(s, "pdf")}><FilePdf size={16} weight="duotone" />PDF memo</button>
         {s.approvedBy ? (
           <span className="tag tag-accent" style={{ padding: "8px 12px", whiteSpace: "nowrap" }}>Approved by {s.approvedBy}</span>
-        ) : (
+        ) : role === "VP" ? (
           <button className="btn btn-primary" style={{ whiteSpace: "nowrap" }} onClick={() => save({ ...s, approvedBy: `${ev?.vp ?? "VP"} (${ev?.vpRole ?? "VP"})`, approvedAt: new Date().toISOString() })}>
-            Approve award as {ev?.vp.split(" ")[0] ?? "VP"}
+            Approve award
+          </button>
+        ) : s.sentAt ? (
+          <span className="tag tag-neutral" style={{ padding: "8px 12px", whiteSpace: "nowrap" }} title="Demo: nothing is sent; switch to the VP in the P menu to approve">Sent to {ev?.vp.split(" ")[0] ?? "the VP"} {stamp(s.sentAt)}</span>
+        ) : (
+          <button className="btn btn-primary" style={{ whiteSpace: "nowrap" }} onClick={() => save({ ...s, sentAt: new Date().toISOString() })}>
+            Send to {ev?.vp.split(" ")[0] ?? "the VP"} for approval
           </button>
         )}
       </div>
@@ -105,7 +118,7 @@ export default function AwardPage() {
           </span>
         </div>
         <table className="table" style={{ fontSize: 13 }}>
-          <thead><tr><th>Line</th><th>Box</th><th>Awarded to</th><th style={{ textAlign: "right" }}>₹/box</th><th style={{ textAlign: "right" }}>Qty</th><th style={{ textAlign: "right" }}>Value</th><th>Source</th></tr></thead>
+          <thead><tr><th>Line</th><th>Box</th><th>Awarded to</th><th style={{ textAlign: "right" }}>₹/box</th><th style={{ textAlign: "right" }}>Qty</th><th style={{ textAlign: "right" }}>Value</th><th>Source</th><th>Checked by you</th></tr></thead>
           <tbody>
             {s.rows.map((r, i) => (
               <tr key={r.lineId} onClick={() => setTr(i)} style={{ cursor: "pointer", background: i === tr ? "var(--color-accent-100)" : undefined }}>
@@ -114,6 +127,7 @@ export default function AwardPage() {
                 <td style={{ textAlign: "right" }}>{r.qty.toLocaleString("en-IN")}</td>
                 <td style={{ textAlign: "right" }}>{lakh(r.value)}</td>
                 <td style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{r.where?.replace(/^[^,]+, /, "") ?? "—"}</td>
+                <td style={{ whiteSpace: "nowrap", fontSize: 12, color: r.checked ? "var(--color-accent-800)" : "var(--color-neutral-600)" }} title={r.checked ? `${r.checked.who}` : undefined}>{r.perBox == null ? "" : r.checked ? `✓ ${stamp(r.checked.at)}` : "not yet"}</td>
               </tr>
             ))}
           </tbody>

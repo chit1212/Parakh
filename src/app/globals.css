@@ -146,3 +146,4 @@ button { cursor: pointer; }
 .input::placeholder { color: color-mix(in srgb, var(--color-text) 65%, transparent); opacity: 1; }
 .input:hover { border-color: color-mix(in srgb, var(--color-text) 45%, transparent); }
 .input:focus-visible { border-color: var(--color-accent); outline-offset: 0; }
+.ws-item:hover { background: var(--color-accent-100); }

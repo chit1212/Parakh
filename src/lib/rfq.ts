@@ -5,6 +5,7 @@ import path from "node:path";
 import { DATASET_DIR } from "./config";
 import { readWorkbook, type Sheet } from "./files/xlsx";
 import { costLine, parseSpec, rscBlankAreaM2 } from "./geometry";
+import { PEOPLE } from "./routes";
 import type { LastYearLine, Question, RfqLine, SourcingEvent } from "./types";
 
 const RFQ_TEMPLATE = "01_rfq/SE-2026-041_Quote_Template.xlsx";
@@ -18,11 +19,11 @@ const HEADER = {
   title: "Corrugated boxes, FY27 H2",
   buyerCo: "Sahyadri Appliances Pvt. Ltd.",
   plant: "Plant 2, MIDC Chakan, Pune 410501",
-  buyer: "Vikram Deshpande",
-  buyerRole: "Category Buyer, Packaging",
+  buyer: PEOPLE.buyer.name,
+  buyerRole: PEOPLE.buyer.role,
   buyerEmail: "vikram.deshpande@sahyadri-appliances.example",
-  vp: "Meera Kulkarni",
-  vpRole: "VP, Procurement",
+  vp: PEOPLE.vp.name,
+  vpRole: PEOPLE.vp.role,
   issued: "22 Sep 2026",
   due: "03 Oct 2026",
   basis: "Price per box (or per piece for accessories), in INR, delivered to Plant 2 Chakan, GST extra",

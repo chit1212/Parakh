@@ -22,6 +22,8 @@ export interface SnapshotRow {
   replyId: string | null;
   source: SourceRef | null;
   raw: { text: string; value: number } | null;
+  /** "Verified by you": who checked this price against the document, and when, as at freezing. */
+  checked: { who: string; at: string } | null;
 }
 
 export interface Snapshot {
@@ -39,10 +41,14 @@ export interface Snapshot {
   /** Like-for-like against last year, on the lines that have a price from last year. */
   lastYear: { lines: number; thisYear: number; lastYear: number } | null;
   byVendor: { vendor: string; lines: number; value: number }[];
+  /** Set when only some lines were exported (a filtered view). */
+  partial?: string;
   decisions: { title: string; status: string }[];
   frozenBy: string;
   approvedBy: string | null;
   approvedAt: string | null;
+  /** When the buyer sent it to the VP for approval (stubbed: nothing leaves the app). */
+  sentAt?: string | null;
 }
 
 const NUMBER = ["", "one", "two", "three", "four", "five"];
@@ -50,10 +56,14 @@ const NUMBER = ["", "one", "two", "three", "four", "five"];
 export function freeze(o: {
   ev: SourcingEvent; grid: Grid; quality: Quality[]; report: DoubtReport; lastYear: LastYearLine[];
   scenario: { title: string; result: ScenarioResult } | null; decisions: Record<string, string>; overrides?: Override[];
+  /** Buyer sign-offs, keyed "vendorId:lineId". */
+  checks?: Record<string, { who: string; at: string }>;
+  /** Only these lines (an exported view); all lines when absent. */
+  only?: string[];
 }): Snapshot {
   const { ev, grid } = o;
   const award: Award = o.scenario?.result.award ?? grid.asQuoted;
-  const rows: SnapshotRow[] = ev.lines.map((l) => {
+  const rows: SnapshotRow[] = ev.lines.filter((l) => !o.only || o.only.includes(l.id)).map((l) => {
     const w = award.per[l.id];
     const c = w ? grid.cells[cellKey(w.vendorId, l.id)] : null;
     return {
@@ -62,9 +72,12 @@ export function freeze(o: {
       perBox: w?.perBox ?? null, value: w ? w.perBox * l.qty : 0,
       asWritten: c?.norm.asWritten ?? null, calc: c?.norm.calc ?? null, where: c?.norm.source ? where(c.norm.source) : null,
       replyId: c?.norm.replyId ?? null, source: c?.norm.source ?? null, raw: c?.norm.raw ?? null,
+      checked: w ? o.checks?.[`${w.vendorId}:${l.id}`] ?? null : null,
     };
   });
-  const byVendor = grid.vendors.filter((v) => award.byVendor[v.id]?.lines).map((v) => ({ vendor: v.short, lines: award.byVendor[v.id].lines, value: award.byVendor[v.id].value }));
+  const byVendor = grid.vendors
+    .map((v) => ({ vendor: v.short, lines: rows.filter((r) => r.vendorId === v.id).length, value: rows.filter((r) => r.vendorId === v.id).reduce((a, r) => a + r.value, 0) }))
+    .filter((v) => v.lines);
   const ly = rows.filter((r) => r.perBox != null && o.lastYear.some((x) => x.lineId === r.lineId));
   const lastYear = ly.length
     ? { lines: ly.length, thisYear: ly.reduce((a, r) => a + r.value, 0), lastYear: ly.reduce((a, r) => a + o.lastYear.find((x) => x.lineId === r.lineId)!.price * r.qty, 0) }
@@ -79,7 +92,9 @@ export function freeze(o: {
     basis: o.scenario?.title ?? "As quoted (cheapest per line, all vendors)",
     rules: o.scenario?.result.rules ?? ["Each line goes to the lowest price that can win as quoted."],
     excluded: (o.scenario?.result.excluded ?? []).map((x) => ({ name: x.name, why: x.why })),
-    rows, total: award.total, cheapestOverall: grid.asQuoted.total, lastYear, byVendor,
+    rows, total: o.only ? rows.reduce((a, r) => a + r.value, 0) : award.total,
+    cheapestOverall: o.only ? rows.reduce((a, r) => a + (grid.asQuoted.per[r.lineId]?.perBox ?? 0) * r.qty, 0) : grid.asQuoted.total,
+    lastYear, byVendor, ...(o.only ? { partial: `${rows.length} of ${ev.lines.length} lines, as filtered` } : {}),
     decisions: [
       ...o.report.raised.map((d) => ({ title: d.title, status: o.decisions[d.title] ?? "Open: not yet answered" })),
       ...(o.overrides ?? []).map((x) => ({

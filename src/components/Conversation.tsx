@@ -60,11 +60,10 @@ export function Conversation({ msgs, results, titles, people, asker, setAsker, b
                 const d = r.award.total - r.base.total;
                 return (
                   <div key={si} style={{ background: "var(--color-bg)", boxShadow: "var(--shadow-sm)", padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6 }}>
-                    <span style={{ ...label, color: "var(--color-accent-800)" }}>Scenario {si + 1} · applied to the table</span>
-                    <span style={{ fontSize: 13, color: "var(--color-neutral-800)" }}>{titles[si]}</span>
+                    <span style={{ ...label, color: "var(--color-accent-800)" }}>{titles[si]} · applied to the table</span>
                     <span style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
                       <span style={{ fontSize: 20, fontWeight: 600 }}>{crore(r.award.total)}</span>
-                      <span style={{ color: "var(--color-accent-800)" }}>{d >= 0 ? "+" : "−"}{lakh(Math.abs(d))} vs as quoted</span>
+                      <span style={{ color: "var(--color-accent-800)" }}>{d >= 0 ? "+" : "−"}{lakh(Math.abs(d))} vs cheapest overall</span>
                     </span>
                     <span style={{ color: "var(--color-neutral-800)" }}>{Object.entries(r.award.byVendor).filter(([, b]) => b.lines).map(([v, b]) => `${vendorNames[v]} ${b.lines}`).join(" · ")} lines</span>
                     <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{r.rules.length} rules · {r.excluded.length ? `${r.excluded.length} vendor${r.excluded.length > 1 ? "s" : ""} excluded` : "no vendors excluded"} · {r.changed.length} lines change hands</span>
