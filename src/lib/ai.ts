@@ -5,24 +5,42 @@ import { MODELS } from "./config";
 let client: Anthropic | null = null;
 
 export function apiKey(): string | undefined {
-  // PARAKH_ANTHROPIC_API_KEY lets a dev container hold the app's key without
-  // changing the key its own tools use; Vercel and .env.local use ANTHROPIC_API_KEY.
+  // Vercel and .env.local use ANTHROPIC_API_KEY. PARAKH_ANTHROPIC_API_KEY lets a dev
+  // machine hold the app's key without changing the key its own tools use.
   return process.env.ANTHROPIC_API_KEY || process.env.PARAKH_ANTHROPIC_API_KEY || undefined;
 }
 
+/**
+ * Cloud dev containers can hold the key as a "network secret": an egress proxy adds the
+ * x-api-key header to requests for api.anthropic.com, so the key never sits on the machine.
+ * Used only when no key is set, a proxy is configured, and we are not on Vercel.
+ */
+function proxyMode(): boolean {
+  return !apiKey() && !process.env.VERCEL && Boolean(process.env.HTTPS_PROXY || process.env.https_proxy);
+}
+
 export function hasApiKey(): boolean {
-  return Boolean(apiKey());
+  return Boolean(apiKey()) || proxyMode();
 }
 
 export function anthropic(): Anthropic {
+  if (client) return client;
+  // Explicit base URL, so an ANTHROPIC_BASE_URL set for other tools on the machine is never picked up.
+  const baseURL = process.env.PARAKH_ANTHROPIC_BASE_URL || "https://api.anthropic.com";
   const key = apiKey();
-  if (!key) throw new MissingKeyError();
-  client ??= new Anthropic({
-    apiKey: key,
-    // Explicit, so an ANTHROPIC_BASE_URL set for other tools on the machine is never picked up.
-    baseURL: process.env.PARAKH_ANTHROPIC_BASE_URL || "https://api.anthropic.com",
-    maxRetries: 3,
-  });
+  if (key) {
+    client = new Anthropic({ apiKey: key, baseURL, maxRetries: 3 });
+  } else if (proxyMode()) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { ProxyAgent } = require("undici") as typeof import("undici");
+    client = new Anthropic({
+      apiKey: "added-by-network-secret",
+      baseURL,
+      maxRetries: 3,
+      defaultHeaders: { "x-api-key": null }, // the proxy adds the real one
+      fetchOptions: { dispatcher: new ProxyAgent(process.env.HTTPS_PROXY || process.env.https_proxy!) } as unknown as NonNullable<ConstructorParameters<typeof Anthropic>[0]>["fetchOptions"],
+    });
+  } else throw new MissingKeyError();
   return client;
 }
 
