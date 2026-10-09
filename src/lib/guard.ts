@@ -1,8 +1,9 @@
 // A simple per-visitor limit on model calls, so a public link cannot use up the free Gemini quota.
+// Raised for the test round (was 12 per hour, 150 a day); lower again once testing is done.
 // In memory per server instance: enough for a demo, not a billing system.
 const HOUR = 3_600_000;
-const PER_VISITOR_PER_HOUR = Number(process.env.PARAKH_CALLS_PER_HOUR ?? 12);
-const ALL_VISITORS_PER_DAY = Number(process.env.PARAKH_CALLS_PER_DAY ?? 150);
+const PER_VISITOR_PER_HOUR = Number(process.env.PARAKH_CALLS_PER_HOUR ?? 200);
+const ALL_VISITORS_PER_DAY = Number(process.env.PARAKH_CALLS_PER_DAY ?? 600);
 
 const byVisitor = new Map<string, number[]>();
 let day: number[] = [];

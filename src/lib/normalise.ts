@@ -103,11 +103,18 @@ export function lastYearFreight(sheets: Sheet[], vendorName: string): { perBox: 
 }
 
 /** Freight and handling for one vendor, from its checked terms. */
-function freightOf(terms: Term[]): { add: VendorBasis["freight"]; unknown: boolean; notes: string[] } {
+function freightOf(terms: Term[], plant: string): { add: VendorBasis["freight"]; unknown: boolean; notes: string[]; held: string | null } {
   const notes: string[] = [];
   const freight = terms.filter((t) => t.kind === "freight" && ok(t.verification));
-  const stated = freight.find((t) => t.amount_stated && t.value !== null && !t.condition && (t.value_unit === "inr_per_box" || t.value_unit === "usd_per_box"));
-  if (!stated) return { add: null, unknown: freight.some((t) => !t.amount_stated), notes };
+  const perBoxAmount = (t: Term) => t.amount_stated && t.value !== null && (t.value_unit === "inr_per_box" || t.value_unit === "usd_per_box");
+  // A "condition" that only names our delivery point or how freight is billed does not limit it.
+  const town = plant.match(/([A-Z][a-z]+),\s*[A-Z][a-z]+\s*\d{6}/)?.[1] ?? plant.match(/([A-Z][a-z]+),\s*Pune/)?.[1] ?? "Chakan";
+  const harmless = (c: string) => new RegExp(`^(?:(?:to|delivered to|till|up to|upto)\\s+(?:your\\s+)?(?:${town}|plant|factory|site|works)\\b|billed|charged|invoiced|in (?:the )?invoice|extra|[\\s,;.&]|and)+$`, "i").test(c.trim());
+  const stated = freight.find((t) => perBoxAmount(t) && (!t.condition || harmless(t.condition)));
+  // A stated amount with a real condition is never applied silently: it is shown and treated as unknown.
+  const conditional = !stated ? freight.find((t) => perBoxAmount(t) && t.condition) : undefined;
+  if (!stated) return { add: null, unknown: freight.some((t) => !t.amount_stated) || !!conditional, notes, held: conditional ? `freight ${conditional.value_unit === "usd_per_box" ? "USD" : "Rs"} ${fmt(conditional.value!)}/box stated only "${conditional.condition}"; not added` : null };
+  if (stated.condition) notes.push(`Freight as written: "${stated.summary}"`);
   let perBox = stated.value_unit === "usd_per_box" ? stated.value! * USD_REFERENCE.rate : stated.value!;
   let calc = stated.value_unit === "usd_per_box" ? `${fmt(stated.value!, 4)} freight x ${USD_REFERENCE.rate}` : `${fmt(stated.value!)} freight`;
   const handling = terms.find(
@@ -119,8 +126,11 @@ function freightOf(terms: Term[]): { add: VendorBasis["freight"]; unknown: boole
   }
   const otherHandling = terms.filter((t) => t.kind === "handling" && t !== handling && ok(t.verification));
   for (const h of otherHandling) notes.push(`Handling charge not applied, because what it applies to is unclear: "${h.summary}"`);
-  return { add: { perBox, calc, source: stated.source }, unknown: false, notes };
+  return { add: { perBox, calc, source: stated.source }, unknown: false, notes, held: null };
 }
+
+/** Flags that mean a price is compared before freight that the reply did not settle. */
+export const FREIGHT_UNSETTLED = /^(freight extra, amount not given|freight .* stated only|ex-works, and the reply gives no freight)/;
 
 /** The vendor's conditional discount, kept separate (never applied to the main value). */
 function conditionalDiscount(terms: Term[]): Term | null {
@@ -177,9 +187,9 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
     // Terms: the latest reply's, plus any kind it does not restate from an earlier offer.
     const kinds = new Set(latest.terms.map((t) => t.kind));
     const terms = [...latest.terms, ...earlier.flatMap((r) => r.terms.filter((t) => !kinds.has(t.kind)))];
-    const fr = freightOf(terms);
+    const fr = freightOf(terms, ev.plant);
     const disc = conditionalDiscount(terms);
-    const lyFreight = fr.unknown && vendor ? lastYearFreight(history.sheets, vendor.name) : null;
+    const lyFreight = !fr.add && vendor ? lastYearFreight(history.sheets, vendor.name) : null;
     const cells: NormCell[] = ev.lines.map((line) => {
       // A later reply replaces only the lines it prices; the rest stand from the earlier offer.
       const pricesLine = (r: ReplyReading) =>
@@ -280,8 +290,10 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
       if (!delivered && fr.add) {
         base.v += fr.add.perBox; base.calc += ` + ${fr.add.calc}`;
         cell.flags.push(`ex-works; freight added from ${where(fr.add.source)}`);
-      } else if (!delivered && fr.unknown) {
-        cell.flags.push(`freight extra, amount not given${lyFreight ? ` (last year it was Rs ${fmt(lyFreight.perBox)}/box)` : ""}`);
+      } else if (!delivered && (fr.unknown || basis === "ex_works")) {
+        // Never silent: an ex-works price whose freight the reply does not settle is flagged and tested.
+        const why = fr.held ?? (fr.unknown ? "freight extra, amount not given" : "ex-works, and the reply gives no freight amount");
+        cell.flags.push(`${why}${lyFreight ? ` (last year it was Rs ${fmt(lyFreight.perBox)}/box)` : ""}`);
         if (lyFreight)
           cell.variants.lastYearFreight = {
             value: round(base.v + lyFreight.perBox, 2), calc: `${base.calc} + ${fmt(lyFreight.perBox)} freight (last year's)`,
@@ -306,7 +318,7 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
       return cell;
     });
     // Unknown freight matters only where a price is not delivered.
-    const freightUnknown = cells.some((c) => c.flags.some((f) => f.startsWith("freight extra, amount not given")));
+    const freightUnknown = cells.some((c) => c.flags.some((f) => FREIGHT_UNSETTLED.test(f)));
     out.push({ vendorId, replyIds: list.map((r) => r.replyId), freight: fr.add, freightUnknown, cells });
   }
   return out;
