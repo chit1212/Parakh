@@ -14,7 +14,7 @@ vi.mock("@/lib/config", () => ({
   RETRY: { attempts: 3, firstDelayMs: 1, maxDelayMs: 2 },
 }));
 
-const { callStructured, QuotaError, ReaderError } = await import("@/lib/reader/call");
+const { callStructured, QuotaError, ReaderError, resetUsedUp } = await import("@/lib/reader/call");
 
 const Schema = z.object({ answer: z.string() });
 const busy = () => new ApiError({ status: 503, message: '{"error":{"code":503,"message":"This model is currently experiencing high demand."}}' });
@@ -26,6 +26,7 @@ const call = (onWait?: (s: number) => void) =>
 
 beforeEach(() => {
   generateContent.mockReset();
+  resetUsedUp();
   vi.spyOn(console, "warn").mockImplementation(() => {});
 });
 

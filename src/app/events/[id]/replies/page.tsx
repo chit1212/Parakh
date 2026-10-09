@@ -4,7 +4,8 @@ import { Camera, Envelope, File, FileDoc, FilePdf, FileXls, Paperclip, Warning }
 import Link from "next/link";
 import { ScreenHead } from "@/components/Rail";
 import { Shell } from "@/components/Shell";
-import { useReadings, type ReplyState } from "@/components/useReadings";
+import { useReadings, type EventData, type ReplyState } from "@/components/useReadings";
+import { buildGrid, cellKey } from "@/lib/compare";
 import type { ReplyReading } from "@/lib/reader/pipeline";
 import { mainFile, type ReplySummary } from "@/lib/summary";
 import { readStamp, where } from "@/lib/format";
@@ -72,7 +73,7 @@ function termLine(rd: ReplyReading): string[] {
   return out;
 }
 
-function Row({ r, st, ev, onRead }: { r: ReplySummary; st: ReplyState | undefined; ev: SourcingEvent; onRead: (fresh: boolean) => void }) {
+function Row({ r, st, ev, onRead, impact }: { r: ReplySummary; st: ReplyState | undefined; ev: SourcingEvent; onRead: (fresh: boolean) => void; impact?: string | null }) {
   const [open, setOpen] = useState(false);
   const rd = st?.reading ?? null;
   const f = mainFile(r, rd);
@@ -101,6 +102,7 @@ function Row({ r, st, ev, onRead }: { r: ReplySummary; st: ReplyState | undefine
           {r.contact ? ` · ${r.contact}` : r.from ? ` · ${r.from}` : " · no sender (arrived without an email)"}
         </div>
         {rd?.revision?.is_revision && <div className="text-[13px] text-a-700 mt-[4px]">Revised offer{rd.revision.supersedes ? `: supersedes ${rd.revision.supersedes}` : ""}</div>}
+        {impact && <div className="text-[13px] text-n-800 mt-[2px]">{impact}</div>}
         <div className="flex gap-[var(--space-3)] mt-[var(--space-2)] text-[14px]">
           {f && <a href={`/api/file?path=${encodeURIComponent(f.path)}`} target="_blank" rel="noreferrer">Open original</a>}
           {rd && (rd.prices.length > 0 || rd.terms.length > 0) && (
@@ -159,8 +161,8 @@ function Row({ r, st, ev, onRead }: { r: ReplySummary; st: ReplyState | undefine
             {st?.notice && <div className="text-[13px] text-n-800 bg-n-100 px-[8px] py-[4px] mt-[8px] rounded-[var(--radius-md)]">{st.notice}</div>}
             <div className="text-[12px] text-n-500 mt-[8px]">
               {rd.status === "error" ? "Not read yet" : `${rd.saved ? "Saved reading, " : "Read live, "}${readStamp(rd)}`}
-              {" · "}
-              <button className="underline" onClick={() => onRead(true)}>Read again live</button>
+              {r.origin !== "upload" && <>{" · "}<button className="underline" onClick={() => onRead(true)}>Read again live</button></>}
+              {r.origin === "upload" && " · uploaded in this session"}
             </div>
           </>
         ) : null}
@@ -303,8 +305,74 @@ function Detail({ rd, ev }: { rd: ReplyReading; ev: SourcingEvent }) {
   );
 }
 
+/** Upload a reply that arrived outside the event inbox; the real pipeline reads it live. */
+function Upload({ vendors, onUpload, disabled }: { vendors: SourcingEvent["vendors"]; onUpload: (files: File[], vendorId: string) => Promise<void>; disabled: boolean }) {
+  const [files, setFiles] = useState<File[]>([]);
+  const [vendorId, setVendorId] = useState("");
+  const [busy, setBusy] = useState(false);
+  return (
+    <form
+      className="mt-[var(--space-4)] flex flex-wrap items-center gap-[12px] text-[14px] p-[var(--space-3)] bg-surface rounded-[var(--radius-md)]"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        if (!files.length) return;
+        setBusy(true);
+        await onUpload(files, vendorId);
+        setBusy(false);
+        setFiles([]);
+        (e.target as HTMLFormElement).reset();
+      }}
+    >
+      <span className="font-semibold">Upload a reply</span>
+      <input type="file" multiple accept=".xlsx,.docx,.pdf,.jpg,.jpeg,.png,.eml,.txt,.csv" onChange={(e) => setFiles([...(e.target.files ?? [])])} disabled={busy || disabled} />
+      <label className="flex items-center gap-[6px]">
+        From
+        <select className="input" style={{ width: 220, minHeight: 32, padding: "4px 8px" }} value={vendorId} onChange={(e) => setVendorId(e.target.value)} disabled={busy || disabled}>
+          <option value="">Work it out (sender or letterhead)</option>
+          {vendors.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
+        </select>
+      </label>
+      <button className="btn btn-primary" type="submit" disabled={!files.length || busy || disabled}>{busy ? "Reading…" : "Read it"}</button>
+      <span className="text-n-700 text-[12px]">Read live by AI, checked by code; it joins the comparison for this session. Up to 4 MB.</span>
+    </form>
+  );
+}
+
+/**
+ * L17: for a reply that revises a vendor's earlier offer, what changed and whether it moves a winner.
+ * Code compares the table with and without this reply.
+ */
+function revisionImpact(data: EventData, state: Record<string, ReplyState>, id: string): string | null {
+  const rd = state[id]?.reading;
+  if (!rd?.vendorId || rd.status !== "read") return null;
+  const all = data.replies.map((x) => state[x.id]?.reading).filter((x): x is ReplyReading => Boolean(x && x.status !== "error"));
+  const others = all.filter((x) => x.replyId !== id);
+  if (!others.some((x) => x.vendorId === rd.vendorId)) return null; // nothing earlier to revise
+  const files = Object.fromEntries(data.replies.map((x) => [x.id, mainFile(x, state[x.id]?.reading ?? null) ?? undefined]));
+  const g1 = buildGrid(data.event, all, { sheets: data.historySheets }, files, data.lastYear);
+  // Lines whose price as written differs from the vendor's previous offer.
+  const changed = data.event.lines.filter((l) => {
+    const n = g1.cells[cellKey(rd.vendorId!, l.id)].norm;
+    return n.replyId === id && n.flags.some((f) => f.startsWith("revised (was"));
+  });
+  if (!changed.length) return "No price differs from the earlier offer.";
+  // The same table with only those lines put back to the earlier offer's price (terms unchanged).
+  const ids = new Set(changed.map((l) => l.id));
+  const earlier = others.filter((x) => x.vendorId === rd.vendorId);
+  const undone: ReplyReading = {
+    ...rd,
+    prices: rd.prices.map((p) => (p.line_id && ids.has(p.line_id) ? earlier.map((e) => e.prices.find((q) => q.line_id === p.line_id)).find(Boolean) ?? p : p)),
+  };
+  const g0 = buildGrid(data.event, [...others, undone], { sheets: data.historySheets }, files, data.lastYear);
+  const short = (v: string | undefined) => data.event.vendors.find((x) => x.id === v)?.short ?? "nobody";
+  const moves = data.event.lines.filter((l) => g1.asQuoted.per[l.id]?.vendorId !== g0.asQuoted.per[l.id]?.vendorId);
+  const fmt = (n: number | null) => (n == null ? "—" : `₹${n.toFixed(2)}`);
+  return `Changes ${changed.map((l) => `${l.id} ${fmt(g0.cells[cellKey(rd.vendorId!, l.id)].perBox)} → ${fmt(g1.cells[cellKey(rd.vendorId!, l.id)].perBox)}`).join(", ")}. `
+    + (moves.length ? `Moves the winner on ${moves.map((l) => `${l.id} (${short(g0.asQuoted.per[l.id]?.vendorId)} → ${short(g1.asQuoted.per[l.id]?.vendorId)})`).join(", ")}.` : "It does not move any winner.");
+}
+
 export default function RepliesPage() {
-  const { data, state, blocked, readOne } = useReadings();
+  const { data, state, blocked, readOne, upload } = useReadings();
   if (!data) return <Shell><div className="text-n-700">Loading the event…</div></Shell>;
   const ev = data.event;
   // Quotes first (in arrival order), then everything kept out of the comparison.
@@ -331,12 +399,13 @@ export default function RepliesPage() {
           Live reading is off: no Gemini API key is set on the server yet. Saved readings still show.
         </div>
       )}
+      <Upload vendors={ev.vendors} onUpload={upload} disabled={!data.keyConfigured} />
       {blocked && <div className="mt-[var(--space-4)] p-[var(--space-3)] bg-d-100 text-[14px] rounded-[var(--radius-md)]">{blocked}</div>}
       {data.keyConfigured && done < data.replies.length && (
         <div className="text-[13px] text-n-700 mt-[var(--space-3)]">Reading: {done} of {data.replies.length} done</div>
       )}
       <div className="mt-[var(--space-6)]">
-        {main.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} />)}
+        {main.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} impact={revisionImpact(data, state, r.id)} />)}
       </div>
       {other.length > 0 && (
         <>

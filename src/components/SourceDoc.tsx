@@ -16,9 +16,12 @@ export function SourceDoc({ replyId, source, raw, lineId, filePath }: {
   const box = useRef<HTMLDivElement>(null);
   const key = JSON.stringify([replyId, source, raw, lineId]);
 
+  // Uploaded files stay in the buyer's browser session; the server keeps no copy to draw.
+  const uploaded = replyId.startsWith("upload-");
   useEffect(() => {
     let live = true;
     setView(null);
+    if (uploaded) return;
     setFailed(false);
     fetch("/api/source", { method: "POST", body: JSON.stringify({ replyId, source, valueText: raw?.text, value: raw?.value, lineId }) })
       .then((r) => r.json())
@@ -46,6 +49,16 @@ export function SourceDoc({ replyId, source, raw, lineId, filePath }: {
   );
   const frame = { background: "var(--color-bg)", boxShadow: "var(--shadow-sm)", maxHeight: 360, overflow: "auto" as const, position: "relative" as const };
 
+  if (uploaded)
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <span style={label11}>The original, as it arrived</span>
+        <div style={{ background: "var(--color-bg)", boxShadow: "var(--shadow-sm)", padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6 }}>
+          <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{source.file} was uploaded in this session; Parakh keeps no copy on the server to draw. The words it was read from, checked by code against the file:</span>
+          <q style={{ fontSize: 14, background: "var(--color-accent-200)", padding: "2px 4px", alignSelf: "flex-start", quotes: "none" }}>{source.snippet}</q>
+        </div>
+      </div>
+    );
   if (failed) return <>{head}<p style={{ margin: 0, color: "var(--color-neutral-700)" }}>The original could not be drawn here. Use “Open original”.</p></>;
   if (!view) return <>{head}<div style={{ ...frame, height: 120, padding: 12, color: "var(--color-neutral-700)" }}>Opening {source.file}…</div></>;
 

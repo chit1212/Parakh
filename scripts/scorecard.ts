@@ -72,6 +72,8 @@ async function main() {
   }
   console.log("\nPlanted edges");
   for (const e of sc.edges) console.log(`  ${e.ok ? "PASS" : "FAIL"}  ${e.name}  [${e.detail}]`);
+  console.log("\nDoubts and scenarios");
+  for (const e of sc.doubts) console.log(`  ${e.ok ? "PASS" : "FAIL"}  ${e.name}  [${e.detail}]`);
   console.log("\nFailure cases");
   for (const e of sc.failures) console.log(`  ${e.ok ? "PASS" : "FAIL"}  ${e.name}  [${e.detail}]`);
   console.log(`\nNot graded yet: ${sc.notYet.join("; ")}`);

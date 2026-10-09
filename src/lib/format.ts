@@ -6,8 +6,9 @@ export function where(s: SourceRef | null): string {
   const parts = [s.file];
   if (s.sheet) parts.push(`sheet ${s.sheet}${s.cell ? `, cell ${s.cell}` : ""}`);
   if (s.page) parts.push(`page ${s.page}`);
-  if (s.table) parts.push(`table ${s.table}${s.row ? `, row ${s.row}` : ""}`);
-  else if (s.row) parts.push(`row ${s.row}`);
+  const row = s.row?.replace(/^(table\s*\d+\s*,\s*)?row\s*/i, "");
+  if (s.table) parts.push(`table ${s.table}${row ? `, row ${row}` : ""}`);
+  else if (row) parts.push(`row ${row}`);
   return parts.join(", ");
 }
 
@@ -30,3 +31,10 @@ export const inr = (n: number) => `₹${num2(n)}`;
 export const lakh = (n: number) => `₹${(n / 1e5).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} L`;
 /** ₹4.01 Cr (crores) */
 export const crore = (n: number) => `₹${(n / 1e7).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} Cr`;
+
+/** A short, stable fingerprint of some text (browser-safe; for snapshot ids, not security). */
+export function hashOfText(s: string): string {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
+  return (h >>> 0).toString(16).padStart(8, "0");
+}

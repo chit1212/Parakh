@@ -26,6 +26,14 @@ const HEADER = {
   issued: "22 Sep 2026",
   due: "03 Oct 2026",
   basis: "Price per box (or per piece for accessories), in INR, delivered to Plant 2 Chakan, GST extra",
+  terms: {
+    "Price basis": "Per box (per piece for accessories), INR, delivered to Plant 2 Chakan, GST extra",
+    Validity: "Prices firm for the supply period, or state your validity",
+    Payment: "60 days from receipt of goods (state if different)",
+    Delivery: "Weekly call-offs against monthly purchase orders; monthly PO value per vendor INR 15-30 lakh",
+    Quality: "Boxes must meet the board grade stated; each lot needs a test certificate",
+    Freight: "Freight, loading and handling included in the delivered price or shown separately",
+  },
   lyEventId: "SE-2025-037",
   passRule:
     "Questionnaire returned, score 70 or more, and both mandatory items (Q1 ISO 9001, Q2 test report within 12 months) passed",

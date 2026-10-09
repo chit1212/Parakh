@@ -10,10 +10,10 @@ export function Rail() {
   const path = usePathname();
   const items = [
     { icon: Tray, label: "Events", href: "/events" },
-    { icon: NotePencil, label: "RFQ", href: null },
+    { icon: NotePencil, label: "RFQ", href: `/events/${EVENT}/rfq` },
     { icon: EnvelopeOpen, label: "Replies", href: `/events/${EVENT}/replies` },
     { icon: Table, label: "Compare", href: HOME },
-    { icon: SealCheck, label: "Award", href: null },
+    { icon: SealCheck, label: "Award", href: `/events/${EVENT}/award` },
   ];
   return (
     <nav style={{ width: 68, flex: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "18px 0", position: "sticky", top: 0, height: "100vh" }}>

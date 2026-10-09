@@ -71,10 +71,11 @@
   "unsourced": 0,
   "usage": [],
   "cached": true,
-  "ms": 1,
+  "ms": 2,
   "readAt": "2026-10-09T12:14:35.767Z",
   "models": [
    "gemini-3.5-flash-lite"
-  ]
+  ],
+  "receivedAt": "2026-10-03T20:31:00.000Z"
  }
 }

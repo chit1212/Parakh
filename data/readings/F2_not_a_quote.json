@@ -75,6 +75,7 @@
   "readAt": "2026-10-09T12:14:36.568Z",
   "models": [
    "gemini-3.5-flash-lite"
-  ]
+  ],
+  "receivedAt": "2026-10-04T03:45:00.000Z"
  }
 }

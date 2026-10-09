@@ -33,3 +33,21 @@ Built:
 - The app reads `GEMINI_API_KEY`, or `PARAKH_GEMINI_API_KEY` in a dev container. In a container with an egress proxy (never on Vercel), Node's fetch is pointed at the proxy.
 - Model outputs are cached by content hash (`.cache/readings`, or `/tmp` on Vercel) so re-reading an unchanged file uses no quota (development only; the demo uses `data/readings/`).
 - Fonts and icons are bundled from npm (no CDN at runtime).
+
+## Milestones 3 and 4 (done)
+- L18 checks: last year's price per cell, spec change named (L21 5-ply to 7-ply); unit sanity (5x off should-cost).
+- Quality (`src/lib/quality.ts`): cleared = questionnaire returned + valid ISO 9001 + test report within 12 months of the RFQ, all checked in code. The 0-100 score needs a marking scheme the RFQ does not give: milestone 5 (L26).
+- Doubts (`src/lib/doubts.ts`): every candidate (conditional discount, unknown freight, substitute spec, far below should-cost, hard-to-read number) is re-solved in the cheapest-overall and quality-cleared views; raised only if a winner changes, ranked by rupees, routed to vendor or buyer. Doubts tab and magenta doubt cells on Compare. Vendor emails drafted by Gemini on request (`/api/draft`), only that vendor's own figures; approve is stubbed.
+- Scorecard grades doubts and totals against the answer key: 9 of 9 pass.
+
+## Milestone 5 (analyst chat) done; quality score still open
+- Scenario solver (`src/lib/scenario.ts`): eligibility (all / quality-cleared / exclusions), discount and freight assumptions, held cells, worst case, share cap, line overrides. Matches all four answer-key scenario totals (`test/compare.test.ts`).
+- Chat (`/api/chat`): Gemini function calling with read_comparison, run_scenario, get_cell_source, show_view; the model never does sums. The client re-solves each returned rule set in code and applies it to the table: scenario pills, rules/excluded strip, "was X", faded excluded vendors, chart view.
+- Free tier: on 9 Oct the three Flash models hit their daily limit; Flash-Lite models are now the last fallback for reading and chat, and daily-limited models are skipped until the next day. A busy model (503) is no longer reported as "used up for today".
+- Not done: a 0-100 quality score (no marking scheme in the RFQ); the header shows pass/fail with reasons.
+
+## Milestones 6 and 7 (done)
+- Freeze for award (Compare) -> snapshot in the browser; Award record `/events/SE-2026-041/award` with KPIs, rules, decisions on record (doubt decisions and overrides), frozen table and trace panel; VP approval; Excel and PDF memo from `/api/export` (exceljs, pdf-lib).
+- Upload a reply (Replies) -> `/api/upload` parses in code and streams the real reading; kept in the browser session; a later reply replaces only the lines it prices.
+- L17 revised quote: what changed and whether it moves a winner (Replies). L32 override with audit trail (source panel). L29 counter-offer drafted by Gemini (source panel), target set in code, no other vendor named. L0 RFQ co-pilot `/events/SE-2026-041/rfq`: Gemini edits the draft via tools; start from the issued RFQ or clone SE-2025-037.
+- Open: a 0-100 quality score (the RFQ has no marking scheme; pass/fail is shown with reasons). Uploaded files are not drawn in the source panel (not kept on the server).

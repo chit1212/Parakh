@@ -33,7 +33,7 @@ export default function EventsPage() {
       const ev = data.event;
       const readings = data.replies.map((r) => state[r.id]?.reading).filter((r): r is ReplyReading => Boolean(r && r.status !== "error"));
       const files = Object.fromEntries(data.replies.map((r) => [r.id, mainFile(r, state[r.id]?.reading ?? null) ?? undefined]));
-      const grid = buildGrid(ev, readings, { sheets: data.historySheets }, files);
+      const grid = buildGrid(ev, readings, { sheets: data.historySheets }, files, data.lastYear);
       const replied = new Set(readings.filter((r) => r.vendorId && (r.status === "read" || r.status === "incomplete")).map((r) => r.vendorId)).size;
       live.push({
         id: ev.id, name: ev.title.replace(", ", " · "), cat: "Packaging", status: "Comparing", lines: ev.lines.length,

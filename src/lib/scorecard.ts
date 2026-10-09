@@ -3,9 +3,12 @@
 import fs from "node:fs/promises";
 import { datasetPath } from "./rfq";
 import type { Sheet } from "./files/xlsx";
+import { buildGrid } from "./compare";
+import { findDoubts } from "./doubts";
 import { normalise } from "./normalise";
+import { qualityOf } from "./quality";
 import type { ReplyReading } from "./reader/pipeline";
-import type { SourcingEvent } from "./types";
+import type { LastYearLine, SourcingEvent } from "./types";
 
 interface KeyCell {
   as_written: string;
@@ -18,7 +21,9 @@ interface KeyCell {
 
 interface Key {
   cells: Record<string, KeyCell | null>;
-  questionnaire: { results: Record<string, { returned: boolean }> };
+  scenarios: Record<string, { total_inr: number; winners?: Record<string, string> }>;
+  expected_doubts: { id: string; title: string; route: string; [k: string]: unknown }[];
+  questionnaire: { results: Record<string, { returned: boolean }>; cleared: string[] };
   failure_cases: Record<string, string>;
 }
 
@@ -95,6 +100,8 @@ export interface Scorecard {
   byVendor: { vendor: string; right: number; total: number }[];
   cells: CellResult[];
   edges: Check[];
+  /** L24: expected doubts raised (or correctly only logged), quality and scenario totals. */
+  doubts: Check[];
   failures: Check[];
   notYet: string[];
   /** Model calls made in this run (0 when every answer came from the cache or saved readings). */
@@ -106,7 +113,7 @@ export interface Scorecard {
 
 const unitOf = (u: string) => (u === "per_piece" ? "per_box" : u);
 
-export function grade(ev: SourcingEvent, key: Key, readings: ReplyReading[], history: { sheets: Sheet[] }): Scorecard {
+export function grade(ev: SourcingEvent, key: Key, readings: ReplyReading[], history: { sheets: Sheet[]; lines?: LastYearLine[] }): Scorecard {
   const byReply = new Map(readings.map((r) => [r.replyId, r]));
   // Milestone 2: the code's conversion of what was read, graded to the paisa.
   const basis = normalise(ev, readings, history);
@@ -254,11 +261,40 @@ export function grade(ev: SourcingEvent, key: Key, readings: ReplyReading[], his
     cells,
     edges,
     failures,
-    notYet: [
-      "Which expected doubts are escalated vs only logged: milestone 4",
-    ],
+    doubts: gradeDoubts(ev, key, readings, history),
+    notYet: [],
     modelCalls: readings.flatMap((r) => r.usage).length,
     models: [...new Set(readings.flatMap((r) => r.models))],
     readAt: readings.map((r) => r.readAt).filter((t): t is string => Boolean(t)).sort().at(-1) ?? null,
   };
+}
+
+/** Expected doubts (answer key) against what the doubt engine raised or only logged. */
+function gradeDoubts(ev: SourcingEvent, key: Key, readings: ReplyReading[], history: { sheets: Sheet[]; lines?: LastYearLine[] }): Check[] {
+  const grid = buildGrid(ev, readings, history, {}, history.lines ?? []);
+  const q = ev.vendors.map((v) => qualityOf(ev, v.id, readings));
+  const cleared = q.filter((x) => x.cleared).map((x) => x.vendorId);
+  const r = findDoubts(ev, grid, cleared);
+  const out: Check[] = [];
+  const same = (a: string[], b: string[]) => a.length === b.length && [...a].sort().join() === [...b].sort().join();
+  const lines = (d: (typeof r.raised)[number] | undefined, view: "all" | "cleared") => [...new Set((d?.changes ?? []).filter((c) => c.view === view).map((c) => c.lineId))];
+  out.push({ name: "Quality-cleared vendors", ok: same(cleared, key.questionnaire.cleared), detail: cleared.join(", ") });
+  const tot = (k: string, got: number) => out.push({ name: `Total: ${k.replaceAll("_", " ")}`, ok: Math.abs(got - key.scenarios[k].total_inr) < 5000, detail: `₹${Math.round(got).toLocaleString("en-IN")} vs ₹${key.scenarios[k].total_inr.toLocaleString("en-IN")}` });
+  tot("cheapest_overall_all_vendors", r.views.all.total);
+  tot("cheapest_per_line_quality_cleared", r.views.cleared.total);
+  const find = (kind: string, vendor: string, line?: string) => r.raised.find((d) => d.kind === kind && d.vendorId === vendor && (!line || d.lineIds.includes(line)));
+  const exp = Object.fromEntries(key.expected_doubts.map((d) => [d.id, d]));
+  const d1 = find("conditional_discount", "VP");
+  out.push({ name: `Raised: ${exp.D1.title}`, ok: same(lines(d1, "cleared"), exp.D1.lines_that_change_in_quality_scenario as string[]), detail: d1 ? `quality-cleared lines ${lines(d1, "cleared").join(", ")}` : "not raised" });
+  const d2 = find("freight_unknown", "RB");
+  out.push({ name: `Raised: ${exp.D2.title}`, ok: same(lines(d2, "all"), exp.D2.lines_that_change_if_ly_freight_added as string[]), detail: d2 ? `lines ${lines(d2, "all").join(", ")}` : "not raised" });
+  const d3 = find("substitute_spec", "AC", "L14");
+  out.push({ name: `Raised: ${exp.D3.title}`, ok: Boolean(d3) && d3!.route === "buyer", detail: d3 ? `routed to ${d3.route}` : "not raised" });
+  const d4 = find("far_below_should_cost", "KP", "L09");
+  out.push({ name: `Raised: ${exp.D4.title}`, ok: Boolean(d4) && d4!.route === "vendor", detail: d4 ? `routed to ${d4.route}` : "not raised" });
+  const l19raised = r.raised.some((d) => d.vendorId === "AC" && d.lineIds.includes("L19"));
+  const l19logged = r.logged.some((d) => d.vendorId === "AC" && d.lineIds.includes("L19"));
+  out.push({ name: `Logged, not raised: ${exp.D5.title}`, ok: l19logged && !l19raised, detail: l19raised ? "raised" : l19logged ? "logged" : "not seen" });
+  out.push({ name: "No other doubts raised", ok: r.raised.length === 4, detail: `${r.raised.length} raised, ${r.logged.length + r.checks.length} logged` });
+  return out;
 }

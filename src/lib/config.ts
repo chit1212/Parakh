@@ -14,7 +14,8 @@ export const MODELS = {
  */
 export const FALLBACKS: Record<string, string[]> = {
   // gemini-3.7-flash is not listed: Google serves gemini-3.8-flash behind that name, so it is busy when 3.8 is.
-  [MODELS.reader]: ["gemini-3.6-flash", "gemini-3.5-flash"],
+  // Flash-Lite last: a larger free daily allowance, so the demo keeps answering when Flash is used up.
+  [MODELS.reader]: ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"],
   [MODELS.classifier]: ["gemini-3.1-flash-lite"],
 };
 
