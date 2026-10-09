@@ -1,0 +1,1466 @@
+{
+ "replyId": "3_kaveri_word",
+ "readAt": "2026-10-09T12:19:30.231Z",
+ "models": [
+  "gemini-3.5-flash-lite",
+  "gemini-3.5-flash"
+ ],
+ "files": "8d011b415913c5ba56018dcd",
+ "reading": {
+  "replyId": "3_kaveri_word",
+  "vendorId": "KP",
+  "vendorName": "Kaveri Paper Products",
+  "status": "read",
+  "headline": "30 of 30 lines quoted.",
+  "nextStep": {
+   "kind": "none",
+   "text": ""
+  },
+  "classification": {
+   "category": "quote",
+   "vendor_name": "Kaveri Paper Products",
+   "reason": "The email and attached Word document contain pricing and item details for the RFQ.",
+   "files": [
+    {
+     "name": "Kaveri_Quotation_SE-2026-041.docx",
+     "role": "quote"
+    },
+    {
+     "name": "KP_ISO9001_Certificate_SAMPLE.pdf",
+     "role": "certificate"
+    },
+    {
+     "name": "KP_Box_Test_Report_SAMPLE.pdf",
+     "role": "test_report"
+    }
+   ],
+   "looks_incomplete": false,
+   "incomplete_evidence": null,
+   "promised_followup": null
+  },
+  "prices": [
+   {
+    "vendor_wording": "Steam iron, unit carton",
+    "line_id": "L01",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L01.",
+    "raw_value_text": "446.00",
+    "raw_value": 446,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "3-ply E",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 2",
+     "snippet": "L01 | Steam iron, unit carton | 3-ply E | 156,000 | 446.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L01 | Steam iron, unit carton | 3-ply E | 156,000 | 446.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Steam iron, master carton (6 units)",
+    "line_id": "L02",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L02.",
+    "raw_value_text": "4,134.00",
+    "raw_value": 4134,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 3",
+     "snippet": "L02 | Steam iron, master carton (6 units) | 5-ply BC | 26,000 | 4,134.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L02 | Steam iron, master carton (6 units) | 5-ply BC | 26,000 | 4,134.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Dry iron, unit carton",
+    "line_id": "L03",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L03.",
+    "raw_value_text": "388.00",
+    "raw_value": 388,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "3-ply B",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 4",
+     "snippet": "L03 | Dry iron, unit carton | 3-ply B | 104,000 | 388.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L03 | Dry iron, unit carton | 3-ply B | 104,000 | 388.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Dry iron, master carton (8 units)",
+    "line_id": "L04",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L04.",
+    "raw_value_text": "3,394.00",
+    "raw_value": 3394,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 5",
+     "snippet": "L04 | Dry iron, master carton (8 units) | 5-ply BC | 13,000 | 3,394.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L04 | Dry iron, master carton (8 units) | 5-ply BC | 13,000 | 3,394.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Mixer grinder 750W, unit carton",
+    "line_id": "L05",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L05.",
+    "raw_value_text": "3,519.00",
+    "raw_value": 3519,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 6",
+     "snippet": "L05 | Mixer grinder 750W, unit carton | 5-ply BC | 91,000 | 3,519.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L05 | Mixer grinder 750W, unit carton | 5-ply BC | 91,000 | 3,519.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Mixer grinder, master carton (2 units)",
+    "line_id": "L06",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L06.",
+    "raw_value_text": "5,980.00",
+    "raw_value": 5980,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 7",
+     "snippet": "L06 | Mixer grinder, master carton (2 units) | 5-ply BC | 45,500 | 5,980.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L06 | Mixer grinder, master carton (2 units) | 5-ply BC | 45,500 | 5,980.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Juicer mixer, unit carton",
+    "line_id": "L07",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L07.",
+    "raw_value_text": "4,093.00",
+    "raw_value": 4093,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 8",
+     "snippet": "L07 | Juicer mixer, unit carton | 5-ply BC | 31,000 | 4,093.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L07 | Juicer mixer, unit carton | 5-ply BC | 31,000 | 4,093.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Hand blender, unit carton",
+    "line_id": "L08",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L08.",
+    "raw_value_text": "328.00",
+    "raw_value": 328,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "3-ply E",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 9",
+     "snippet": "L08 | Hand blender, unit carton | 3-ply E | 65,000 | 328.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L08 | Hand blender, unit carton | 3-ply E | 65,000 | 328.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Electric kettle 1.5L, unit carton",
+    "line_id": "L09",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L09.",
+    "raw_value_text": "579.00",
+    "raw_value": 579,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "3-ply B",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 10",
+     "snippet": "L09 | Electric kettle 1.5L, unit carton | 3-ply B | 78,000 | 579.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L09 | Electric kettle 1.5L, unit carton | 3-ply B | 78,000 | 579.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Electric kettle, master carton (6 units)",
+    "line_id": "L10",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L10.",
+    "raw_value_text": "5,627.00",
+    "raw_value": 5627,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 11",
+     "snippet": "L10 | Electric kettle, master carton (6 units) | 5-ply BC | 13,000 | 5,627.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L10 | Electric kettle, master carton (6 units) | 5-ply BC | 13,000 | 5,627.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Pop-up toaster, unit carton",
+    "line_id": "L11",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L11.",
+    "raw_value_text": "1,825.00",
+    "raw_value": 1825,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 12",
+     "snippet": "L11 | Pop-up toaster, unit carton | 5-ply BC | 39,000 | 1,825.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L11 | Pop-up toaster, unit carton | 5-ply BC | 39,000 | 1,825.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Induction cooktop, unit carton",
+    "line_id": "L12",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L12.",
+    "raw_value_text": "2,221.00",
+    "raw_value": 2221,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 13",
+     "snippet": "L12 | Induction cooktop, unit carton | 5-ply BC | 52,000 | 2,221.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L12 | Induction cooktop, unit carton | 5-ply BC | 52,000 | 2,221.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Table fan 400mm, unit carton",
+    "line_id": "L13",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L13.",
+    "raw_value_text": "3,480.00",
+    "raw_value": 3480,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 14",
+     "snippet": "L13 | Table fan 400mm, unit carton | 5-ply BC | 47,000 | 3,480.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L13 | Table fan 400mm, unit carton | 5-ply BC | 47,000 | 3,480.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Exhaust fan 250mm, unit carton",
+    "line_id": "L14",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L14.",
+    "raw_value_text": "1,882.00",
+    "raw_value": 1882,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 15",
+     "snippet": "L14 | Exhaust fan 250mm, unit carton | 5-ply BC | 57,000 | 1,882.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L14 | Exhaust fan 250mm, unit carton | 5-ply BC | 57,000 | 1,882.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Pedestal fan, unit carton",
+    "line_id": "L15",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L15.",
+    "raw_value_text": "4,548.00",
+    "raw_value": 4548,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 16",
+     "snippet": "L15 | Pedestal fan, unit carton | 5-ply BC | 36,500 | 4,548.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L15 | Pedestal fan, unit carton | 5-ply BC | 36,500 | 4,548.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Wall fan, unit carton",
+    "line_id": "L16",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L16.",
+    "raw_value_text": "3,256.00",
+    "raw_value": 3256,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 17",
+     "snippet": "L16 | Wall fan, unit carton | 5-ply BC | 41,500 | 3,256.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L16 | Wall fan, unit carton | 5-ply BC | 41,500 | 3,256.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Ceiling fan 1200mm, unit carton",
+    "line_id": "L17",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L17.",
+    "raw_value_text": "3,264.00",
+    "raw_value": 3264,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 18",
+     "snippet": "L17 | Ceiling fan 1200mm, unit carton | 5-ply BC | 117,000 | 3,264.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L17 | Ceiling fan 1200mm, unit carton | 5-ply BC | 117,000 | 3,264.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Ceiling fan, master carton (2 units)",
+    "line_id": "L18",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L18.",
+    "raw_value_text": "12,439.00",
+    "raw_value": 12439,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "7-ply BCB",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 19",
+     "snippet": "L18 | Ceiling fan, master carton (2 units) | 7-ply BCB | 58,500 | 12,439.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L18 | Ceiling fan, master carton (2 units) | 7-ply BCB | 58,500 | 12,439.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Room heater 2000W, unit carton",
+    "line_id": "L19",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L19.",
+    "raw_value_text": "3,004.00",
+    "raw_value": 3004,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 20",
+     "snippet": "L19 | Room heater 2000W, unit carton | 5-ply BC | 23,500 | 3,004.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L19 | Room heater 2000W, unit carton | 5-ply BC | 23,500 | 3,004.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Water heater 15L, unit carton",
+    "line_id": "L20",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L20.",
+    "raw_value_text": "5,104.00",
+    "raw_value": 5104,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 21",
+     "snippet": "L20 | Water heater 15L, unit carton | 5-ply BC | 28,500 | 5,104.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L20 | Water heater 15L, unit carton | 5-ply BC | 28,500 | 5,104.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Water heater 25L, unit carton",
+    "line_id": "L21",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L21.",
+    "raw_value_text": "11,808.00",
+    "raw_value": 11808,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "7-ply BCB",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 22",
+     "snippet": "L21 | Water heater 25L, unit carton | 7-ply BCB | 21,000 | 11,808.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L21 | Water heater 25L, unit carton | 7-ply BCB | 21,000 | 11,808.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Air cooler 40L, unit carton",
+    "line_id": "L22",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L22.",
+    "raw_value_text": "17,172.00",
+    "raw_value": 17172,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "7-ply BCB",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 23",
+     "snippet": "L22 | Air cooler 40L, unit carton | 7-ply BCB | 10,500 | 17,172.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L22 | Air cooler 40L, unit carton | 7-ply BCB | 10,500 | 17,172.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Rice cooker 1.8L, unit carton",
+    "line_id": "L23",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L23.",
+    "raw_value_text": "2,749.00",
+    "raw_value": 2749,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 24",
+     "snippet": "L23 | Rice cooker 1.8L, unit carton | 5-ply BC | 26,000 | 2,749.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L23 | Rice cooker 1.8L, unit carton | 5-ply BC | 26,000 | 2,749.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Sandwich maker, unit carton",
+    "line_id": "L24",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L24.",
+    "raw_value_text": "781.00",
+    "raw_value": 781,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "3-ply B",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 25",
+     "snippet": "L24 | Sandwich maker, unit carton | 3-ply B | 47,000 | 781.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L24 | Sandwich maker, unit carton | 3-ply B | 47,000 | 781.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Vegetable chopper, unit carton",
+    "line_id": "L25",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L25.",
+    "raw_value_text": "489.00",
+    "raw_value": 489,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "3-ply E",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 26",
+     "snippet": "L25 | Vegetable chopper, unit carton | 3-ply E | 52,000 | 489.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L25 | Vegetable chopper, unit carton | 3-ply E | 52,000 | 489.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Partition set, 6-cell, for kettle master",
+    "line_id": "L26",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L26.",
+    "raw_value_text": "1,077.00",
+    "raw_value": 1077,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "3-ply B",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 27",
+     "snippet": "L26 | Partition set, 6-cell, for kettle master | 3-ply B | 13,000 | 1,077.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L26 | Partition set, 6-cell, for kettle master | 3-ply B | 13,000 | 1,077.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Layer pad 1000 x 1200 mm, for pallets",
+    "line_id": "L27",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L27.",
+    "raw_value_text": "4,121.00",
+    "raw_value": 4121,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 28",
+     "snippet": "L27 | Layer pad 1000 x 1200 mm, for pallets | 5-ply BC | 21,000 | 4,121.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L27 | Layer pad 1000 x 1200 mm, for pallets | 5-ply BC | 21,000 | 4,121.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Air fryer 4L, unit carton (new SKU)",
+    "line_id": "L28",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L28.",
+    "raw_value_text": "3,898.00",
+    "raw_value": 3898,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 29",
+     "snippet": "L28 | Air fryer 4L, unit carton (new SKU) | 5-ply BC | 39,000 | 3,898.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L28 | Air fryer 4L, unit carton (new SKU) | 5-ply BC | 39,000 | 3,898.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Air fryer, master carton (2 units) (new SKU)",
+    "line_id": "L29",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L29.",
+    "raw_value_text": "6,068.00",
+    "raw_value": 6068,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5-ply BC",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 30",
+     "snippet": "L29 | Air fryer, master carton (2 units) (new SKU) | 5-ply BC | 19,500 | 6,068.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L29 | Air fryer, master carton (2 units) (new SKU) | 5-ply BC | 19,500 | 6,068.00\"."
+    }
+   },
+   {
+    "vendor_wording": "Mixer grinder, die-cut jar insert",
+    "line_id": "L30",
+    "match_basis": "line_id_given",
+    "match_reason": "The vendor explicitly provides the line ID L30.",
+    "raw_value_text": "350.00",
+    "raw_value": 350,
+    "unit": "per_100",
+    "unit_text": "Rate per 100 pcs (Rs.)",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "3-ply B",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 1,
+     "row": "row 31",
+     "snippet": "L30 | Mixer grinder, die-cut jar insert | 3-ply B | 91,000 | 350.00",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 1, row \"L30 | Mixer grinder, die-cut jar insert | 3-ply B | 91,000 | 350.00\"."
+    }
+   }
+  ],
+  "rateRules": [],
+  "notQuoted": [],
+  "terms": [
+   {
+    "kind": "price_basis",
+    "summary": "Prices are ex-works at Talegaon.",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "P8",
+     "snippet": "The above rates are ex our works at Talegaon and GST at 18% will be charged extra.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Paragraph 8."
+    }
+   },
+   {
+    "kind": "gst",
+    "summary": "GST of 18% is extra.",
+    "value": 18,
+    "value_unit": "percent",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "P8",
+     "snippet": "The above rates are ex our works at Talegaon and GST at 18% will be charged extra.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Paragraph 8."
+    }
+   },
+   {
+    "kind": "freight",
+    "summary": "Transportation to Chakan is arranged at Rs. 0.40 per box.",
+    "value": 0.4,
+    "value_unit": "inr_per_box",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "P8",
+     "snippet": "Transportation to your Chakan plant will be arranged by us through our regular transporter at Rs. 0.40 per box, on which a handling charge of 15% will be added and billed separately in the invoice.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Paragraph 8."
+    }
+   },
+   {
+    "kind": "handling",
+    "summary": "A handling charge of 15% is added on transportation charges.",
+    "value": 15,
+    "value_unit": "percent",
+    "applies_to": "freight",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "P8",
+     "snippet": "on which a handling charge of 15% will be added and billed separately in the invoice.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Paragraph 8."
+    }
+   },
+   {
+    "kind": "payment",
+    "summary": "Payment term is within 45 days of delivery.",
+    "value": 45,
+    "value_unit": "days",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "P8",
+     "snippet": "Payment may kindly be released within 45 days of delivery.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Paragraph 8."
+    }
+   },
+   {
+    "kind": "validity",
+    "summary": "Rates are valid for 30 days from the date of the letter.",
+    "value": 30,
+    "value_unit": "days",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "P8",
+     "snippet": "These rates are valid for 30 days from the date of this letter, after which they may change depending on the price of kraft paper.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Paragraph 8."
+    }
+   },
+   {
+    "kind": "price_revision_clause",
+    "summary": "Rates are subject to revision depending on the price of kraft paper after 30 days.",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": "after 30 days, depending on the price of kraft paper",
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "P8",
+     "snippet": "These rates are valid for 30 days from the date of this letter, after which they may change depending on the price of kraft paper.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Paragraph 8."
+    }
+   },
+   {
+    "kind": "lead_time",
+    "summary": "Standard lead time is 12 days from receipt of purchase order.",
+    "value": 12,
+    "value_unit": "days",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": "receipt of your purchase order",
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "P8",
+     "snippet": "Delivery will be made within 12 days of receipt of your purchase order.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Paragraph 8."
+    }
+   },
+   {
+    "kind": "tooling_or_plates",
+    "summary": "For printed items, the cost of printing plates is charged once per design at actuals.",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "printed items",
+    "amount_stated": false,
+    "condition": "For printed items, once per design",
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "P8",
+     "snippet": "For printed items, the cost of printing plates (cylinders) will be borne by you, and is charged once per design at actuals.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Paragraph 8."
+    }
+   },
+   {
+    "kind": "currency",
+    "summary": "Prices are quoted in INR (Rs.) per 100 pieces.",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": "P7",
+     "snippet": "As is our practice, all rates are given per 100 pieces.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Paragraph 7."
+    }
+   }
+  ],
+  "questionnaire": [
+   {
+    "question_id": "Q1",
+    "answer": "Yes, ISO 9001:2015, certificate no. DQC/QMS/24102, valid to 09 Jan 2027",
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 2,
+     "row": "2",
+     "snippet": "Yes, ISO 9001:2015, certificate no. DQC/QMS/24102, valid to 09 Jan 2027",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 2, row \"Q1 | Valid ISO 9001 certificate (attach copy) | Yes, ISO 9001:2015, certificate no. DQC/QMS/24102, valid to 09 Jan 2027\"."
+    }
+   },
+   {
+    "question_id": "Q2",
+    "answer": "Yes, bursting strength report dated 05 Feb 2026",
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 2,
+     "row": "3",
+     "snippet": "Yes, bursting strength report dated 05 Feb 2026",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 2, row \"Q2 | Box compression or bursting strength test report from the last 12 months (attach) | Yes, bursting strength report dated 05 Feb 2026\"."
+    }
+   },
+   {
+    "question_id": "Q3",
+    "answer": "310 tonnes per month",
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 2,
+     "row": "4",
+     "snippet": "310 tonnes per month",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 2, row \"Q3 | Monthly capacity in tonnes of finished boxes | 310 tonnes per month\"."
+    }
+   },
+   {
+    "question_id": "Q4",
+    "answer": "12 days",
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 2,
+     "row": "5",
+     "snippet": "12 days",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 2, row \"Q4 | Standard lead time from PO to delivery, in days | 12 days\"."
+    }
+   },
+   {
+    "question_id": "Q5",
+    "answer": "1.4%",
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 2,
+     "row": "6",
+     "snippet": "1.4%",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 2, row \"Q5 | Rejection rate at customer end in the last 12 months (%) | 1.4%\"."
+    }
+   },
+   {
+    "question_id": "Q6",
+    "answer": "No",
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 2,
+     "row": "7",
+     "snippet": "No",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 2, row \"Q6 | Moisture-resistant (wax or water-based coating) option available? | No\"."
+    }
+   },
+   {
+    "question_id": "Q7",
+    "answer": "70% recycled fibre",
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 2,
+     "row": "8",
+     "snippet": "70% recycled fibre",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 2, row \"Q7 | Share of recycled fibre, and FSC certification if any | 70% recycled fibre\"."
+    }
+   },
+   {
+    "question_id": "Q8",
+    "answer": "One reference given",
+    "source": {
+     "file": "Kaveri_Quotation_SE-2026-041.docx",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": 2,
+     "row": "9",
+     "snippet": "One reference given",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Table 2, row \"Q8 | Two current customer references in consumer durables | One reference given\"."
+    }
+   }
+  ],
+  "qualityDocs": [
+   {
+    "kind": "iso_certificate",
+    "summary": "ISO 9001:2015 Registration Certificate issued to Kaveri Paper Products",
+    "identifier": "DQC/QMS/24102",
+    "date": null,
+    "valid_until": "09 Jan 2027",
+    "marked_as_sample": true,
+    "source": {
+     "file": "KP_ISO9001_Certificate_SAMPLE.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": null,
+     "snippet": "SAMPLE DOCUMENT FOR A PRODUCT DEMO. NOT A REAL CERTIFICATE.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"SAMPLE DOCUMENT FOR A PRODUCT DEMO. NOT A REAL CERTIFICATE.\"."
+    }
+   },
+   {
+    "kind": "test_report",
+    "summary": "Box compression and bursting strength test report for a 5-ply BC carton",
+    "identifier": null,
+    "date": "05 Feb 2026",
+    "valid_until": null,
+    "marked_as_sample": true,
+    "source": {
+     "file": "KP_Box_Test_Report_SAMPLE.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": null,
+     "snippet": "SAMPLE DOCUMENT FOR A PRODUCT DEMO. NOT A REAL CERTIFICATE.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"SAMPLE DOCUMENT FOR A PRODUCT DEMO. NOT A REAL CERTIFICATE.\"."
+    }
+   }
+  ],
+  "revision": {
+   "is_revision": false,
+   "supersedes": null,
+   "changes_claimed": null,
+   "source": null
+  },
+  "readingNotes": [
+   "All prices quoted by Kaveri Paper Products are ex-works Talegaon.",
+   "Kaveri states that all rates are given per 100 pieces (per_100).",
+   "Transportation to the Chakan plant is offered through their regular transporter at Rs. 0.40 per box, plus a 15% handling charge billed separately."
+  ],
+  "coverage": {
+   "quoted": [
+    "L01",
+    "L02",
+    "L03",
+    "L04",
+    "L05",
+    "L06",
+    "L07",
+    "L08",
+    "L09",
+    "L10",
+    "L11",
+    "L12",
+    "L13",
+    "L14",
+    "L15",
+    "L16",
+    "L17",
+    "L18",
+    "L19",
+    "L20",
+    "L21",
+    "L22",
+    "L23",
+    "L24",
+    "L25",
+    "L26",
+    "L27",
+    "L28",
+    "L29",
+    "L30"
+   ],
+   "missing": [],
+   "total": 30
+  },
+  "unsourced": 0,
+  "usage": [],
+  "cached": true,
+  "ms": 13,
+  "readAt": "2026-10-09T12:19:30.231Z",
+  "models": [
+   "gemini-3.5-flash-lite",
+   "gemini-3.5-flash"
+  ]
+ }
+}

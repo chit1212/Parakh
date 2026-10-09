@@ -1,0 +1,339 @@
+{
+ "replyId": "5_rohit_email",
+ "readAt": "2026-10-09T12:19:50.982Z",
+ "models": [
+  "gemini-3.5-flash-lite",
+  "gemini-3.5-flash"
+ ],
+ "files": "53c0d650465db04258a52d50",
+ "reading": {
+  "replyId": "5_rohit_email",
+  "vendorId": "RB",
+  "vendorName": "Rohit Box Industries",
+  "status": "read",
+  "headline": "30 of 30 lines quoted.",
+  "nextStep": {
+   "kind": "none",
+   "text": ""
+  },
+  "classification": {
+   "category": "quote",
+   "vendor_name": "Rohit Box Industries",
+   "reason": "The email contains the initial pricing per kg for the corrugated boxes requested in the RFQ.",
+   "files": [],
+   "looks_incomplete": false,
+   "incomplete_evidence": null,
+   "promised_followup": "Will send formal letter on Monday if required."
+  },
+  "prices": [],
+  "rateRules": [
+   {
+    "vendor_wording": "₹42/kg for the 5-ply",
+    "component": "board_per_kg",
+    "applies_to_ply": 5,
+    "value": 42,
+    "value_text": "42",
+    "currency": "INR",
+    "unit_text": "₹42/kg",
+    "from_earlier_record": false,
+    "pointer": null,
+    "source": {
+     "file": "Re_RFQ_SE-2026-041.eml",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": null,
+     "snippet": "₹42/kg for the 5-ply",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Found in the email."
+    }
+   },
+   {
+    "vendor_wording": "38 for the 3-ply",
+    "component": "board_per_kg",
+    "applies_to_ply": 3,
+    "value": 38,
+    "value_text": "38",
+    "currency": "INR",
+    "unit_text": "per kg",
+    "from_earlier_record": false,
+    "pointer": null,
+    "source": {
+     "file": "Re_RFQ_SE-2026-041.eml",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": null,
+     "snippet": "38 for the 3-ply",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Found in the email."
+    }
+   },
+   {
+    "vendor_wording": "7-ply, per kg of box weight",
+    "component": "board_per_kg",
+    "applies_to_ply": 7,
+    "value": 44,
+    "value_text": "44",
+    "currency": "INR",
+    "unit_text": "per kg of box weight",
+    "from_earlier_record": true,
+    "pointer": "rest same as last year",
+    "source": {
+     "file": "SE-2025-037_Award_Summary.xlsx",
+     "sheet": "Rohit Box quote FY26 H2",
+     "cell": "B5",
+     "page": null,
+     "table": null,
+     "row": "Row 5",
+     "snippet": "Row 5: [A5] 7-ply, per kg of box weight | [B5] 44",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Rohit Box quote FY26 H2!B5 holds 44."
+    }
+   },
+   {
+    "vendor_wording": "Printing, per colour per box",
+    "component": "printing_per_colour",
+    "applies_to_ply": null,
+    "value": 0.2,
+    "value_text": "0.2",
+    "currency": "INR",
+    "unit_text": "per colour per box",
+    "from_earlier_record": true,
+    "pointer": "rest same as last year",
+    "source": {
+     "file": "SE-2025-037_Award_Summary.xlsx",
+     "sheet": "Rohit Box quote FY26 H2",
+     "cell": "B6",
+     "page": null,
+     "table": null,
+     "row": "Row 6",
+     "snippet": "Row 6: [A6] Printing, per colour per box | [B6] 0.2",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Rohit Box quote FY26 H2!B6 holds 0.2."
+    }
+   },
+   {
+    "vendor_wording": "Die-cutting, per piece",
+    "component": "die_cutting_per_piece",
+    "applies_to_ply": null,
+    "value": 0.15,
+    "value_text": "0.15",
+    "currency": "INR",
+    "unit_text": "per piece",
+    "from_earlier_record": true,
+    "pointer": "rest same as last year",
+    "source": {
+     "file": "SE-2025-037_Award_Summary.xlsx",
+     "sheet": "Rohit Box quote FY26 H2",
+     "cell": "B7",
+     "page": null,
+     "table": null,
+     "row": "Row 7",
+     "snippet": "Row 7: [A7] Die-cutting, per piece | [B7] 0.15",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Rohit Box quote FY26 H2!B7 holds 0.15."
+    }
+   }
+  ],
+  "notQuoted": [],
+  "terms": [
+   {
+    "kind": "freight",
+    "summary": "Freight is extra and not included in the price.",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all items",
+    "amount_stated": false,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Re_RFQ_SE-2026-041.eml",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": null,
+     "snippet": "freight extra.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Found in the email."
+    }
+   },
+   {
+    "kind": "other",
+    "summary": "Price is 42 INR per kg for 5-ply boxes.",
+    "value": 42,
+    "value_unit": "other",
+    "applies_to": "5-ply",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Re_RFQ_SE-2026-041.eml",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": null,
+     "snippet": "₹42/kg for the 5-ply",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Found in the email."
+    }
+   },
+   {
+    "kind": "other",
+    "summary": "Price is 38 INR per kg for 3-ply boxes.",
+    "value": 38,
+    "value_unit": "other",
+    "applies_to": "3-ply",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Re_RFQ_SE-2026-041.eml",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": null,
+     "snippet": "38 for the 3-ply",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Found in the email."
+    }
+   },
+   {
+    "kind": "currency",
+    "summary": "Pricing is in Indian Rupees (INR).",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Re_RFQ_SE-2026-041.eml",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": null,
+     "snippet": "₹42/kg for the 5-ply",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Found in the email."
+    }
+   },
+   {
+    "kind": "other",
+    "summary": "All other terms remain identical to last year.",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all other terms",
+    "amount_stated": false,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Re_RFQ_SE-2026-041.eml",
+     "sheet": null,
+     "cell": null,
+     "page": null,
+     "table": null,
+     "row": null,
+     "snippet": "rest same as last year",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Found in the email."
+    }
+   }
+  ],
+  "questionnaire": [],
+  "qualityDocs": [],
+  "revision": {
+   "is_revision": false,
+   "supersedes": null,
+   "changes_claimed": null,
+   "source": null
+  },
+  "readingNotes": [
+   "The vendor does not quote individual per-line prices, but provides component-based rate rules (per kg of box weight, printing per colour, and die-cutting per piece).",
+   "All RFQ lines (L01 to L30) are covered through these rate rules since they specify rates for 3-ply, 5-ply, and 7-ply boards.",
+   "The 3-ply rate is revised from last year's 36 to 38, and the 5-ply rate is revised from 40 to 42. Other rates are carried over from the FY26 H2 record because of the vendor's phrase 'rest same as last year'.",
+   "The email states 'freight extra', which likely overrides the previous freight rate of Rs 0.30 per box mentioned in the buyer's record."
+  ],
+  "coverage": {
+   "quoted": [
+    "L01",
+    "L02",
+    "L03",
+    "L04",
+    "L05",
+    "L06",
+    "L07",
+    "L08",
+    "L09",
+    "L10",
+    "L11",
+    "L12",
+    "L13",
+    "L14",
+    "L15",
+    "L16",
+    "L17",
+    "L18",
+    "L19",
+    "L20",
+    "L21",
+    "L22",
+    "L23",
+    "L24",
+    "L25",
+    "L26",
+    "L27",
+    "L28",
+    "L29",
+    "L30"
+   ],
+   "missing": [],
+   "total": 30
+  },
+  "unsourced": 0,
+  "usage": [],
+  "cached": true,
+  "ms": 6,
+  "readAt": "2026-10-09T12:19:50.982Z",
+  "models": [
+   "gemini-3.5-flash-lite",
+   "gemini-3.5-flash"
+  ]
+ }
+}

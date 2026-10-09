@@ -1,0 +1,80 @@
+{
+ "replyId": "F2_not_a_quote",
+ "readAt": "2026-10-09T12:14:36.568Z",
+ "models": [
+  "gemini-3.5-flash-lite"
+ ],
+ "files": "8e6c469550518f82a94b0abf",
+ "reading": {
+  "replyId": "F2_not_a_quote",
+  "vendorId": null,
+  "vendorName": "Mehta Packaging",
+  "status": "pending",
+  "headline": "The sender acknowledges the RFQ but states that their costing team is on leave and they will send rates by next Monday.",
+  "nextStep": {
+   "kind": "wait",
+   "text": "Waiting: will send rates by next Monday"
+  },
+  "classification": {
+   "category": "not_a_quote_yet",
+   "vendor_name": "Mehta Packaging",
+   "reason": "The sender acknowledges the RFQ but states that their costing team is on leave and they will send rates by next Monday.",
+   "files": [],
+   "looks_incomplete": false,
+   "incomplete_evidence": null,
+   "promised_followup": "will send rates by next Monday"
+  },
+  "prices": [],
+  "rateRules": [],
+  "notQuoted": [],
+  "terms": [],
+  "questionnaire": [],
+  "qualityDocs": [],
+  "revision": null,
+  "readingNotes": [],
+  "coverage": {
+   "quoted": [],
+   "missing": [
+    "L01",
+    "L02",
+    "L03",
+    "L04",
+    "L05",
+    "L06",
+    "L07",
+    "L08",
+    "L09",
+    "L10",
+    "L11",
+    "L12",
+    "L13",
+    "L14",
+    "L15",
+    "L16",
+    "L17",
+    "L18",
+    "L19",
+    "L20",
+    "L21",
+    "L22",
+    "L23",
+    "L24",
+    "L25",
+    "L26",
+    "L27",
+    "L28",
+    "L29",
+    "L30"
+   ],
+   "total": 30
+  },
+  "unsourced": 0,
+  "usage": [],
+  "cached": true,
+  "ms": 1,
+  "readAt": "2026-10-09T12:14:36.568Z",
+  "models": [
+   "gemini-3.5-flash-lite"
+  ]
+ }
+}

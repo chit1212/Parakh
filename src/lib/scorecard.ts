@@ -2,6 +2,8 @@
 // TEST-ONLY: nothing that produces results may import this file (pinned in test/isolation.test.ts).
 import fs from "node:fs/promises";
 import { datasetPath } from "./rfq";
+import type { Sheet } from "./files/xlsx";
+import { normalise } from "./normalise";
 import type { ReplyReading } from "./reader/pipeline";
 import type { SourcingEvent } from "./types";
 
@@ -9,6 +11,9 @@ interface KeyCell {
   as_written: string;
   source: string;
   normalised: number | null;
+  calc?: string | null;
+  with_conditional_discount?: number;
+  with_ly_freight?: number;
 }
 
 interface Key {
@@ -101,8 +106,12 @@ export interface Scorecard {
 
 const unitOf = (u: string) => (u === "per_piece" ? "per_box" : u);
 
-export function grade(ev: SourcingEvent, key: Key, readings: ReplyReading[]): Scorecard {
+export function grade(ev: SourcingEvent, key: Key, readings: ReplyReading[], history: { sheets: Sheet[] }): Scorecard {
   const byReply = new Map(readings.map((r) => [r.replyId, r]));
+  // Milestone 2: the code's conversion of what was read, graded to the paisa.
+  const basis = normalise(ev, readings, history);
+  const norm = (vid: string, lid: string) => basis.find((b) => b.vendorId === vid)?.cells.find((c) => c.lineId === lid);
+  const near = (a: number | null | undefined, b: number | null | undefined) => a != null && b != null && Math.abs(a - b) < 0.0051;
   const tally = new Map<string, FieldScore>();
   const vendorTally = new Map<string, { right: number; total: number }>();
   const mark = (field: string, vendor: string, ok: boolean) => {
@@ -166,7 +175,17 @@ export function grade(ev: SourcingEvent, key: Key, readings: ReplyReading[]): Sc
         if (p.verification.status !== "photo") check("source checked", p.verification.status === "verified");
       }
     }
-    cells.push({ vendor: vid, line: lid, expected: c.as_written, got, ok: misses.length === 0, misses });
+    if (r && r.status !== "error") {
+      const n = norm(vid, lid);
+      if (e.notQuoted) check("converted value", !n || n.status === "not_quoted");
+      else {
+        check("converted value", near(n?.perBox, c.normalised));
+        got += ` → ${n?.perBox ?? n?.status ?? "none"}${n?.calc ? ` (${n.calc})` : ""}`;
+        if (c.with_conditional_discount !== undefined) check("discount kept apart", near(n?.variants.conditionalDiscount?.value, c.with_conditional_discount));
+        if (c.with_ly_freight !== undefined) check("last-year freight", near(n?.variants.lastYearFreight?.value, c.with_ly_freight));
+      }
+    }
+    cells.push({ vendor: vid, line: lid, expected: `${c.as_written}${c.normalised != null ? ` → ${c.normalised} (${c.calc})` : ""}`, got, ok: misses.length === 0, misses });
   }
 
   // Planted edges the reader must notice (from dataset/README.md).
@@ -236,7 +255,6 @@ export function grade(ev: SourcingEvent, key: Key, readings: ReplyReading[]): Sc
     edges,
     failures,
     notYet: [
-      "Normalised values (per box, INR, delivered): milestone 2",
       "Which expected doubts are escalated vs only logged: milestone 4",
     ],
     modelCalls: readings.flatMap((r) => r.usage).length,

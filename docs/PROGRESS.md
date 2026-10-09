@@ -16,7 +16,14 @@ Built:
 - AI provider switched to the Google Gemini API free tier (`@google/genai`): `gemini-3.8-flash` reads, `gemini-3.5-flash-lite` sorts (`src/lib/config.ts`, with fallbacks). JSON-schema structured output, checked again with zod. Busy/rate-limited calls retry with backoff, then fall back, then show a calm message (`src/lib/reader/call.ts`).
 - Saved readings (`data/readings/`, committed, `src/lib/saved.ts`): `npm run scorecard -- --save` writes one file per reply, stamped with date and model and fingerprinted against the reply's files. The demo opens with them ("read on <date> by <model>") and each reply has "Read again live".
 
-Next: first real run (`npm run scorecard -- --only=5_rohit_email`, then a full run), tune prompts against the misses, then `npm run scorecard -- --save` and commit `data/readings/`. The free tier may allow only ~20 Flash calls a day; a full run is ~20-25 calls.
+- First real runs on Gemini (9 Oct 2026): reading 944 of 945 fields right; every source checked; all 4 failure files handled; 21 of 22 planted edges. Saved to `data/readings/` (10 files). The demo opens with them; no model calls on load.
+- Known miss: Anand L19 (hand-corrected 31.20 whose 1 looks like a 7) is read as 37.20, flagged corrected_by_hand, without the other reading. The Replies screen already shows it as "needs a look"; milestone 4 must treat any hand-corrected number as a doubt even when the reader lists no alternatives.
+- Gemini 3.8 Flash answered "high demand" (503) throughout; the readings were made by the fallbacks (3.5 Flash; 3.5 Flash-Lite for sorting). Each reading names its models.
+
+## Milestone 2: Normalising (started)
+- `src/lib/normalise.ts`: code puts every price on INR per box, delivered: per 100 / per kg (weight from the RFQ spec) / USD at the reference rate / freight and handling from the checked terms; conditional discount and "if freight is as last year" kept as separate values; never guesses (unclear unit or currency leaves the cell unpriced with the reason); a revision supersedes the earlier offer and says what changed.
+- Graded by the scorecard: 149 of 150 converted values match the answer key to the paisa (the miss is L19 above); discount 30/30; last-year freight 30/30. `test/normalise.test.ts` pins the arithmetic without the model.
+- Not yet on screen (next: the Comparison screen, then L15 click-to-source).
 
 ## Decisions (technical)
 - "Strict schema" is Gemini's `responseJsonSchema`, generated from the zod schemas, and the answer is validated again in code.

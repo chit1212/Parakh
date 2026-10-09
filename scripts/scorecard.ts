@@ -12,7 +12,7 @@ loadEnv();
 import { hasApiKey } from "@/lib/ai";
 import { loadDemoInbox } from "@/lib/inbox";
 import { readReply, type ReplyReading } from "@/lib/reader/pipeline";
-import { loadEvent } from "@/lib/rfq";
+import { loadEvent, loadHistory } from "@/lib/rfq";
 import { saveReadings } from "@/lib/saved";
 import { readStamp } from "@/lib/format";
 import { grade, loadKey } from "@/lib/scorecard";
@@ -56,7 +56,7 @@ async function main() {
     return;
   }
 
-  const sc = grade(ev, await loadKey(), readings);
+  const sc = grade(ev, await loadKey(), readings, await loadHistory());
   fs.writeFileSync(path.join(out, "scorecard-latest.json"), JSON.stringify(sc, null, 1));
 
   console.log("\nField-level accuracy (150 cells: 5 vendors x 30 lines)");

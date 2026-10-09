@@ -1,0 +1,1253 @@
+{
+ "replyId": "6_revised_quote",
+ "readAt": "2026-10-09T12:20:54.264Z",
+ "models": [
+  "gemini-3.5-flash-lite",
+  "gemini-3.5-flash"
+ ],
+ "files": "649997f5dcfcdf8280ff8165",
+ "reading": {
+  "replyId": "6_revised_quote",
+  "vendorId": "SB",
+  "vendorName": "Shree Balaji Corrugators",
+  "status": "read",
+  "headline": "30 of 30 lines quoted.",
+  "nextStep": {
+   "kind": "none",
+   "text": ""
+  },
+  "classification": {
+   "category": "revised_quote",
+   "vendor_name": "Shree Balaji Corrugators",
+   "reason": "The vendor submitted a revised offer superseding their previous quote following a discussion.",
+   "files": [
+    {
+     "name": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "role": "quote"
+    }
+   ],
+   "looks_incomplete": false,
+   "incomplete_evidence": null,
+   "promised_followup": null
+  },
+  "prices": [
+   {
+    "vendor_wording": "STEAM IRON BOX",
+    "line_id": "L01",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (280x140x150 ID), ply (3 ply E), and print (4 clr).",
+    "raw_value_text": "4.65",
+    "raw_value": 4.65,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "3 ply E, 4 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G8",
+     "page": null,
+     "table": null,
+     "row": "1",
+     "snippet": "1 | CB-3017 | STEAM IRON BOX | 280 x 140 x 150 ID | 3 ply E | 4 clr | 4.65 | 156000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G8 holds 4.65."
+    }
+   },
+   {
+    "vendor_wording": "DRY IRON BOX",
+    "line_id": "L03",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (260x130x140 ID), ply (3 ply B), and print (2 clr).",
+    "raw_value_text": "3.67",
+    "raw_value": 3.67,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "3 ply B, 2 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G9",
+     "page": null,
+     "table": null,
+     "row": "2",
+     "snippet": "2 | CB-3034 | DRY IRON BOX | 260 x 130 x 140 ID | 3 ply B | 2 clr | 3.67 | 104000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G9 holds 3.67."
+    }
+   },
+   {
+    "vendor_wording": "HAND BLENDER BOX",
+    "line_id": "L08",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (300x110x90 ID), ply (3 ply E), and print (4 clr).",
+    "raw_value_text": "3.17",
+    "raw_value": 3.17,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "3 ply E, 4 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G10",
+     "page": null,
+     "table": null,
+     "row": "3",
+     "snippet": "3 | CB-3081 | HAND BLENDER BOX | 300 x 110 x 90 ID | 3 ply E | 4 clr | 3.17 | 65000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G10 holds 3.17."
+    }
+   },
+   {
+    "vendor_wording": "ELECTRIC KETTLE 1.5L BOX",
+    "line_id": "L09",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (230x200x250 ID), ply (3 ply B), and print (4 clr).",
+    "raw_value_text": "7.64",
+    "raw_value": 7.64,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "3 ply B, 4 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G11",
+     "page": null,
+     "table": null,
+     "row": "4",
+     "snippet": "4 | CB-3098 | ELECTRIC KETTLE 1.5L BOX | 230 x 200 x 250 ID | 3 ply B | 4 clr | 7.64 | 78000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G11 holds 7.64."
+    }
+   },
+   {
+    "vendor_wording": "SANDWICH MAKER BOX",
+    "line_id": "L24",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (290x250x120 ID), ply (3 ply B), and print (4 clr).",
+    "raw_value_text": "7.67",
+    "raw_value": 7.67,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "3 ply B, 4 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G12",
+     "page": null,
+     "table": null,
+     "row": "5",
+     "snippet": "5 | CB-3245 | SANDWICH MAKER BOX | 290 x 250 x 120 ID | 3 ply B | 4 clr | 7.67 | 47000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G12 holds 7.67."
+    }
+   },
+   {
+    "vendor_wording": "VEGETABLE CHOPPER BOX",
+    "line_id": "L25",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (180x160x220 ID), ply (3 ply E), and print (4 clr).",
+    "raw_value_text": "5.19",
+    "raw_value": 5.19,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "3 ply E, 4 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G13",
+     "page": null,
+     "table": null,
+     "row": "6",
+     "snippet": "6 | CB-3252 | VEGETABLE CHOPPER BOX | 180 x 160 x 220 ID | 3 ply E | 4 clr | 5.19 | 52000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G13 holds 5.19."
+    }
+   },
+   {
+    "vendor_wording": "PARTITION SET, 6-CELL, FOR KETTLE MASTER",
+    "line_id": "L26",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size/area (0.62 m2), ply (3 ply B), and print (plain).",
+    "raw_value_text": "10.06",
+    "raw_value": 10.06,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "3 ply B, plain",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G14",
+     "page": null,
+     "table": null,
+     "row": "7",
+     "snippet": "7 | CB-3269 | PARTITION SET, 6-CELL, FOR KETTLE MASTER | 0.62 m2 board area | 3 ply B | plain | 10.06 | 13000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G14 holds 10.06."
+    }
+   },
+   {
+    "vendor_wording": "MIXER GRINDER, DIE-CUT JAR INSERT",
+    "line_id": "L30",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size/area (0.21 m2), ply (3 ply B), and print (plain).",
+    "raw_value_text": "3.48",
+    "raw_value": 3.48,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "3 ply B, plain",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G15",
+     "page": null,
+     "table": null,
+     "row": "8",
+     "snippet": "8 | CB-3306 | MIXER GRINDER, DIE-CUT JAR INSERT | 0.21 m2 board area | 3 ply B | plain | 3.48 | 91000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G15 holds 3.48."
+    }
+   },
+   {
+    "vendor_wording": "STEAM IRON, MASTER CTN (6 UNITS)",
+    "line_id": "L02",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (450x300x440 ID), ply (5 ply BC), and print (1 clr).",
+    "raw_value_text": "38.57",
+    "raw_value": 38.57,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 1 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G17",
+     "page": null,
+     "table": null,
+     "row": "9",
+     "snippet": "9 | CB-5023 | STEAM IRON, MASTER CTN (6 UNITS) | 450 x 300 x 440 ID | 5 ply BC | 1 clr | 38.57 | 26000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G17 holds 38.57."
+    }
+   },
+   {
+    "vendor_wording": "DRY IRON, MASTER CTN (8 UNITS)",
+    "line_id": "L04",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (540x270x300 ID), ply (5 ply BC), and print (1 clr).",
+    "raw_value_text": "34.03",
+    "raw_value": 34.03,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 1 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G18",
+     "page": null,
+     "table": null,
+     "row": "10",
+     "snippet": "10 | CB-5040 | DRY IRON, MASTER CTN (8 UNITS) | 540 x 270 x 300 ID | 5 ply BC | 1 clr | 34.03 | 13000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G18 holds 34.03."
+    }
+   },
+   {
+    "vendor_wording": "MIXER GRINDER 750W BOX",
+    "line_id": "L05",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (380x300x420 ID), ply (5-ply BC), and print (4-colour).",
+    "raw_value_text": "35.03",
+    "raw_value": 35.03,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 4 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G19",
+     "page": null,
+     "table": null,
+     "row": "11",
+     "snippet": "11 | CB-5057 | MIXER GRINDER 750W BOX | 380 x 300 x 420 ID | 5 ply BC | 4 clr | 35.03 | 91000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G19 holds 35.03."
+    }
+   },
+   {
+    "vendor_wording": "MIXER GRINDER, MASTER CTN (2 UNITS)",
+    "line_id": "L06",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (610x390x430 ID), ply (5 ply BC), and print (1 clr).",
+    "raw_value_text": "59.18",
+    "raw_value": 59.18,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 1 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G20",
+     "page": null,
+     "table": null,
+     "row": "12",
+     "snippet": "12 | CB-5064 | MIXER GRINDER, MASTER CTN (2 UNITS) | 610 x 390 x 430 ID | 5 ply BC | 1 clr | 59.18 | 45500",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G20 holds 59.18."
+    }
+   },
+   {
+    "vendor_wording": "JUICER MIXER BOX",
+    "line_id": "L07",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (420x320x450 ID), ply (5 ply BC), and print (4 clr).",
+    "raw_value_text": "42.05",
+    "raw_value": 42.05,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 4 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G21",
+     "page": null,
+     "table": null,
+     "row": "13",
+     "snippet": "13 | CB-5071 | JUICER MIXER BOX | 420 x 320 x 450 ID | 5 ply BC | 4 clr | 42.05 | 31000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G21 holds 42.05."
+    }
+   },
+   {
+    "vendor_wording": "ELECTRIC KETTLE, MASTER CTN (6 UNITS)",
+    "line_id": "L10",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (700x420x265 ID), ply (5 ply BC), and print (1 clr).",
+    "raw_value_text": "54.7",
+    "raw_value": 54.7,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 1 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G22",
+     "page": null,
+     "table": null,
+     "row": "14",
+     "snippet": "14 | CB-5108 | ELECTRIC KETTLE, MASTER CTN (6 UNITS) | 700 x 420 x 265 ID | 5 ply BC | 1 clr | 54.7 | 13000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G22 holds 54.7."
+    }
+   },
+   {
+    "vendor_wording": "POP-UP TOASTER BOX",
+    "line_id": "L11",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (330x220x230 ID), ply (5 ply BC), and print (2 clr).",
+    "raw_value_text": "17.61",
+    "raw_value": 17.61,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 2 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G23",
+     "page": null,
+     "table": null,
+     "row": "15",
+     "snippet": "15 | CB-5115 | POP-UP TOASTER BOX | 330 x 220 x 230 ID | 5 ply BC | 2 clr | 17.61 | 39000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G23 holds 17.61."
+    }
+   },
+   {
+    "vendor_wording": "INDUCTION COOKTOP BOX",
+    "line_id": "L12",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (380x320x120 ID), ply (5 ply BC), and print (2 clr).",
+    "raw_value_text": "22.48",
+    "raw_value": 22.48,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 2 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G24",
+     "page": null,
+     "table": null,
+     "row": "16",
+     "snippet": "16 | CB-5122 | INDUCTION COOKTOP BOX | 380 x 320 x 120 ID | 5 ply BC | 2 clr | 22.48 | 52000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G24 holds 22.48."
+    }
+   },
+   {
+    "vendor_wording": "TABLE FAN 400MM BOX",
+    "line_id": "L13",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (480x200x480 ID), ply (5 ply BC), and print (2 clr).",
+    "raw_value_text": "34.37",
+    "raw_value": 34.37,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 2 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G25",
+     "page": null,
+     "table": null,
+     "row": "17",
+     "snippet": "17 | CB-5139 | TABLE FAN 400MM BOX | 480 x 200 x 480 ID | 5 ply BC | 2 clr | 34.37 | 47000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G25 holds 34.37."
+    }
+   },
+   {
+    "vendor_wording": "EXHAUST FAN 250MM BOX",
+    "line_id": "L14",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (330x170x330 ID), ply (5 ply BC), and print (1 clr).",
+    "raw_value_text": "17.79",
+    "raw_value": 17.79,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 1 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G26",
+     "page": null,
+     "table": null,
+     "row": "18",
+     "snippet": "18 | CB-5146 | EXHAUST FAN 250MM BOX | 330 x 170 x 330 ID | 5 ply BC | 1 clr | 17.79 | 57000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G26 holds 17.79."
+    }
+   },
+   {
+    "vendor_wording": "PEDESTAL FAN BOX",
+    "line_id": "L15",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (720x210x480 ID), ply (5 ply BC), and print (2 clr).",
+    "raw_value_text": "44.55",
+    "raw_value": 44.55,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 2 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G27",
+     "page": null,
+     "table": null,
+     "row": "19",
+     "snippet": "19 | CB-5153 | PEDESTAL FAN BOX | 720 x 210 x 480 ID | 5 ply BC | 2 clr | 44.55 | 36500",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G27 holds 44.55."
+    }
+   },
+   {
+    "vendor_wording": "WALL FAN BOX",
+    "line_id": "L16",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (470x200x470 ID), ply (5 ply BC), and print (2 clr).",
+    "raw_value_text": "31.34",
+    "raw_value": 31.34,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 2 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G28",
+     "page": null,
+     "table": null,
+     "row": "20",
+     "snippet": "20 | CB-5160 | WALL FAN BOX | 470 x 200 x 470 ID | 5 ply BC | 2 clr | 31.34 | 41500",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G28 holds 31.34."
+    }
+   },
+   {
+    "vendor_wording": "CEILING FAN 1200MM BOX",
+    "line_id": "L17",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (520x320x210 ID), ply (5 ply BC), and print (1 clr).",
+    "raw_value_text": "32.23",
+    "raw_value": 32.23,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 1 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G29",
+     "page": null,
+     "table": null,
+     "row": "21",
+     "snippet": "21 | CB-5177 | CEILING FAN 1200MM BOX | 520 x 320 x 210 ID | 5 ply BC | 1 clr | 32.23 | 117000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G29 holds 32.23."
+    }
+   },
+   {
+    "vendor_wording": "ROOM HEATER 2000W BOX",
+    "line_id": "L19",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (420x180x510 ID), ply (5 ply BC), and print (2 clr).",
+    "raw_value_text": "30.36",
+    "raw_value": 30.36,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 2 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G30",
+     "page": null,
+     "table": null,
+     "row": "22",
+     "snippet": "22 | CB-5194 | ROOM HEATER 2000W BOX | 420 x 180 x 510 ID | 5 ply BC | 2 clr | 30.36 | 23500",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G30 holds 30.36."
+    }
+   },
+   {
+    "vendor_wording": "WATER HEATER 15L BOX",
+    "line_id": "L20",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (400x400x480 ID), ply (5 ply BC), and print (2 clr).",
+    "raw_value_text": "51.18",
+    "raw_value": 51.18,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 2 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G31",
+     "page": null,
+     "table": null,
+     "row": "23",
+     "snippet": "23 | CB-5201 | WATER HEATER 15L BOX | 400 x 400 x 480 ID | 5 ply BC | 2 clr | 51.18 | 28500",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G31 holds 51.18."
+    }
+   },
+   {
+    "vendor_wording": "RICE COOKER 1.8L BOX",
+    "line_id": "L23",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (330x300x300 ID), ply (5-ply BC), and print (4-colour).",
+    "raw_value_text": "26.73",
+    "raw_value": 26.73,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 4 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G32",
+     "page": null,
+     "table": null,
+     "row": "24",
+     "snippet": "24 | CB-5238 | RICE COOKER 1.8L BOX | 330 x 300 x 300 ID | 5 ply BC | 4 clr | 26.73 | 26000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G32 holds 26.73."
+    }
+   },
+   {
+    "vendor_wording": "LAYER PAD 1000 X 1200 MM, FOR PALLETS",
+    "line_id": "L27",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size/area (1.20 m2), ply (5 ply BC), and print (plain).",
+    "raw_value_text": "42.21",
+    "raw_value": 42.21,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, plain",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G33",
+     "page": null,
+     "table": null,
+     "row": "25",
+     "snippet": "25 | CB-5275 | LAYER PAD 1000 X 1200 MM, FOR PALLETS | 1.20 m2 board area | 5 ply BC | plain | 42.21 | 21000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G33 holds 42.21."
+    }
+   },
+   {
+    "vendor_wording": "AIR FRYER 4L BOX (NEW SKU)",
+    "line_id": "L28",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (360x340x380 ID), ply (5 ply BC), and print (4 clr).",
+    "raw_value_text": "37.86",
+    "raw_value": 37.86,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 4 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G34",
+     "page": null,
+     "table": null,
+     "row": "26",
+     "snippet": "26 | CB-5282 | AIR FRYER 4L BOX (NEW SKU) | 360 x 340 x 380 ID | 5 ply BC | 4 clr | 37.86 | 39000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G34 holds 37.86."
+    }
+   },
+   {
+    "vendor_wording": "AIR FRYER, MASTER CTN (2 UNITS) (NEW SKU)",
+    "line_id": "L29",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (740x370x400 ID), ply (5 ply BC), and print (1 clr).",
+    "raw_value_text": "58.5",
+    "raw_value": 58.5,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "5 ply BC, 1 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G35",
+     "page": null,
+     "table": null,
+     "row": "27",
+     "snippet": "27 | CB-5299 | AIR FRYER, MASTER CTN (2 UNITS) (NEW SKU) | 740 x 370 x 400 ID | 5 ply BC | 1 clr | 58.5 | 19500",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G35 holds 58.5."
+    }
+   },
+   {
+    "vendor_wording": "CEILING FAN, MASTER CTN (2 UNITS)",
+    "line_id": "L18",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (660x530x330 ID), ply (7 ply BCB), and print (1 clr).",
+    "raw_value_text": "117.08",
+    "raw_value": 117.08,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "7 ply BCB, 1 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G37",
+     "page": null,
+     "table": null,
+     "row": "28",
+     "snippet": "28 | CB-7186 | CEILING FAN, MASTER CTN (2 UNITS) | 660 x 530 x 330 ID | 7 ply BCB | 1 clr | 117.08 | 58500",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G37 holds 117.08."
+    }
+   },
+   {
+    "vendor_wording": "WATER HEATER 25L BOX",
+    "line_id": "L21",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (460x460x560 ID), ply (7 ply BCB), and print (2 clr).",
+    "raw_value_text": "107.28",
+    "raw_value": 107.28,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "7 ply BCB, 2 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G38",
+     "page": null,
+     "table": null,
+     "row": "29",
+     "snippet": "29 | CB-7213 | WATER HEATER 25L BOX | 460 x 460 x 560 ID | 7 ply BCB | 2 clr | 107.28 | 21000",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G38 holds 107.28."
+    }
+   },
+   {
+    "vendor_wording": "AIR COOLER 40L BOX",
+    "line_id": "L22",
+    "match_basis": "name_and_spec",
+    "match_reason": "Matches by name, size (540x420x1100 ID), ply (7 ply BCB), and print (1 clr).",
+    "raw_value_text": "177.22",
+    "raw_value": 177.22,
+    "unit": "per_piece",
+    "unit_text": "Rs/pc ex-works",
+    "currency": "INR",
+    "price_basis": "ex_works",
+    "offered_spec": "7 ply BCB, 1 clr",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G39",
+     "page": null,
+     "table": null,
+     "row": "30",
+     "snippet": "30 | CB-7220 | AIR COOLER 40L BOX | 540 x 420 x 1100 ID | 7 ply BCB | 1 clr | 177.22 | 10500",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G39 holds 177.22."
+    }
+   }
+  ],
+  "rateRules": [],
+  "notQuoted": [],
+  "terms": [
+   {
+    "kind": "price_basis",
+    "summary": "Prices are ex-works Bhosari, Pune.",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "T&C",
+     "cell": "B2",
+     "page": null,
+     "table": null,
+     "row": "A2",
+     "snippet": "Ex-works Bhosari, Pune",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "T&C!B2 reads \"Ex-works Bhosari, Pune\"."
+    }
+   },
+   {
+    "kind": "freight",
+    "summary": "Freight is Rs 0.35 per box to Chakan, billed in the invoice.",
+    "value": 0.35,
+    "value_unit": "inr_per_box",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "T&C",
+     "cell": "B3",
+     "page": null,
+     "table": null,
+     "row": "A3",
+     "snippet": "Rs 0.35 per box to Chakan, billed in invoice",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "T&C!B3 holds Rs 0.35 per box to Chakan, billed in invoice."
+    }
+   },
+   {
+    "kind": "gst",
+    "summary": "GST of 18% is extra.",
+    "value": 18,
+    "value_unit": "percent",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "T&C",
+     "cell": "B4",
+     "page": null,
+     "table": null,
+     "row": "A4",
+     "snippet": "18% extra",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "T&C!B4 holds 18% extra."
+    }
+   },
+   {
+    "kind": "payment",
+    "summary": "Payment terms are 45 days from invoice date.",
+    "value": 45,
+    "value_unit": "days",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "T&C",
+     "cell": "B5",
+     "page": null,
+     "table": null,
+     "row": "A5",
+     "snippet": "45 days from invoice",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "T&C!B5 holds 45 days from invoice."
+    }
+   },
+   {
+    "kind": "validity",
+    "summary": "Offer validity is 60 days.",
+    "value": 60,
+    "value_unit": "days",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "T&C",
+     "cell": "B6",
+     "page": null,
+     "table": null,
+     "row": "A6",
+     "snippet": "60 days (extended in R1)",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "T&C!B6 holds 60 days (extended in R1)."
+    }
+   },
+   {
+    "kind": "lead_time",
+    "summary": "Standard lead time is 10 days from PO.",
+    "value": 10,
+    "value_unit": "days",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "T&C",
+     "cell": "B7",
+     "page": null,
+     "table": null,
+     "row": "A7",
+     "snippet": "10 days from PO",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "T&C!B7 holds 10 days from PO."
+    }
+   },
+   {
+    "kind": "other",
+    "summary": "Quantity tolerance of +/- 5% per call-off.",
+    "value": 5,
+    "value_unit": "percent",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "T&C",
+     "cell": "B8",
+     "page": null,
+     "table": null,
+     "row": "A8",
+     "snippet": "Qty +/- 5% per call-off",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "T&C!B8 holds Qty +/- 5% per call-off."
+    }
+   },
+   {
+    "kind": "price_revision_clause",
+    "summary": "Rates are subject to revision if the price of kraft paper moves by more than 5%.",
+    "value": 5,
+    "value_unit": "percent",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": "kraft paper price moves more than 5% (base: Oct 2026)",
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "T&C",
+     "cell": "B9",
+     "page": null,
+     "table": null,
+     "row": "A9",
+     "snippet": "Rates subject to revision if kraft paper price moves more than 5% (base: Oct 2026)",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "T&C!B9 holds Rates subject to revision if kraft paper price moves more than 5% (base: Oct 2026)."
+    }
+   },
+   {
+    "kind": "currency",
+    "summary": "Rates are quoted in INR per piece.",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+     "sheet": "Offer",
+     "cell": "G6",
+     "page": null,
+     "table": null,
+     "row": "6",
+     "snippet": "Rate Rs/pc ex-works",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Offer!G6 reads \"Rate Rs/pc ex-works\"."
+    }
+   }
+  ],
+  "questionnaire": [],
+  "qualityDocs": [],
+  "revision": {
+   "is_revision": true,
+   "supersedes": "our offer 0418 dated 01-10-2026",
+   "changes_claimed": "Changes on our items CB-0107, CB-0211, CB-0324 after discussion. Rates reduced on three items and validity extended to 60 days.",
+   "source": {
+    "file": "SBC_Offer_0418-R1_REVISED.xlsx",
+    "sheet": "Offer",
+    "cell": "A4",
+    "page": null,
+    "table": null,
+    "row": "A4",
+    "snippet": "REVISED OFFER (R1) - supersedes our offer 0418 dated 01-10-2026. Changes on our items CB-0107, CB-0211, CB-0324 after discussion.",
+    "region": null
+   }
+  },
+  "readingNotes": [
+   "The quote is offered on an ex-works Bhosari, Pune basis.",
+   "A separate freight charge of Rs 0.35 per box to Chakan is mentioned in the T&C sheet (Row 3) and is to be billed in the invoice.",
+   "This is a revised offer (SBC/OFF/26-27/0418-R1) superseding offer 0418 dated 01-10-2026, featuring rate reductions on CB-0107, CB-0211, and CB-0324."
+  ],
+  "coverage": {
+   "quoted": [
+    "L01",
+    "L02",
+    "L03",
+    "L04",
+    "L05",
+    "L06",
+    "L07",
+    "L08",
+    "L09",
+    "L10",
+    "L11",
+    "L12",
+    "L13",
+    "L14",
+    "L15",
+    "L16",
+    "L17",
+    "L18",
+    "L19",
+    "L20",
+    "L21",
+    "L22",
+    "L23",
+    "L24",
+    "L25",
+    "L26",
+    "L27",
+    "L28",
+    "L29",
+    "L30"
+   ],
+   "missing": [],
+   "total": 30
+  },
+  "unsourced": 0,
+  "usage": [],
+  "cached": true,
+  "ms": 4,
+  "readAt": "2026-10-09T12:20:54.264Z",
+  "models": [
+   "gemini-3.5-flash-lite",
+   "gemini-3.5-flash"
+  ]
+ }
+}

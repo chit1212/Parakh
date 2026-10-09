@@ -1,0 +1,1491 @@
+{
+ "replyId": "2_vardhman_pdf",
+ "readAt": "2026-10-09T12:18:41.628Z",
+ "models": [
+  "gemini-3.5-flash-lite",
+  "gemini-3.5-flash"
+ ],
+ "files": "b71d01572404fc60ad507573",
+ "reading": {
+  "replyId": "2_vardhman_pdf",
+  "vendorId": "VP",
+  "vendorName": "Vardhman Packwell Exports",
+  "status": "read",
+  "headline": "30 of 30 lines quoted.",
+  "nextStep": {
+   "kind": "none",
+   "text": ""
+  },
+  "classification": {
+   "category": "quote",
+   "vendor_name": "Vardhman Packwell Exports",
+   "reason": "The email and attached quotation document provide pricing details and questionnaire replies for the requested RFQ.",
+   "files": [
+    {
+     "name": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "role": "quote"
+    },
+    {
+     "name": "VP_ISO9001_Certificate_SAMPLE.pdf",
+     "role": "certificate"
+    },
+    {
+     "name": "VP_Box_Test_Report_SAMPLE.pdf",
+     "role": "test_report"
+    }
+   ],
+   "looks_incomplete": false,
+   "incomplete_evidence": null,
+   "promised_followup": null
+  },
+  "prices": [
+   {
+    "vendor_wording": "Steam iron, unit carton",
+    "line_id": "L01",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.0551",
+    "raw_value": 0.0551,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "3-ply E, 4 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L01",
+     "snippet": "L01\tSteam iron, unit carton\t3-ply E, 4 col\t156,000\t0.0551",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L01\tSteam iron, unit carton\t3-ply E, 4 col\t156,000\t0.0551\"."
+    }
+   },
+   {
+    "vendor_wording": "Steam iron, master carton (6 units)",
+    "line_id": "L02",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.4668",
+    "raw_value": 0.4668,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 1 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L02",
+     "snippet": "L02\tSteam iron, master carton (6 units)\t5-ply BC, 1 col\t26,000\t0.4668",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L02\tSteam iron, master carton (6 units)\t5-ply BC, 1 col\t26,000\t0.4668\"."
+    }
+   },
+   {
+    "vendor_wording": "Dry iron, unit carton",
+    "line_id": "L03",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.0475",
+    "raw_value": 0.0475,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "3-ply B, 2 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L03",
+     "snippet": "L03\tDry iron, unit carton\t3-ply B, 2 col\t104,000\t0.0475",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L03\tDry iron, unit carton\t3-ply B, 2 col\t104,000\t0.0475\"."
+    }
+   },
+   {
+    "vendor_wording": "Dry iron, master carton (8 units)",
+    "line_id": "L04",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.3900",
+    "raw_value": 0.39,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 1 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L04",
+     "snippet": "L04\tDry iron, master carton (8 units)\t5-ply BC, 1 col\t13,000\t0.3900",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L04\tDry iron, master carton (8 units)\t5-ply BC, 1 col\t13,000\t0.3900\"."
+    }
+   },
+   {
+    "vendor_wording": "Mixer grinder 750W, unit carton",
+    "line_id": "L05",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.3941",
+    "raw_value": 0.3941,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 4 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L05",
+     "snippet": "L05\tMixer grinder 750W, unit carton\t5-ply BC, 4 col\t91,000\t0.3941",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L05\tMixer grinder 750W, unit carton\t5-ply BC, 4 col\t91,000\t0.3941\"."
+    }
+   },
+   {
+    "vendor_wording": "Mixer grinder, master carton (2 units)",
+    "line_id": "L06",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.6494",
+    "raw_value": 0.6494,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 1 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L06",
+     "snippet": "L06\tMixer grinder, master carton (2 units)\t5-ply BC, 1 col\t45,500\t0.6494",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L06\tMixer grinder, master carton (2 units)\t5-ply BC, 1 col\t45,500\t0.6494\"."
+    }
+   },
+   {
+    "vendor_wording": "Juicer mixer, unit carton",
+    "line_id": "L07",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.4812",
+    "raw_value": 0.4812,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 4 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L07",
+     "snippet": "L07\tJuicer mixer, unit carton\t5-ply BC, 4 col\t31,000\t0.4812",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L07\tJuicer mixer, unit carton\t5-ply BC, 4 col\t31,000\t0.4812\"."
+    }
+   },
+   {
+    "vendor_wording": "Hand blender, unit carton",
+    "line_id": "L08",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.0405",
+    "raw_value": 0.0405,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "3-ply E, 4 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L08",
+     "snippet": "L08\tHand blender, unit carton\t3-ply E, 4 col\t65,000\t0.0405",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L08\tHand blender, unit carton\t3-ply E, 4 col\t65,000\t0.0405\"."
+    }
+   },
+   {
+    "vendor_wording": "Electric kettle 1.5L, unit carton",
+    "line_id": "L09",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.0858",
+    "raw_value": 0.0858,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "3-ply B, 4 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L09",
+     "snippet": "L09\tElectric kettle 1.5L, unit carton\t3-ply B, 4 col\t78,000\t0.0858",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L09\tElectric kettle 1.5L, unit carton\t3-ply B, 4 col\t78,000\t0.0858\"."
+    }
+   },
+   {
+    "vendor_wording": "Electric kettle, master carton (6 units)",
+    "line_id": "L10",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.6383",
+    "raw_value": 0.6383,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 1 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L10",
+     "snippet": "L10\tElectric kettle, master carton (6 units)\t5-ply BC, 1 col\t13,000\t0.6383",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L10\tElectric kettle, master carton (6 units)\t5-ply BC, 1 col\t13,000\t0.6383\"."
+    }
+   },
+   {
+    "vendor_wording": "Pop-up toaster, unit carton",
+    "line_id": "L11",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.2124",
+    "raw_value": 0.2124,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 2 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L11",
+     "snippet": "L11\tPop-up toaster, unit carton\t5-ply BC, 2 col\t39,000\t0.2124",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L11\tPop-up toaster, unit carton\t5-ply BC, 2 col\t39,000\t0.2124\"."
+    }
+   },
+   {
+    "vendor_wording": "Induction cooktop, unit carton",
+    "line_id": "L12",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.2493",
+    "raw_value": 0.2493,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 2 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L12",
+     "snippet": "L12\tInduction cooktop, unit carton\t5-ply BC, 2 col\t52,000\t0.2493",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L12\tInduction cooktop, unit carton\t5-ply BC, 2 col\t52,000\t0.2493\"."
+    }
+   },
+   {
+    "vendor_wording": "Table fan 400mm, unit carton",
+    "line_id": "L13",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.3679",
+    "raw_value": 0.3679,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 2 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L13",
+     "snippet": "L13\tTable fan 400mm, unit carton\t5-ply BC, 2 col\t47,000\t0.3679",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L13\tTable fan 400mm, unit carton\t5-ply BC, 2 col\t47,000\t0.3679\"."
+    }
+   },
+   {
+    "vendor_wording": "Exhaust fan 250mm, unit carton",
+    "line_id": "L14",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.2088",
+    "raw_value": 0.2088,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 1 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L14",
+     "snippet": "L14\tExhaust fan 250mm, unit carton\t5-ply BC, 1 col\t57,000\t0.2088",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L14\tExhaust fan 250mm, unit carton\t5-ply BC, 1 col\t57,000\t0.2088\"."
+    }
+   },
+   {
+    "vendor_wording": "Pedestal fan, unit carton",
+    "line_id": "L15",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.5184",
+    "raw_value": 0.5184,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 2 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L15",
+     "snippet": "L15\tPedestal fan, unit carton\t5-ply BC, 2 col\t36,500\t0.5184",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L15\tPedestal fan, unit carton\t5-ply BC, 2 col\t36,500\t0.5184\"."
+    }
+   },
+   {
+    "vendor_wording": "Wall fan, unit carton",
+    "line_id": "L16",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.3746",
+    "raw_value": 0.3746,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 2 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L16",
+     "snippet": "L16\tWall fan, unit carton\t5-ply BC, 2 col\t41,500\t0.3746",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L16\tWall fan, unit carton\t5-ply BC, 2 col\t41,500\t0.3746\"."
+    }
+   },
+   {
+    "vendor_wording": "Ceiling fan 1200mm, unit carton",
+    "line_id": "L17",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.3601",
+    "raw_value": 0.3601,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 1 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L17",
+     "snippet": "L17\tCeiling fan 1200mm, unit carton\t5-ply BC, 1 col\t117,000\t0.3601",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L17\tCeiling fan 1200mm, unit carton\t5-ply BC, 1 col\t117,000\t0.3601\"."
+    }
+   },
+   {
+    "vendor_wording": "Ceiling fan, master carton (2 units)",
+    "line_id": "L18",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "1.3527",
+    "raw_value": 1.3527,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "7-ply BCB, 1 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L18",
+     "snippet": "L18\tCeiling fan, master carton (2 units)\t7-ply BCB, 1 col\t58,500\t1.3527",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L18\tCeiling fan, master carton (2 units)\t7-ply BCB, 1 col\t58,500\t1.3527\"."
+    }
+   },
+   {
+    "vendor_wording": "Room heater 2000W, unit carton",
+    "line_id": "L19",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.3270",
+    "raw_value": 0.327,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 2 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L19",
+     "snippet": "L19\tRoom heater 2000W, unit carton\t5-ply BC, 2 col\t23,500\t0.3270",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L19\tRoom heater 2000W, unit carton\t5-ply BC, 2 col\t23,500\t0.3270\"."
+    }
+   },
+   {
+    "vendor_wording": "Water heater 15L, unit carton",
+    "line_id": "L20",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.5561",
+    "raw_value": 0.5561,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 2 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L20",
+     "snippet": "L20\tWater heater 15L, unit carton\t5-ply BC, 2 col\t28,500\t0.5561",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L20\tWater heater 15L, unit carton\t5-ply BC, 2 col\t28,500\t0.5561\"."
+    }
+   },
+   {
+    "vendor_wording": "Water heater 25L, unit carton",
+    "line_id": "L21",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "1.2596",
+    "raw_value": 1.2596,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "7-ply BCB, 2 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L21",
+     "snippet": "L21\tWater heater 25L, unit carton\t7-ply BCB, 2 col\t21,000\t1.2596",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L21\tWater heater 25L, unit carton\t7-ply BCB, 2 col\t21,000\t1.2596\"."
+    }
+   },
+   {
+    "vendor_wording": "Air cooler 40L, unit carton",
+    "line_id": "L22",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "1.9934",
+    "raw_value": 1.9934,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "7-ply BCB, 1 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L22",
+     "snippet": "L22\tAir cooler 40L, unit carton\t7-ply BCB, 1 col\t10,500\t1.9934",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L22\tAir cooler 40L, unit carton\t7-ply BCB, 1 col\t10,500\t1.9934\"."
+    }
+   },
+   {
+    "vendor_wording": "Rice cooker 1.8L, unit carton",
+    "line_id": "L23",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.3168",
+    "raw_value": 0.3168,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 4 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L23",
+     "snippet": "L23\tRice cooker 1.8L, unit carton\t5-ply BC, 4 col\t26,000\t0.3168",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L23\tRice cooker 1.8L, unit carton\t5-ply BC, 4 col\t26,000\t0.3168\"."
+    }
+   },
+   {
+    "vendor_wording": "Sandwich maker, unit carton",
+    "line_id": "L24",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.0924",
+    "raw_value": 0.0924,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "3-ply B, 4 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L24",
+     "snippet": "L24\tSandwich maker, unit carton\t3-ply B, 4 col\t47,000\t0.0924",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L24\tSandwich maker, unit carton\t3-ply B, 4 col\t47,000\t0.0924\"."
+    }
+   },
+   {
+    "vendor_wording": "Vegetable chopper, unit carton",
+    "line_id": "L25",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.0609",
+    "raw_value": 0.0609,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "3-ply E, 4 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L25",
+     "snippet": "L25\tVegetable chopper, unit carton\t3-ply E, 4 col\t52,000\t0.0609",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L25\tVegetable chopper, unit carton\t3-ply E, 4 col\t52,000\t0.0609\"."
+    }
+   },
+   {
+    "vendor_wording": "Partition set, 6-cell, for kettle master",
+    "line_id": "L26",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.1246",
+    "raw_value": 0.1246,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "3-ply B, plain",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L26",
+     "snippet": "L26\tPartition set, 6-cell, for kettle master\t3-ply B, plain\t13,000\t0.1246",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L26\tPartition set, 6-cell, for kettle master\t3-ply B, plain\t13,000\t0.1246\"."
+    }
+   },
+   {
+    "vendor_wording": "Layer pad 1000 x 1200 mm, for pallets",
+    "line_id": "L27",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.4771",
+    "raw_value": 0.4771,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, plain",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L27",
+     "snippet": "L27\tLayer pad 1000 x 1200 mm, for pallets\t5-ply BC, plain\t21,000\t0.4771",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L27\tLayer pad 1000 x 1200 mm, for pallets\t5-ply BC, plain\t21,000\t0.4771\"."
+    }
+   },
+   {
+    "vendor_wording": "Air fryer 4L, unit carton (new SKU)",
+    "line_id": "L28",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.4154",
+    "raw_value": 0.4154,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 4 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L28",
+     "snippet": "L28\tAir fryer 4L, unit carton (new SKU)\t5-ply BC, 4 col\t39,000\t0.4154",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L28\tAir fryer 4L, unit carton (new SKU)\t5-ply BC, 4 col\t39,000\t0.4154\"."
+    }
+   },
+   {
+    "vendor_wording": "Air fryer, master carton (2 units) (new SKU)",
+    "line_id": "L29",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.6647",
+    "raw_value": 0.6647,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "5-ply BC, 1 col",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L29",
+     "snippet": "L29\tAir fryer, master carton (2 units) (new SKU)\t5-ply BC, 1 col\t19,500\t0.6647",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L29\tAir fryer, master carton (2 units) (new SKU)\t5-ply BC, 1 col\t19,500\t0.6647\"."
+    }
+   },
+   {
+    "vendor_wording": "Mixer grinder, die-cut jar insert",
+    "line_id": "L30",
+    "match_basis": "line_id_given",
+    "match_reason": "Line ID matched exactly with RFQ line ID.",
+    "raw_value_text": "0.0408",
+    "raw_value": 0.0408,
+    "unit": "per_box",
+    "unit_text": "USD / box ‡",
+    "currency": "USD",
+    "price_basis": "delivered",
+    "offered_spec": "3-ply B, plain",
+    "differs_from_rfq": false,
+    "difference": null,
+    "legibility": "clear",
+    "alternative_readings": [],
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": "L30",
+     "snippet": "L30\tMixer grinder, die-cut jar insert\t3-ply B, plain\t91,000\t0.0408",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"L30\tMixer grinder, die-cut jar insert\t3-ply B, plain\t91,000\t0.0408\"."
+    }
+   }
+  ],
+  "rateRules": [],
+  "notQuoted": [],
+  "terms": [
+   {
+    "kind": "price_basis",
+    "summary": "The price basis is delivered to Plant 2, MIDC Chakan, on returnable pallets.",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 2,
+     "table": null,
+     "row": null,
+     "snippet": "Price basis: Delivered Plant 2, MIDC Chakan, on returnable pallets",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 2: \"Price basis: Delivered Plant 2, MIDC Chakan, on returnable pallets\"."
+    }
+   },
+   {
+    "kind": "currency",
+    "summary": "All prices are maintained in US dollars, invoiced in INR at the exchange rate on the invoice date.",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 2,
+     "table": null,
+     "row": null,
+     "snippet": "Currency: US dollars. Invoiced in INR at the exchange rate on the invoice date.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 2: \"Currency: US dollars. Invoiced in INR at the exchange rate on the invoice date.\"."
+    }
+   },
+   {
+    "kind": "gst",
+    "summary": "GST is extra as applicable.",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all items",
+    "amount_stated": false,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 2,
+     "table": null,
+     "row": null,
+     "snippet": "GST: Extra as applicable",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 2: \"GST: Extra as applicable\"."
+    }
+   },
+   {
+    "kind": "payment",
+    "summary": "Payment terms are 60 days.",
+    "value": 60,
+    "value_unit": "days",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 2,
+     "table": null,
+     "row": null,
+     "snippet": "Payment: 60 days",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 2: \"Payment: 60 days\"."
+    }
+   },
+   {
+    "kind": "validity",
+    "summary": "Quotation validity is 45 days from the date of quotation.",
+    "value": 45,
+    "value_unit": "days",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 2,
+     "table": null,
+     "row": null,
+     "snippet": "Validity: 45 days from date of quotation",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 2: \"Validity: 45 days from date of quotation\"."
+    }
+   },
+   {
+    "kind": "lead_time",
+    "summary": "Standard lead time is 14 days from PO.",
+    "value": 14,
+    "value_unit": "days",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 2,
+     "table": null,
+     "row": null,
+     "snippet": "Lead time: 14 days from PO",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 2: \"Lead time: 14 days from PO\"."
+    }
+   },
+   {
+    "kind": "price_revision_clause",
+    "summary": "Rates are based on kraft paper prices as of September 2026.",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 3,
+     "table": null,
+     "row": null,
+     "snippet": "1. Rates are based on kraft paper prices as of September 2026.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 3: \"1. Rates are based on kraft paper prices as of September 2026.\"."
+    }
+   },
+   {
+    "kind": "packaging_or_deposit",
+    "summary": "A pallet deposit of USD 9 per pallet is refunded on return of pallets in good condition.",
+    "value": 9,
+    "value_unit": "usd",
+    "applies_to": "pallets",
+    "amount_stated": true,
+    "condition": "refunded on return of pallets in good condition",
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 3,
+     "table": null,
+     "row": null,
+     "snippet": "2. Pallet deposit of USD 9 per pallet is refunded on return of pallets in good condition.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 3: \"2. Pallet deposit of USD 9 per pallet is refunded on return of pallets in good condition.\"."
+    }
+   },
+   {
+    "kind": "tooling_or_plates",
+    "summary": "Printing plates are supplied free of cost for orders above 10,000 pieces per design.",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "printed items",
+    "amount_stated": true,
+    "condition": "for orders above 10,000 pieces per design",
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 3,
+     "table": null,
+     "row": null,
+     "snippet": "3. Printing plates are supplied free of cost for orders above 10,000 pieces per design.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 3: \"3. Printing plates are supplied free of cost for orders above 10,000 pieces per design.\"."
+    }
+   },
+   {
+    "kind": "discount",
+    "summary": "A trade discount of 2.5% applies on the invoice value of all items if a single PO exceeds INR 25,00,000.",
+    "value": 2.5,
+    "value_unit": "percent",
+    "applies_to": "all items",
+    "amount_stated": true,
+    "condition": "provided the value of a single purchase order exceeds INR 25,00,000",
+    "condition_threshold_inr": 2500000,
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 3,
+     "table": null,
+     "row": null,
+     "snippet": "‡ A trade discount of 2.5% applies on the invoice value of all items, provided the value of a single purchase order exceeds INR 25,00,000. Rates shown are before this discount.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 3: \"‡ A trade discount of 2.5% applies on the invoice value of all items, provided the value of a single purchase order exceeds INR 25,00,000. Rates shown are before this discount.\"."
+    }
+   },
+   {
+    "kind": "freight",
+    "summary": "Freight is included in the delivered price to Chakan plant.",
+    "value": null,
+    "value_unit": "none",
+    "applies_to": "all items",
+    "amount_stated": false,
+    "condition": null,
+    "condition_threshold_inr": null,
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": null,
+     "snippet": "Please find our best rates below, delivered to your Chakan plant, packed on pallets.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"Please find our best rates below, delivered to your Chakan plant, packed on pallets.\"."
+    }
+   }
+  ],
+  "questionnaire": [
+   {
+    "question_id": "Q1",
+    "answer": "Yes, ISO 9001:2015, certificate no. DQC/QMS/19870, valid to 30 Nov 2027",
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 2,
+     "table": null,
+     "row": "Q1",
+     "snippet": "Yes, ISO 9001:2015, certificate no. DQC/QMS/19870, valid to 30 Nov 2027",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 2: \"Yes, ISO 9001:2015, certificate no. DQC/QMS/19870, valid to 30 Nov 2027\"."
+    }
+   },
+   {
+    "question_id": "Q2",
+    "answer": "Yes, bursting strength report dated 28 Apr 2026",
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 2,
+     "table": null,
+     "row": "Q2",
+     "snippet": "Yes, bursting strength report dated 28 Apr 2026",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 2: \"Yes, bursting strength report dated 28 Apr 2026\"."
+    }
+   },
+   {
+    "question_id": "Q3",
+    "answer": "900 tonnes per month",
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 2,
+     "table": null,
+     "row": "Q3",
+     "snippet": "900 tonnes per month",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 2: \"900 tonnes per month\"."
+    }
+   },
+   {
+    "question_id": "Q4",
+    "answer": "14 days",
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 2,
+     "table": null,
+     "row": "Q4",
+     "snippet": "14 days",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 2: \"14 days\"."
+    }
+   },
+   {
+    "question_id": "Q5",
+    "answer": "0.9%",
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 2,
+     "table": null,
+     "row": "Q5",
+     "snippet": "0.9%",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 2: \"0.9%\"."
+    }
+   },
+   {
+    "question_id": "Q6",
+    "answer": "Yes, wax coating",
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 2,
+     "table": null,
+     "row": "Q6",
+     "snippet": "Yes, wax coating",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 2: \"Yes, wax coating\"."
+    }
+   },
+   {
+    "question_id": "Q7",
+    "answer": "45% recycled fibre; FSC chain of custody",
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 2,
+     "table": null,
+     "row": "Q7",
+     "snippet": "45% recycled fibre; FSC chain of custody",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 2: \"45% recycled fibre; FSC chain of custody\"."
+    }
+   },
+   {
+    "question_id": "Q8",
+    "answer": "References available on request",
+    "source": {
+     "file": "Vardhman_Quotation_VPE-Q-2611.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 2,
+     "table": null,
+     "row": "Q8",
+     "snippet": "References available on request",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 2: \"References available on request\"."
+    }
+   }
+  ],
+  "qualityDocs": [
+   {
+    "kind": "iso_certificate",
+    "summary": "Fictional ISO 9001:2015 registration certificate for Vardhman Packwell Exports",
+    "identifier": "DQC/QMS/19870",
+    "date": null,
+    "valid_until": "30 Nov 2027",
+    "marked_as_sample": true,
+    "source": {
+     "file": "VP_ISO9001_Certificate_SAMPLE.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": null,
+     "snippet": "SAMPLE DOCUMENT FOR A PRODUCT DEMO. NOT A REAL CERTIFICATE.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"SAMPLE DOCUMENT FOR A PRODUCT DEMO. NOT A REAL CERTIFICATE.\"."
+    }
+   },
+   {
+    "kind": "test_report",
+    "summary": "In-house laboratory box compression and bursting strength test report",
+    "identifier": null,
+    "date": "28 Apr 2026",
+    "valid_until": null,
+    "marked_as_sample": true,
+    "source": {
+     "file": "VP_Box_Test_Report_SAMPLE.pdf",
+     "sheet": null,
+     "cell": null,
+     "page": 1,
+     "table": null,
+     "row": null,
+     "snippet": "SAMPLE DOCUMENT FOR A PRODUCT DEMO. NOT A REAL CERTIFICATE.",
+     "region": null
+    },
+    "verification": {
+     "status": "verified",
+     "note": "Page 1: \"SAMPLE DOCUMENT FOR A PRODUCT DEMO. NOT A REAL CERTIFICATE.\"."
+    }
+   }
+  ],
+  "revision": {
+   "is_revision": false,
+   "supersedes": null,
+   "changes_claimed": null,
+   "source": null
+  },
+  "readingNotes": [
+   "All rates are quoted in US dollars (USD).",
+   "Invoices are billed in INR calculated at the exchange rate on the invoice date.",
+   "A trade discount of 2.5% is offered on all items for single purchase orders exceeding INR 25,00,000. Prices listed are pre-discount.",
+   "Prices are quoted on a delivered-to-Chakan-plant basis on returnable pallets. A refundable pallet deposit of USD 9 per pallet applies."
+  ],
+  "coverage": {
+   "quoted": [
+    "L01",
+    "L02",
+    "L03",
+    "L04",
+    "L05",
+    "L06",
+    "L07",
+    "L08",
+    "L09",
+    "L10",
+    "L11",
+    "L12",
+    "L13",
+    "L14",
+    "L15",
+    "L16",
+    "L17",
+    "L18",
+    "L19",
+    "L20",
+    "L21",
+    "L22",
+    "L23",
+    "L24",
+    "L25",
+    "L26",
+    "L27",
+    "L28",
+    "L29",
+    "L30"
+   ],
+   "missing": [],
+   "total": 30
+  },
+  "unsourced": 0,
+  "usage": [],
+  "cached": true,
+  "ms": 37,
+  "readAt": "2026-10-09T12:18:41.628Z",
+  "models": [
+   "gemini-3.5-flash-lite",
+   "gemini-3.5-flash"
+  ]
+ }
+}

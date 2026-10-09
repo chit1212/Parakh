@@ -1,0 +1,80 @@
+{
+ "replyId": "F3_spam",
+ "readAt": "2026-10-09T12:14:35.767Z",
+ "models": [
+  "gemini-3.5-flash-lite"
+ ],
+ "files": "4a3751281c0f8885ef3d5244",
+ "reading": {
+  "replyId": "F3_spam",
+  "vendorId": null,
+  "vendorName": "Growth Team",
+  "status": "ignored",
+  "headline": "The email is an unsolicited marketing message offering B2B buyer leads rather than responding to the RFQ.",
+  "nextStep": {
+   "kind": "ignore",
+   "text": "Nothing to do. Kept out of the comparison."
+  },
+  "classification": {
+   "category": "spam",
+   "vendor_name": "Growth Team",
+   "reason": "The email is an unsolicited marketing message offering B2B buyer leads rather than responding to the RFQ.",
+   "files": [],
+   "looks_incomplete": false,
+   "incomplete_evidence": null,
+   "promised_followup": null
+  },
+  "prices": [],
+  "rateRules": [],
+  "notQuoted": [],
+  "terms": [],
+  "questionnaire": [],
+  "qualityDocs": [],
+  "revision": null,
+  "readingNotes": [],
+  "coverage": {
+   "quoted": [],
+   "missing": [
+    "L01",
+    "L02",
+    "L03",
+    "L04",
+    "L05",
+    "L06",
+    "L07",
+    "L08",
+    "L09",
+    "L10",
+    "L11",
+    "L12",
+    "L13",
+    "L14",
+    "L15",
+    "L16",
+    "L17",
+    "L18",
+    "L19",
+    "L20",
+    "L21",
+    "L22",
+    "L23",
+    "L24",
+    "L25",
+    "L26",
+    "L27",
+    "L28",
+    "L29",
+    "L30"
+   ],
+   "total": 30
+  },
+  "unsourced": 0,
+  "usage": [],
+  "cached": true,
+  "ms": 1,
+  "readAt": "2026-10-09T12:14:35.767Z",
+  "models": [
+   "gemini-3.5-flash-lite"
+  ]
+ }
+}
