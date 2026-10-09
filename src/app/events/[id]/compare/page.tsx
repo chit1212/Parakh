@@ -121,6 +121,52 @@ function ChartView({ grid, r }: { grid: Grid; r: ScenarioResult | null }) {
   );
 }
 
+/**
+ * L29: an AI-drafted counter-offer to a vendor that is not winning a line, asking it to sharpen its
+ * price toward a target set in code. The draft never names other vendors or whose price the target is.
+ */
+function CounterOffer({ vendorId, line, cell, target }: { vendorId: string; line: Grid["lines"][number]; cell: GridCell; target: number }) {
+  const [d, setD] = useState<{ to: string; subject: string; body: string; model?: string } | { error: string } | "loading" | null>(null);
+  const [sent, setSent] = useState(false);
+  const draft = async () => {
+    setD("loading");
+    try {
+      const r = await fetch("/api/draft", {
+        method: "POST",
+        body: JSON.stringify({
+          vendorId,
+          title: `Counter-offer on ${line.id} (${line.name})`,
+          ask: `Ask the vendor to sharpen its price for ${line.id} (${line.name}, ${line.qty.toLocaleString("en-IN")} boxes) to ₹${target.toFixed(2)} per box delivered Chakan, ex-GST, our target for this line, and to confirm in writing. Do not say where the target comes from.`,
+          lines: [`${line.id} ${line.name}: ${cell.norm.asWritten} → ₹${cell.perBox!.toFixed(2)} per box delivered`],
+          howRead: cell.norm.flags.slice(0, 3),
+        }),
+      });
+      setD(await r.json());
+    } catch {
+      setD({ error: "The draft could not be written just now. Try again in a minute." });
+    }
+  };
+  return (
+    <details>
+      <summary style={{ cursor: "pointer", color: "var(--color-accent-800)" }}>Counter-offer: ask this vendor to sharpen {line.id} toward {inr(target)}</summary>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingTop: 6 }}>
+        <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>The target is set in code from the line’s lowest price; the email does not say whose it is.</span>
+        {sent ? <span style={{ color: "var(--color-accent-800)" }}>Approved by you and marked as sent. (Demo: no email server; nothing left this app.)</span>
+          : !d ? <button className="btn btn-primary" style={{ alignSelf: "flex-start" }} onClick={draft}>Draft the counter-offer</button>
+          : d === "loading" ? <span style={{ color: "var(--color-neutral-700)" }}>Drafting with AI…</span>
+          : "error" in d ? <span>{d.error} <button className="btn btn-ghost" onClick={draft}>Try again</button></span>
+          : (
+            <>
+              <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>To {d.to} · {d.subject} · drafted by {d.model ?? "AI"}, for you to check</span>
+              <textarea className="input" style={{ minHeight: 170, whiteSpace: "pre-wrap", background: "var(--color-bg)" }} value={d.body} onChange={(e) => setD({ ...d, body: e.target.value })} />
+              <button className="btn btn-primary" style={{ alignSelf: "flex-start" }} onClick={() => setSent(true)}>Approve &amp; send</button>
+            </>
+          )}
+      </div>
+    </details>
+  );
+}
+
 /** L32: award a line to another vendor, with a reason; recorded with who and when. */
 function OverrideBox({ line, grid, shown, current, buyer, onOverride }: {
   line: string; grid: Grid; shown: Award; current: Override | undefined; buyer: string; onOverride: (o: Override) => void;
@@ -611,6 +657,9 @@ function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, overrid
           </div>
         ))}
         <OverrideBox key={line.id} line={line.id} grid={grid} shown={shown} current={override} buyer={buyer} onOverride={onOverride} />
+        {c.perBox != null && w && w.vendorId !== sel.v && c.canWin && (
+          <CounterOffer key={`co-${sel.v}-${line.id}`} vendorId={sel.v} line={line} cell={c} target={w.perBox} />
+        )}
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
