@@ -150,6 +150,8 @@ export async function callStructured<S extends z.ZodType>(opts: {
           lastDaily = true;
           break; // this model's day is used up; a fallback has its own quota
         }
+        // Server log only (never shown to the buyer): which model refused, and how.
+        console.warn(`[gemini] ${opts.step} ${model} attempt ${attempt}: ${e instanceof ApiError ? e.status : "error"} ${(e as Error).message.slice(0, 120)}`);
         if (!c.retry) throw e instanceof ReaderError ? e : new ReaderError(`Reading failed (${opts.step}): ${(e as Error).message.slice(0, 200)}`);
         if (attempt === RETRY.attempts) break;
         const wait = Math.min(c.waitMs ?? delay, RETRY.maxDelayMs);
