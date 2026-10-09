@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/broadsheet-b2904ec4-9842-45c9-b4be-2ac94f55f925/styles.css">
+<script src="_ds/broadsheet-b2904ec4-9842-45c9-b4be-2ac94f55f925/_ds_bundle.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<script src="data.js"></script>
+<style>a{color:var(--color-accent)}a:hover{color:var(--color-accent-600)}</style>
+</helmet>
+<div style="display:flex; flex-wrap:wrap; gap:20px 28px; align-items:flex-start; font-size:13px; line-height:1.45; color:var(--color-text); font-variant-numeric:tabular-nums;">
+  <div style="flex:1 1 380px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+    <div style="display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;">
+      <i class="ph-duotone {{ v.icon }}" style="font-size:16px; color:var(--color-neutral-700); align-self:center;"></i>
+      <span style="font-weight:600;">{{ v.name }}</span>
+      <span style="color:var(--color-neutral-700);">{{ v.file }}</span>
+    </div>
+    <div style="color:var(--color-neutral-700); font-size:12px;">{{ c.loc }} · received {{ v.received }}</div>
+
+    <sc-if value="{{ isXls }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff; box-shadow:var(--shadow-sm); font-size:12px; overflow:hidden;">
+        <div style="display:grid; grid-template-columns:28px 1.6fr 1fr 40px 52px 70px; background:var(--color-neutral-200); color:var(--color-neutral-700); font-size:11px;">
+          <span style="padding:3px 6px;"></span><span style="padding:3px 6px;">B</span><span style="padding:3px 6px;">C</span><span style="padding:3px 6px;">D</span><span style="padding:3px 6px;">E</span><span style="padding:3px 6px;">F</span>
+        </div>
+        <div style="display:grid; grid-template-columns:28px 1.6fr 1fr 40px 52px 70px; color:var(--color-neutral-700); font-size:11px; border-bottom:1px solid var(--color-neutral-300);">
+          <span style="padding:3px 6px; background:var(--color-neutral-200);">5</span><span style="padding:3px 6px;">ITEM</span><span style="padding:3px 6px;">SIZE (MM)</span><span style="padding:3px 6px;">PLY</span><span style="padding:3px 6px;">QTY</span><span style="padding:3px 6px;">RATE/PC</span>
+        </div>
+        <sc-for list="{{ xlsRows }}" as="r" hint-placeholder-count="5">
+          <div style="display:grid; grid-template-columns:28px 1.6fr 1fr 40px 52px 70px; border-bottom:1px solid var(--color-neutral-200);">
+            <span style="padding:4px 6px; background:var(--color-neutral-200); color:var(--color-neutral-700); font-size:11px;">{{ r.row }}</span>
+            <span style="padding:4px 6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ r.item }}</span>
+            <span style="padding:4px 6px;">{{ r.size }}</span>
+            <span style="padding:4px 6px;">{{ r.ply }}</span>
+            <span style="padding:4px 6px;">{{ r.qty }}</span>
+            <sc-if value="{{ r.hl }}" hint-placeholder-val="{{ false }}">
+              <span style="padding:3px 6px; text-align:right; background:var(--color-accent-200); outline:2px solid var(--color-accent); outline-offset:-2px; font-weight:600;">{{ r.rate }}</span>
+            </sc-if>
+            <sc-if value="{{ r.nohl }}" hint-placeholder-val="{{ true }}">
+              <span style="padding:4px 6px; text-align:right;">{{ r.rate }}</span>
+            </sc-if>
+          </div>
+        </sc-for>
+        <div style="padding:6px; font-size:11px; color:var(--color-neutral-700);">Rows are in their own order; matched to our {{ l.id }} by size, ply and BF</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isPdf }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff; box-shadow:var(--shadow-sm); padding:16px 18px; font-size:12px; display:flex; flex-direction:column; gap:8px;">
+        <div style="text-align:center; display:flex; flex-direction:column; gap:1px;">
+          <span style="font-size:14px; letter-spacing:0.14em; font-weight:600;">VARDHMAN PACKWELL EXPORTS</span>
+          <span style="font-size:10px; color:var(--color-neutral-700);">Plot 14, Dabhel Industrial Estate, Daman 396 210 · GSTIN 25AAFCV4471K1Z8</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--color-neutral-700);"><span>Quotation VPE/Q/2026/118</span><span>6 October 2026</span></div>
+        <div style="display:grid; grid-template-columns:30px 1fr 84px; font-size:11px; color:var(--color-neutral-700); border-bottom:1px solid var(--color-neutral-400); padding-bottom:3px;"><span>Sr</span><span>Description</span><span style="text-align:right;">USD / box</span></div>
+        <sc-for list="{{ pdfRows }}" as="r" hint-placeholder-count="5">
+          <sc-if value="{{ r.hl }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid; grid-template-columns:30px 1fr 84px; background:var(--color-accent-200); outline:2px solid var(--color-accent); padding:2px 0;"><span>{{ r.sr }}</span><span>{{ r.desc }}</span><span style="text-align:right; font-weight:600;">{{ r.usd }}</span></div>
+          </sc-if>
+          <sc-if value="{{ r.nohl }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid; grid-template-columns:30px 1fr 84px; padding:2px 0;"><span>{{ r.sr }}</span><span>{{ r.desc }}</span><span style="text-align:right;">{{ r.usd }}</span></div>
+          </sc-if>
+        </sc-for>
+        <div style="font-size:10.5px; color:var(--color-neutral-700);">Prices delivered to buyer’s works. GST extra as applicable. Validity 30 days.</div>
+        <sc-if value="{{ isDoubt }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:10.5px; background:var(--color-accent-2-200); outline:2px solid var(--color-accent-2); padding:2px 4px; color:var(--color-accent-2-900);">‡ 2.5% discount on orders above ₹25 lakh per PO.</div>
+        </sc-if>
+        <sc-if value="{{ notDoubt }}" hint-placeholder-val="{{ true }}">
+          <div style="font-size:10.5px; background:var(--color-accent-100); padding:2px 4px;">‡ 2.5% discount on orders above ₹25 lakh per PO.</div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isDoc }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff; box-shadow:var(--shadow-sm); padding:16px 20px; font-size:12.5px; line-height:1.6; display:flex; flex-direction:column; gap:8px;">
+        <span style="color:var(--color-neutral-700); font-size:11px;">Kaveri Paper Products · Ref KPP/SAL/0926 · page 2</span>
+        <p style="margin:0;">{{ docBefore }} <span style="background:var(--color-accent-200); outline:2px solid var(--color-accent); padding:0 2px;">{{ docHit }}</span> {{ docAfter }}</p>
+        <p style="margin:0; color:var(--color-neutral-700);">Freight: ₹38 per 100 nos up to your Chakan plant. All prices are per hundred numbers. GST 18% extra. Payment 45 days from receipt.</p>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isPhoto }}" hint-placeholder-val="{{ false }}">
+      <div style="background:var(--color-neutral-400); padding:22px 18px 26px; overflow:hidden;">
+        <div class="halftone" style="background:#fbfaf6; box-shadow:var(--shadow-md); transform:perspective(900px) rotateX(9deg) rotateZ(-3.5deg); padding:12px 14px; font-size:11.5px; display:flex; flex-direction:column; gap:2px;">
+          <span style="text-align:center; font-weight:600; letter-spacing:0.1em;">ANAND CARTONS — RATE LIST 2026</span>
+          <span style="text-align:center; font-size:10px; color:var(--color-neutral-700);">Naroda GIDC, Ahmedabad · Rates per box, delivered Pune region</span>
+          <sc-for list="{{ photoRows }}" as="r" hint-placeholder-count="5">
+            <sc-if value="{{ r.hlDoubt }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid; grid-template-columns:1fr 50px 64px; outline:2px solid var(--color-accent-2); background:color-mix(in srgb, var(--color-accent-2-200) 70%, transparent); padding:2px 4px;"><span>{{ r.size }}</span><span>{{ r.ply }}</span><span style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; line-height:1.1;"><span style="font-style:italic; font-size:12.5px; color:var(--color-accent-800);">{{ r.hand }}</span><span style="{{ r.strikeS }}">{{ r.rate }}</span></span></div>
+            </sc-if>
+            <sc-if value="{{ r.hlOk }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid; grid-template-columns:1fr 50px 64px; outline:2px solid var(--color-accent); background:color-mix(in srgb, var(--color-accent-200) 70%, transparent); padding:2px 4px;"><span>{{ r.size }}</span><span>{{ r.ply }}</span><span style="text-align:right;">{{ r.rate }}</span></div>
+            </sc-if>
+            <sc-if value="{{ r.nohl }}" hint-placeholder-val="{{ true }}">
+              <div style="display:grid; grid-template-columns:1fr 50px 64px; padding:2px 4px;"><span>{{ r.size }}</span><span>{{ r.ply }}</span><span style="text-align:right;">{{ r.rate }}</span></div>
+            </sc-if>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isMail }}" hint-placeholder-val="{{ false }}">
+      <div style="background:#fff; box-shadow:var(--shadow-sm); padding:14px 18px; font-size:12.5px; display:flex; flex-direction:column; gap:8px;">
+        <div style="display:grid; grid-template-columns:56px 1fr; gap:2px 8px; font-size:11.5px; color:var(--color-neutral-700);">
+          <span>From</span><span>Rohit Jadhav &lt;rohit@rohitbox.co.in&gt;</span>
+          <span>Date</span><span>7 Oct 2026, 20:12</span>
+          <span>Subject</span><span>Re: RFQ SE-2026-041 Corrugated boxes</span>
+        </div>
+        <p style="margin:0; line-height:1.7;">Sir, <span style="{{ m42 }}">₹42/kg for the 5-ply</span>, <span style="{{ m38 }}">38 for the 3-ply</span>, <span style="{{ mLy }}">rest same as last year</span>, <span style="{{ mFr }}">freight extra</span>.</p>
+        <p style="margin:0; color:var(--color-neutral-700);">Regards, Rohit<br>Sent from my phone</p>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="flex:1 1 300px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+    <sc-if value="{{ isDoubt }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; gap:8px; align-items:baseline; color:var(--color-accent-2-800);">
+        <i class="ph-duotone ph-question" style="font-size:15px; align-self:center;"></i>
+        <span><span style="font-weight:600;">Doubt {{ doubt.rank }} of {{ doubtCount }} · {{ doubt.stakeL }} at stake.</span> {{ doubt.title }}</span>
+      </div>
+    </sc-if>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div style="display:flex; flex-direction:column; gap:2px;">
+        <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">As written</span>
+        <span style="font-size:20px; font-weight:600; line-height:1.2;">{{ c.raw }}</span>
+        <span style="color:var(--color-neutral-700);">{{ c.unit }}</span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:2px;">
+        <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">On our basis</span>
+        <span style="font-size:20px; font-weight:600; line-height:1.2;">{{ pTxt }}</span>
+        <span style="color:var(--color-neutral-700);">per box · delivered Chakan · GST 18% extra</span>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+        <div style="display:grid; grid-template-columns:92px 1fr; gap:10px;">
+          <span style="display:flex; flex-direction:column; line-height:1.25;"><span style="font-weight:600;">{{ s.stage }}</span><span style="font-size:11px; color:var(--color-neutral-700);">{{ s.who }}</span></span>
+          <span style="text-wrap:pretty;">{{ s.text }}</span>
+        </div>
+      </sc-for>
+      <div style="display:grid; grid-template-columns:92px 1fr; gap:10px;">
+        <span style="display:flex; flex-direction:column; line-height:1.25;"><span style="font-weight:600;">Decide</span><span style="font-size:11px; color:var(--color-neutral-700);">You</span></span>
+        <span style="color:var(--color-neutral-700);">{{ decideTxt }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:520},&quot;vid&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;SB&quot;,&quot;VP&quot;,&quot;KP&quot;,&quot;AC&quot;,&quot;RB&quot;],&quot;default&quot;:&quot;RB&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;li&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:0,&quot;min&quot;:0,&quot;max&quot;:29,&quot;tsType&quot;:&quot;number&quot;}}">
+class Component extends DCLogic {
+  componentDidMount() { if (!window.KD) { this._h = () => this.forceUpdate(); window.addEventListener('kd-ready', this._h); this._t = setInterval(() => window.KD && (clearInterval(this._t), this.forceUpdate()), 150); } }
+  componentWillUnmount() { this._h && window.removeEventListener('kd-ready', this._h); clearInterval(this._t); }
+  renderVals() {
+    const K = window.KD; if (!K) return {};
+    const vid = this.props.vid ?? 'RB', li = +(this.props.li ?? 0);
+    const c = K.cells[vid][li], l = K.lines[li], v = K.VI[vid];
+    const isDoubt = c.kind === 'doubt', doubt = isDoubt ? K.doubts.find(d => d.id === c.doubt) : null;
+    const near = (arr, idx) => { const k = arr.indexOf(idx), s = Math.max(0, Math.min(arr.length - 5, k - 2)); return arr.slice(s, s + 5); };
+    const all = K.lines.map(x => x.i);
+    const xlsRows = near(K.sbOrder, li).map(i => { const x = K.lines[i]; return { row: K.sbRow[i], item: K.short(x), size: x.dims.replace(/×/g, 'x'), ply: x.ply, qty: x.qtyK + 'K', rate: K.num(K.cells.SB[i].p), hl: i === li, nohl: i !== li }; });
+    const pdfRows = near(all, li).map(i => { const x = K.lines[i]; return { sr: x.n, desc: `RSC ${x.dims.replace(/×/g, 'x')} mm, ${x.ply}P, BF${x.bf}`, usd: K.cells.VP[i].usd.toFixed(3), hl: i === li, nohl: i !== li }; });
+    const sent = i => { const x = K.lines[i], cc = K.cells.KP[i]; return `For the ${x.name.toLowerCase()} box (${x.dims} mm, ${x.ply}-ply) we offer ${cc.raw}.`; };
+    const acIdx = all.filter(i => K.cells.AC[i].p != null);
+    const photoRows = near(acIdx, acIdx.includes(li) ? li : acIdx.find(i => i > li) ?? acIdx[acIdx.length - 1]).map(i => { const x = K.lines[i], cc = K.cells.AC[i]; const hit = i === li;
+      return { size: x.dims.replace(/×/g, '*'), ply: (cc.sub ? 3 : x.ply) + ' PLY', rate: cc.ocr ? '34.50' : K.num(cc.p), hand: cc.ocr ? '31.20?' : '', strikeS: { textDecoration: cc.ocr ? 'line-through' : 'none' }, hlDoubt: hit && cc.kind === 'doubt', hlOk: hit && cc.kind !== 'doubt', nohl: !hit }; });
+    const hlS = 'background:var(--color-accent-200); outline:2px solid var(--color-accent); padding:0 2px;';
+    const dS = 'background:var(--color-accent-2-200); outline:2px solid var(--color-accent-2); padding:0 2px;';
+    const css = s => Object.fromEntries(s.split(';').filter(Boolean).map(p => { const [k, ...r] = p.split(':'); return [k.trim().replace(/-([a-z])/g, (m, ch) => ch.toUpperCase()), r.join(':').trim()]; }));
+    const hit = (on, d) => on ? css(d ? dS : hlS) : {};
+    const stepsRaw = c.steps;
+    const steps = stepsRaw.map(s => ({ stage: s[0], who: s[1] === 'AI' ? 'AI read' : s[1] === 'Code' ? 'Code' : 'Independent check', text: s[2] }));
+    return {
+      v, c, l, doubt, isDoubt, notDoubt: !isDoubt, doubtCount: K.doubts.length,
+      isXls: v.fmt === 'Excel', isPdf: v.fmt === 'PDF', isDoc: v.fmt === 'Word', isPhoto: v.fmt === 'Photo', isMail: v.fmt === 'Email',
+      xlsRows, pdfRows, photoRows,
+      docBefore: li > 0 ? sent(li - 1) : 'With reference to your enquiry SE-2026-041 dated 1 October 2026, we are pleased to offer as under.',
+      docHit: sent(li), docAfter: li < 29 ? sent(li + 1) : '',
+      m42: hit(l.ply === 5, false), m38: hit(l.ply === 3, false), mLy: hit(!!c.ly || (li >= 25 && l.print !== 'none'), isDoubt && doubt.id === 'D5'), mFr: hit(true, isDoubt && doubt.id === 'D3'),
+      pTxt: c.p == null ? 'Not quoted' : K.inr(c.p), steps,
+      decideTxt: isDoubt ? doubt.ask : c.p == null ? 'Line will be awarded among vendors who quoted it.' : 'Nothing to decide — the number stands.'
+    };
+  }
+}
+</script>
+</body>
+</html>

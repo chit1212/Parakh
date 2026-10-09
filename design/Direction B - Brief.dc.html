@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/broadsheet-b2904ec4-9842-45c9-b4be-2ac94f55f925/styles.css">
+<script src="_ds/broadsheet-b2904ec4-9842-45c9-b4be-2ac94f55f925/_ds_bundle.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<script src="data.js"></script>
+<style>body{margin:0;background:var(--color-bg)}a{color:var(--color-accent)}a:hover{color:var(--color-accent-600)}</style>
+</helmet>
+<div style="display:flex; flex-direction:column; height:100vh; min-width:1360px; font-size:13px; line-height:1.45; color:var(--color-text); font-variant-numeric:tabular-nums; overflow:hidden;">
+  <header style="display:flex; align-items:baseline; gap:28px; padding:16px 28px 12px;">
+    <a href="Shared Screens.dc.html" style="font-size:20px; font-weight:600; color:var(--color-text); text-decoration:none;">Parakh</a>
+    <span style="display:flex; flex-direction:column; line-height:1.2;"><span style="font-size:17px; font-weight:600;">Corrugated boxes, FY27 H2</span><span style="font-size:11px; color:var(--color-neutral-700);">SE-2026-041 · 30 lines · 5 vendors · award by 15 Oct</span></span>
+    <nav style="display:flex; gap:20px; margin-left:12px;">
+      <a href="Shared Screens.dc.html#rfq" style="color:var(--color-neutral-700); text-decoration:none;">RFQ</a>
+      <a href="Shared Screens.dc.html#responses" style="color:var(--color-neutral-700); text-decoration:none;">Replies</a>
+      <a href="#" style="color:var(--color-accent); text-decoration:none;">Brief</a>
+      <a href="Shared Screens.dc.html#award" style="color:var(--color-neutral-700); text-decoration:none;">Award</a>
+    </nav>
+    <span style="margin-left:auto; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Direction B — Brief</span>
+  </header>
+
+  <div style="flex:1; min-height:0; display:flex;">
+    <section style="width:500px; flex:none; display:flex; flex-direction:column; background:var(--color-surface);">
+      <div ref="{{ threadRef }}" style="flex:1; min-height:0; overflow:auto; padding:20px 24px; display:flex; flex-direction:column; gap:18px;">
+        <sc-for list="{{ msgs }}" as="m" hint-placeholder-count="3">
+          <sc-if value="{{ m.isBot }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-accent-700);">Parakh</span>
+              <p style="margin:0; text-wrap:pretty; font-size:14px;">{{ m.text }}</p>
+            </div>
+          </sc-if>
+          <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end; padding-left:56px;">
+              <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Vikram</span>
+              <p style="margin:0; font-size:14px; font-style:italic; text-align:right; text-wrap:pretty;">{{ m.text }}</p>
+            </div>
+          </sc-if>
+          <sc-if value="{{ m.isAction }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; gap:6px; align-items:center; color:var(--color-neutral-700); font-size:12px;"><i class="ph-duotone ph-cursor-click"></i>{{ m.text }}</div>
+          </sc-if>
+          <sc-if value="{{ m.isSource }}" hint-placeholder-val="{{ false }}">
+            <div style="background:var(--color-bg); padding:14px 16px; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; gap:10px;">
+              <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Source · {{ m.lineId }} · {{ m.lineName }}</span>
+              <dc-import name="SourceDoc" vid="{{ m.vid }}" li="{{ m.li }}" hint-size="100%,620px"></dc-import>
+            </div>
+          </sc-if>
+          <sc-if value="{{ m.isScen }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-accent-700);">Parakh · Scenario 1</span>
+              <p style="margin:0; font-size:14px; text-wrap:pretty;">{{ scenAnswer }}</p>
+              <div style="display:flex; flex-direction:column; gap:4px;">
+                <span style="font-weight:600;">Rules I applied</span>
+                <sc-for list="{{ rules }}" as="r" hint-placeholder-count="4">
+                  <div style="display:grid; grid-template-columns:28px 1fr; gap:4px;"><span style="color:var(--color-accent-800); font-weight:600;">{{ r.n }}</span><span>{{ r.t }}</span></div>
+                </sc-for>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:4px;">
+                <span style="font-weight:600;">Left out</span>
+                <sc-for list="{{ excluded }}" as="x" hint-placeholder-count="2">
+                  <div><span style="font-weight:600;">{{ x.name }}</span> — {{ x.why }}</div>
+                </sc-for>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn btn-secondary" onClick="{{ viewChart }}" style="padding:6px 10px;"><i class="ph-duotone ph-chart-bar-horizontal" style="font-size:15px;"></i>Show as chart</button>
+                <button class="btn btn-secondary" style="padding:6px 10px;"><i class="ph-duotone ph-file-xls" style="font-size:15px;"></i>Export .xlsx</button>
+                <a class="btn btn-ghost" href="Shared Screens.dc.html#award">Use as recommendation</a>
+              </div>
+            </div>
+          </sc-if>
+        </sc-for>
+      </div>
+      <div style="padding:12px 24px 16px; display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <sc-for list="{{ sugg }}" as="s" hint-placeholder-count="3">
+            <button onClick="{{ s.go }}" style="background:var(--color-bg); border:0; padding:4px 10px; font:inherit; font-size:12px; cursor:pointer; color:var(--color-accent-800); border-radius:var(--radius-md);">{{ s.t }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <textarea class="input" style="min-height:56px; background:var(--color-bg);" placeholder="Ask Parakh about any line, vendor or number…" value="{{ q }}" onChange="{{ onQ }}"></textarea>
+          <button class="btn btn-primary btn-icon" onClick="{{ ask }}" style="align-self:flex-end;" title="Send"><i class="ph-duotone ph-paper-plane-right" style="font-size:18px;"></i></button>
+        </div>
+      </div>
+    </section>
+
+    <section style="flex:1; min-width:0; display:flex; flex-direction:column; padding:4px 28px 0;">
+      <div style="display:flex; align-items:baseline; gap:20px; padding:12px 0 10px;">
+        <sc-for list="{{ exTabs }}" as="t" hint-placeholder-count="4">
+          <button onClick="{{ t.go }}" style="{{ t.s }}"><span style="font-size:11px; color:var(--color-neutral-700); margin-right:5px;">{{ t.n }}</span>{{ t.label }}</button>
+        </sc-for>
+        <sc-if value="{{ isScenEx }}" hint-placeholder-val="{{ false }}">
+          <div class="seg" style="margin-left:auto;"><button onClick="{{ viewTable }}" style="{{ segT }}">Table</button><button onClick="{{ viewChart }}" style="{{ segC }}">Chart</button></div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ isGridEx }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; flex-wrap:wrap; gap:4px 20px; padding:0 0 10px; color:var(--color-neutral-700); font-size:12px; align-items:center;">
+          <span>Marks show exceptions only — a plain number was read and checked. Whole-column conversions are stated once, in the header.</span>
+          <span style="display:flex; gap:5px; align-items:center;"><i class="ph-duotone ph-clock-counter-clockwise" style="color:var(--color-neutral-800);"></i>last year</span>
+          <span style="display:flex; gap:5px; align-items:center;"><i class="ph-duotone ph-trend-up" style="color:var(--color-neutral-800);"></i>outside should-cost</span>
+          <span style="display:flex; gap:5px; align-items:center;"><span style="color:var(--color-neutral-500);">—</span>not quoted</span>
+          <span style="display:flex; gap:5px; align-items:center;"><i class="ph-duotone ph-question" style="color:var(--color-accent-2);"></i>doubt</span>
+          <span style="display:flex; gap:5px; align-items:center;"><span style="background:var(--color-accent-100); padding:0 5px;">10.88</span>lowest</span>
+        </div>
+        <div style="flex:1; min-height:0; overflow:auto;">
+          <div style="{{ headS }}">
+            <span style="font-size:11px; color:var(--color-neutral-700);">Line</span>
+            <span style="font-size:11px; color:var(--color-neutral-700);">Box</span>
+            <span style="font-size:11px; color:var(--color-neutral-700); text-align:right;">Qty</span>
+            <sc-for list="{{ heads }}" as="h" hint-placeholder-count="5">
+              <div style="{{ h.s }}">
+                <span style="font-weight:600; line-height:1.15;">{{ h.short }}</span>
+                <span style="font-size:11px; color:var(--color-neutral-700); line-height:1.25;">{{ h.note }}</span>
+              </div>
+            </sc-for>
+            <span style="font-size:11px; color:var(--color-neutral-700); padding-left:12px;">Lowest</span>
+          </div>
+          <div style="{{ qualS }}">
+            <span></span><span style="font-size:12px; color:var(--color-neutral-700);">Quality questionnaire</span><span></span>
+            <sc-for list="{{ heads }}" as="h" hint-placeholder-count="5">
+              <span style="{{ h.qs }}">{{ h.qLabel }}</span>
+            </sc-for>
+            <span></span>
+          </div>
+          <sc-for list="{{ rows }}" as="row" hint-placeholder-count="12">
+            <div style="{{ row.s }}">
+              <span style="color:var(--color-neutral-700);">{{ row.id }}</span>
+              <span style="display:flex; flex-direction:column; min-width:0; padding-right:8px; line-height:1.25;"><span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ row.name }}</span><span style="font-size:11px; color:var(--color-neutral-700);">{{ row.spec }}</span></span>
+              <span style="text-align:right; color:var(--color-neutral-700);">{{ row.qty }}</span>
+              <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="5">
+                <button onClick="{{ c.open }}" style="{{ c.s }}" title="{{ c.tip }}"><i class="ph-duotone {{ c.icon }}" style="{{ c.is }}"></i><span style="{{ c.ns }}">{{ c.txt }}</span></button>
+              </sc-for>
+              <span style="display:flex; flex-direction:column; padding-left:12px; line-height:1.2;"><span>{{ row.win }}</span><span style="font-size:11px; color:var(--color-accent-800);">{{ row.was }}</span></span>
+            </div>
+          </sc-for>
+          <div style="{{ footS }}">
+            <span></span><span style="font-weight:600;">Award value</span><span></span>
+            <sc-for list="{{ foot }}" as="f" hint-placeholder-count="5">
+              <span style="text-align:right; padding-right:10px; display:flex; flex-direction:column;"><span style="font-weight:600;">{{ f.lines }}</span><span style="font-size:11px; color:var(--color-neutral-700);">{{ f.value }}</span></span>
+            </sc-for>
+            <span style="padding-left:12px; font-weight:600;">{{ total }}</span>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isChartEx }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1; min-height:0; overflow:auto; display:flex; flex-direction:column; gap:22px; padding:8px 0 24px; max-width:860px;">
+          <div style="display:flex; flex-direction:column; gap:2px;"><h2 style="font-size:26px; margin:0;">Quality-cleared split costs {{ deltaL }} more</h2><span style="color:var(--color-neutral-700);">{{ scenTotal }} against {{ baseTotal }} for cheapest-per-line. Bars are award value per vendor.</span></div>
+          <sc-for list="{{ bars }}" as="b" hint-placeholder-count="5">
+            <div style="display:grid; grid-template-columns:150px 1fr; gap:14px; align-items:center;">
+              <span style="display:flex; flex-direction:column; line-height:1.2;"><span style="font-weight:600;">{{ b.name }}</span><span style="font-size:11px; color:var(--color-neutral-700);">{{ b.sub }}</span></span>
+              <div style="display:flex; flex-direction:column; gap:3px;">
+                <div style="display:flex; align-items:center; gap:8px;"><span style="{{ b.bs }}"></span><span style="font-size:11px; color:var(--color-neutral-700);">{{ b.bv }} before</span></div>
+                <div style="display:flex; align-items:center; gap:8px;"><span style="{{ b.ss }}"></span><span style="font-size:11px;">{{ b.sv }} in scenario</span></div>
+              </div>
+            </div>
+          </sc-for>
+          <div style="display:flex; gap:8px;"><button class="btn btn-secondary"><i class="ph-duotone ph-image" style="font-size:15px;"></i>Export chart</button><button class="btn btn-secondary"><i class="ph-duotone ph-file-xls" style="font-size:15px;"></i>Export table</button></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isDoubtEx }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1; min-height:0; overflow:auto; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); gap:32px; padding:4px 0 24px;">
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span style="color:var(--color-neutral-700); padding-bottom:8px;">Ranked by rupees at stake. {{ loggedCount }} smaller doubts are logged and don’t change a winner.</span>
+            <sc-for list="{{ doubtRows }}" as="d" hint-placeholder-count="5">
+              <button onClick="{{ d.pick }}" style="{{ d.s }}">
+                <span style="font-size:20px; font-weight:600; color:var(--color-accent-2-700);">{{ d.rank }}</span>
+                <span style="display:flex; flex-direction:column; gap:2px;"><span style="font-weight:600;">{{ d.title }}</span><span style="font-size:12px; color:var(--color-neutral-700);">{{ d.lineIds }} · {{ d.routeLabel }}</span></span>
+                <span style="font-weight:600; text-align:right;">{{ d.stakeL }}</span>
+              </button>
+            </sc-for>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-accent-2-700);">{{ curD.kind }} · {{ curD.stakeL }} at stake</span>
+            <h3 style="font-size:22px; margin:0;">{{ curD.title }}</h3>
+            <p style="margin:0; text-wrap:pretty;">{{ curD.why }}</p>
+            <span style="font-weight:600;">{{ curD.ask }}</span>
+            <sc-if value="{{ curHasEmail }}" hint-placeholder-val="{{ false }}">
+              <span style="font-size:12px; color:var(--color-neutral-700);">To {{ curEmail.to }} · {{ curEmail.subject }}</span>
+              <textarea class="input" style="min-height:200px;" value="{{ curEmail.body }}" onChange="{{ noop }}"></textarea>
+              <div style="display:flex; gap:8px;"><button class="btn btn-primary">Approve &amp; send</button><button class="btn btn-secondary">Edit</button></div>
+            </sc-if>
+            <sc-if value="{{ curHasOpts }}" hint-placeholder-val="{{ false }}">
+              <sc-for list="{{ curOpts }}" as="o" hint-placeholder-count="3">
+                <label class="radio"><input type="radio" name="bopt"><span class="dot"></span>{{ o }}</label>
+              </sc-for>
+              <div style="display:flex; gap:8px;"><button class="btn btn-primary">Record decision</button><button class="btn btn-ghost" onClick="{{ curSource }}">Show source in thread</button></div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;compare&quot;,&quot;analyst&quot;,&quot;doubts&quot;],&quot;default&quot;:&quot;compare&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Screen&quot;}}">
+class Component extends DCLogic {
+  constructor(p) {
+    super(p); const s = (location.hash.slice(1)) || (p && p.startScreen) || 'compare';
+    const intro = [{ t: 'bot', text: '' }, { t: 'user', text: 'Why is Anand so cheap on L14?' }, { t: 'bot', text: 'Because the rate card prices a 3-ply box for L14. You asked for 5-ply BC-flute. Here is the row I read:' }, { t: 'source', vid: 'AC', li: 13 }];
+    this.state = { ex: s === 'doubts' ? 'doubts' : s === 'analyst' ? 'scen' : 'grid', view: 'table', curD: 'D1', q: '', msgs: s === 'analyst' ? intro.slice(0, 1).concat(this.scenMsgs()) : intro };
+    this.threadRef = React.createRef();
+  }
+  scenMsgs() { return [{ t: 'user', text: 'What if we split it, cheapest per line, but only among vendors who cleared the quality questionnaire?' }, { t: 'scen' }]; }
+  componentDidMount() { this._t = setInterval(() => { if (window.KD) { clearInterval(this._t); this.forceUpdate(); this.scroll(); } }, 120); }
+  componentDidUpdate(pp, ps) { if (ps.msgs !== this.state.msgs) this.scroll(); }
+  componentWillUnmount() { clearInterval(this._t); }
+  scroll() { setTimeout(() => { const el = this.threadRef.current; if (el) el.scrollTop = el.scrollHeight; }, 60); }
+  renderVals() {
+    const K = window.KD, S = this.state;
+    if (!K) return { threadRef: this.threadRef };
+    const scen = S.ex === 'scen';
+    const elig = scen ? K.vendors.filter(v => v.q.cleared).map(v => v.id) : null;
+    const sol = scen ? K.qual : K.baseline;
+    const cols = '44px minmax(180px,1fr) 46px repeat(5, minmax(84px,104px)) 112px';
+    const openSrc = (vid, li) => () => { const l = K.lines[li], v = K.VI[vid]; this.setState({ msgs: S.msgs.concat([{ t: 'action', text: `You opened ${v.short} · ${l.id}` }, { t: 'source', vid, li }]) }); };
+    const heads = K.vendors.map(v => { const ex = elig && !elig.includes(v.id);
+      const note = { SB: 'Excel · revised v2', VP: 'PDF · all USD → ₹ @ 88.20, less 2.5% ‡', KP: 'Word · all per 100 → per box', AC: 'Photo · 27 of 30', RB: 'Email · all per kg → per box, freight est.' }[v.id];
+      return { short: v.short, note: ex ? 'Left out of scenario' : note, qLabel: v.q.returned ? `${v.q.score} ${v.q.cleared ? 'cleared' : 'not cleared'}` : 'not returned',
+        s: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', textAlign: 'right', gap: 1, paddingRight: 10, opacity: ex ? 0.45 : 1 },
+        qs: { textAlign: 'right', paddingRight: 10, fontSize: 12, color: v.q.cleared ? 'var(--color-text)' : 'var(--color-neutral-700)', fontWeight: v.q.cleared ? 600 : 400, opacity: ex ? 0.45 : 1 } }; });
+    const rows = K.lines.map(l => { const w = sol.per[l.i];
+      const cells = K.vendors.map(v => { const c = K.cells[v.id][l.i], ex = elig && !elig.includes(v.id), win = w.vid === v.id, k = c.kind;
+        const icon = k === 'ly' ? 'ph-clock-counter-clockwise' : k === 'oor' ? (c.ratio > 1 ? 'ph-trend-up' : 'ph-trend-down') : k === 'doubt' ? 'ph-question' : 'ph-circle';
+        return { open: openSrc(v.id, l.i), icon, txt: c.p == null ? '—' : K.num(c.p), tip: `${v.short} · ${l.id}: ${c.raw}`,
+          is: { fontSize: 13, width: 14, flex: 'none', color: k === 'doubt' ? 'var(--color-accent-2)' : 'var(--color-neutral-800)', visibility: ['ly', 'oor', 'doubt'].includes(k) ? 'visible' : 'hidden' },
+          ns: { color: k === 'miss' ? 'var(--color-neutral-500)' : k === 'doubt' ? 'var(--color-accent-2-800)' : 'var(--color-text)', fontWeight: win ? 600 : 400 },
+          s: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 5, minHeight: 36, padding: '0 10px', border: 0, font: 'inherit', fontSize: 13.5, cursor: 'pointer', opacity: ex ? 0.35 : 1, background: win ? 'var(--color-accent-100)' : 'transparent' } }; });
+      const bw = K.baseline.per[l.i];
+      return { id: l.id, name: l.name, spec: `${l.ply}-ply ${l.flute} · ${l.dims}`, qty: l.qtyK + 'k', cells, win: K.VI[w.vid].short, was: scen && w.changed ? 'was ' + K.VI[bw.vid].short : '',
+        s: { display: 'grid', gridTemplateColumns: cols, alignItems: 'stretch', borderBottom: '1px solid color-mix(in srgb, var(--color-text) 8%, transparent)' } }; });
+    const foot = K.vendors.map(v => ({ lines: sol.by[v.id].lines ? sol.by[v.id].lines + ' lines' : '—', value: sol.by[v.id].lines ? K.lakh(sol.by[v.id].value) : '' }));
+    const delta = K.qual.total - K.baseline.total;
+    const quals = K.vendors.filter(v => v.q.cleared).map(v => v.id);
+    let vpAtRisk = 0; K.qual.per.forEach(x => { if (x.vid !== 'VP') return; const alt = Math.min(...quals.filter(id => id !== 'VP').map(id => K.cells[id][x.i].p)); if (K.cells.VP[x.i].gross > alt) vpAtRisk++; });
+    const mx = Math.max(...K.vendors.map(v => Math.max(K.baseline.by[v.id].value, K.qual.by[v.id].value)));
+    const bar = (x, c) => ({ display: 'block', height: 14, width: Math.max(2, x / mx * 100) + '%', maxWidth: 'calc(100% - 130px)', background: c });
+    const intro = `All five replies are read. ${150 - 3} of 150 prices are on one basis — per box, ₹, delivered Chakan, GST extra; Anand didn’t quote 3 lines. ${K.doubts.length} doubts could change a winner, ${K.lakh(K.totalStake)} at stake. ${K.loggedCount} more are logged and don’t.`;
+    const msgs = S.msgs.map(m => { const l = m.li != null ? K.lines[m.li] : null; return { ...m, text: m.t === 'bot' && !m.text ? intro : m.text, isBot: m.t === 'bot', isUser: m.t === 'user', isAction: m.t === 'action', isSource: m.t === 'source', isScen: m.t === 'scen', lineId: l ? l.id : '', lineName: l ? l.name : '' }; });
+    const tabS = on => ({ background: 'none', border: 0, padding: '4px 0', font: 'inherit', fontSize: 15, cursor: 'pointer', color: on ? 'var(--color-text)' : 'var(--color-neutral-700)', fontWeight: on ? 600 : 400, boxShadow: on ? 'inset 0 -2px 0 var(--color-text)' : 'none' });
+    const exTabs = [['grid', 'Exhibit 3', 'Comparison'], ['scen', 'Exhibit 4', 'Scenario 1'], ['doubts', `${K.doubts.length}`, 'Doubts']].filter(t => t[0] !== 'scen' || S.msgs.some(m => m.t === 'scen')).map(t => ({ n: t[1], label: t[2], go: () => this.setState({ ex: t[0], view: 'table' }), s: tabS(S.ex === t[0]) }));
+    const seg = on => ({ border: 0, padding: '6px 12px', font: 'inherit', fontSize: 13, cursor: 'pointer', background: on ? 'var(--color-accent)' : 'transparent', color: on ? 'var(--color-bg)' : 'inherit' });
+    const runQ = () => this.setState({ msgs: S.msgs.some(m => m.t === 'scen') ? S.msgs : S.msgs.concat(this.scenMsgs()), ex: 'scen', view: 'table', q: '' });
+    const cd = K.doubts.find(d => d.id === S.curD) || K.doubts[0];
+    const doubtRows = K.doubts.map(d => ({ ...d, routeLabel: d.route === 'vendor' ? 'to vendor, email drafted' : 'your call', pick: () => this.setState({ curD: d.id }),
+      s: { display: 'grid', gridTemplateColumns: '30px 1fr 74px', gap: 10, alignItems: 'baseline', textAlign: 'left', padding: '10px 10px', border: 0, font: 'inherit', color: 'inherit', cursor: 'pointer', background: d.id === cd.id ? 'var(--color-accent-2-100)' : 'transparent' } }));
+    return {
+      threadRef: this.threadRef, msgs, exTabs, isGridEx: S.ex === 'grid' || (scen && S.view === 'table'), isChartEx: scen && S.view === 'chart', isScenEx: scen, isDoubtEx: S.ex === 'doubts',
+      headS: { position: 'sticky', top: 0, zIndex: 2, background: 'var(--color-bg)', display: 'grid', gridTemplateColumns: cols, alignItems: 'end', paddingBottom: 6 },
+      qualS: { position: 'sticky', top: 52, zIndex: 2, background: 'var(--color-bg)', display: 'grid', gridTemplateColumns: cols, padding: '4px 0 6px', borderBottom: '1px solid var(--color-text)' },
+      footS: { display: 'grid', gridTemplateColumns: cols, padding: '10px 0 24px', borderTop: '1px solid var(--color-text)', alignItems: 'baseline' },
+      heads, rows, foot, total: K.crore(sol.total),
+      scenAnswer: `It splits three ways — Shree Balaji ${K.qual.by.SB.lines} lines, Vardhman ${K.qual.by.VP.lines}, Kaveri ${K.qual.by.KP.lines} — for ${K.crore(K.qual.total)}. That is ${K.lakh(delta)} (${(delta / K.baseline.total * 100).toFixed(1)}%) more than cheapest-per-line, because the two vendors left out held 26 of the 30 lines. Four of the five open doubts stop mattering; Vardhman’s footnote discount still does, on ${vpAtRisk} lines.`,
+      rules: [{ n: 'R1', t: 'Same basis as the comparison: per box, ₹, delivered Chakan, GST extra.' }, { n: 'R2', t: 'A vendor is eligible if the questionnaire came back, scored 70+, and passed both mandatory items.' }, { n: 'R3', t: 'Each line goes to the lowest eligible price.' }, { n: 'R4', t: 'Open doubts are priced as read and flagged where they still matter.' }],
+      excluded: K.vendors.filter(v => !v.q.cleared).map(v => ({ name: v.short, why: v.q.returned ? `scored ${v.q.score}; no ISO 9001, test report from Jan 2025.` : 'questionnaire not returned.' })),
+      bars: K.vendors.map(v => ({ name: v.short, sub: quals.includes(v.id) ? K.qual.by[v.id].lines + ' lines' : 'left out', bs: bar(K.baseline.by[v.id].value, 'var(--color-neutral-400)'), ss: bar(K.qual.by[v.id].value, 'var(--color-accent)'), bv: K.baseline.by[v.id].value ? K.lakh(K.baseline.by[v.id].value) : '₹0', sv: K.qual.by[v.id].value ? K.lakh(K.qual.by[v.id].value) : '₹0' })),
+      deltaL: K.lakh(delta), scenTotal: K.crore(K.qual.total), baseTotal: K.crore(K.baseline.total),
+      viewTable: () => this.setState({ view: 'table', ex: 'scen' }), viewChart: () => this.setState({ view: 'chart', ex: 'scen' }), segT: seg(S.view === 'table'), segC: seg(S.view === 'chart'),
+      doubtRows, curD: cd, curHasEmail: !!cd.email, curEmail: cd.email || {}, curHasOpts: !!cd.options, curOpts: cd.options || [], curSource: openSrc(cd.vid, cd.lines[0]), loggedCount: K.loggedCount, noop: () => {},
+      q: S.q, onQ: e => this.setState({ q: e.target.value }), ask: runQ,
+      sugg: [{ t: 'Split cheapest per line, quality-cleared only', go: runQ }, { t: 'What changed in Shree Balaji’s revision?', go: () => openSrc('SB', 2)() }, { t: 'Show me the Vardhman footnote', go: () => openSrc('VP', 4)() }]
+    };
+  }
+}
+</script>
+</body>
+</html>

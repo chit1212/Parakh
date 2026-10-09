@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/broadsheet-b2904ec4-9842-45c9-b4be-2ac94f55f925/styles.css">
+<script src="_ds/broadsheet-b2904ec4-9842-45c9-b4be-2ac94f55f925/_ds_bundle.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<script src="data.js"></script>
+<style>body{margin:0;background:var(--color-bg)}a{color:var(--color-accent)}a:hover{color:var(--color-accent-600)}</style>
+</helmet>
+<div style="display:flex; height:100vh; min-width:1360px; font-size:13px; line-height:1.45; color:var(--color-text); font-variant-numeric:tabular-nums; overflow:hidden;">
+  <nav style="width:228px; flex:none; display:flex; flex-direction:column; gap:2px; padding:20px 14px 16px;">
+    <span style="font-size:22px; font-weight:600; padding:0 10px 18px;">Parakh</span>
+    <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5">
+      <a href="{{ n.href }}" onClick="{{ n.go }}" style="{{ n.s }}"><i class="ph-duotone {{ n.icon }}" style="font-size:18px;"></i>{{ n.label }}</a>
+    </sc-for>
+    <sc-if value="{{ inEvent }}" hint-placeholder-val="{{ false }}">
+      <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700); padding:18px 10px 6px;">SE-2026-041</span>
+      <sc-for list="{{ evNav }}" as="n" hint-placeholder-count="5">
+        <a href="{{ n.href }}" onClick="{{ n.go }}" style="{{ n.s }}">{{ n.label }}</a>
+      </sc-for>
+    </sc-if>
+    <div style="margin-top:auto; padding:0 10px; display:flex; flex-direction:column; line-height:1.3;"><span style="font-weight:600;">Vikram Deshpande</span><span style="font-size:12px; color:var(--color-neutral-700);">Category buyer, Packaging · Sahyadri Appliances</span></div>
+  </nav>
+
+  <main style="flex:1; min-width:0; overflow:auto;">
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:24px 40px 40px 12px; display:flex; flex-direction:column; gap:18px; max-width:1180px;">
+        <div style="display:flex; align-items:flex-end; gap:16px;">
+          <div style="margin-right:auto;"><h1 style="font-size:34px; margin:0;">Sourcing events</h1><span style="color:var(--color-neutral-700);">Packaging &amp; print · FY27</span></div>
+          <input class="input" style="width:280px;" placeholder="Search events, vendors, SKUs">
+          <button class="btn btn-primary" style="white-space:nowrap;"><i class="ph-duotone ph-plus" style="font-size:16px;"></i>New event</button>
+        </div>
+        <div style="display:flex; gap:22px;">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="7">
+            <button onClick="{{ t.go }}" style="{{ t.s }}">{{ t.label }} <span style="color:var(--color-neutral-700); font-weight:400;">{{ t.n }}</span></button>
+          </sc-for>
+        </div>
+        <table class="table">
+          <thead><tr><th>Event</th><th>Status</th><th style="text-align:right;">Lines</th><th>Replies</th><th style="text-align:right;">Value</th><th>Next</th><th></th></tr></thead>
+          <tbody>
+            <sc-for list="{{ events }}" as="e" hint-placeholder-count="7">
+              <tr>
+                <td style="padding:12px 10px;"><div style="display:flex; flex-direction:column; line-height:1.3;"><a href="{{ e.href }}" style="font-weight:600; font-size:15px; color:var(--color-text); text-decoration:none;">{{ e.name }}</a><span style="font-size:12px; color:var(--color-neutral-700);">{{ e.id }} · {{ e.cat }}</span><span style="font-size:12px; color:var(--color-accent-800);">{{ e.pastNote }}</span></div></td>
+                <td><span class="{{ e.tagCls }}">{{ e.status }}</span></td>
+                <td style="text-align:right;">{{ e.lines }}</td>
+                <td>{{ e.vendors }}</td>
+                <td style="text-align:right;">{{ e.valueTxt }}</td>
+                <td><div style="display:flex; flex-direction:column; line-height:1.3;"><span>{{ e.due }}</span><span style="font-size:12px; color:var(--color-neutral-700);">{{ e.note }}</span></div></td>
+                <td style="white-space:nowrap; text-align:right;"><a class="btn btn-ghost" href="{{ e.href }}">{{ e.action }}</a><button class="btn btn-ghost btn-icon" title="Duplicate"><i class="ph-duotone ph-copy" style="font-size:16px;"></i></button><button class="btn btn-ghost btn-icon" title="More"><i class="ph-duotone ph-dots-three" style="font-size:18px;"></i></button></td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isRfq }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; height:100%;">
+        <section style="width:430px; flex:none; background:var(--color-surface); display:flex; flex-direction:column;">
+          <div style="flex:1; overflow:auto; padding:22px 24px; display:flex; flex-direction:column; gap:18px;">
+            <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">RFQ co-pilot</span>
+            <sc-for list="{{ rfqChat }}" as="m" hint-placeholder-count="4">
+              <div style="{{ m.s }}"><span style="{{ m.ws }}">{{ m.who }}</span><p style="{{ m.ps }}">{{ m.text }}</p></div>
+            </sc-for>
+          </div>
+          <div style="padding:12px 24px 18px; display:flex; gap:8px;">
+            <textarea class="input" style="min-height:56px; background:var(--color-bg);" placeholder="Tell Parakh what to change — or edit the draft directly"></textarea>
+            <button class="btn btn-primary btn-icon" style="align-self:flex-end;" title="Send"><i class="ph-duotone ph-paper-plane-right" style="font-size:18px;"></i></button>
+          </div>
+        </section>
+        <section style="flex:1; min-width:0; overflow:auto; padding:22px 32px 32px; display:flex; flex-direction:column; gap:16px;">
+          <div style="display:flex; align-items:flex-end; gap:14px;">
+            <div style="margin-right:auto;"><span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Draft RFQ · saved 2 min ago</span><h2 style="font-size:28px; margin:0;">Corrugated boxes, FY27 H2</h2></div>
+            <button class="btn btn-secondary">Preview as vendor</button>
+            <button class="btn btn-primary">Send to 5 vendors</button>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:14px;">
+            <div class="field"><label>Deliver to</label><input class="input" value="Chakan plant, Pune 410501" onChange="{{ noop }}"></div>
+            <div class="field"><label>Replies due</label><input class="input" value="7 Oct 2026, 18:00" onChange="{{ noop }}"></div>
+            <div class="field"><label>Price basis asked</label><input class="input" value="₹ per box, delivered, ex-GST" onChange="{{ noop }}"></div>
+            <div class="field"><label>Contract period</label><input class="input" value="Oct 2026 – Mar 2027" onChange="{{ noop }}"></div>
+          </div>
+          <div style="display:flex; gap:22px;">
+            <sc-for list="{{ rfqTabs }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.go }}" style="{{ t.s }}">{{ t.label }}</button></sc-for>
+          </div>
+          <sc-if value="{{ rfqLines }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid; grid-template-columns:44px minmax(180px,1.4fr) 50px 50px 120px minmax(150px,1fr) 52px 88px 66px; gap:0 8px; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; color:var(--color-neutral-700); padding-bottom:6px; border-bottom:1px solid var(--color-text);">
+              <span>Line</span><span>Box</span><span>Ply</span><span>Flute</span><span>L×W×H mm</span><span>GSM</span><span>BF</span><span>Print</span><span style="text-align:right;">Qty k</span>
+            </div>
+            <sc-for list="{{ rfqRows }}" as="r" hint-placeholder-count="12">
+              <div style="{{ r.s }}">
+                <span style="color:var(--color-neutral-700); display:flex; flex-direction:column; line-height:1.15;">{{ r.id }}<span style="font-size:10px; color:var(--color-accent-800);">{{ r.tag }}</span></span>
+                <input class="input" style="min-height:30px; padding:3px 8px; font-size:13px;" value="{{ r.name }}" onChange="{{ noop }}">
+                <input class="input" style="{{ r.plyS }}" value="{{ r.ply }}" onChange="{{ noop }}">
+                <input class="input" style="min-height:30px; padding:3px 8px; font-size:13px;" value="{{ r.flute }}" onChange="{{ noop }}">
+                <input class="input" style="min-height:30px; padding:3px 8px; font-size:13px;" value="{{ r.dims }}" onChange="{{ noop }}">
+                <input class="input" style="min-height:30px; padding:3px 8px; font-size:13px;" value="{{ r.gsm }}" onChange="{{ noop }}">
+                <input class="input" style="min-height:30px; padding:3px 8px; font-size:13px;" value="{{ r.bf }}" onChange="{{ noop }}">
+                <input class="input" style="min-height:30px; padding:3px 8px; font-size:13px;" value="{{ r.print }}" onChange="{{ noop }}">
+                <input class="input" style="min-height:30px; padding:3px 8px; font-size:13px; text-align:right;" value="{{ r.qtyK }}" onChange="{{ noop }}">
+              </div>
+            </sc-for>
+          </sc-if>
+          <sc-if value="{{ rfqQ }}" hint-placeholder-val="{{ false }}">
+            <sc-for list="{{ qRows }}" as="q" hint-placeholder-count="10">
+              <div style="display:grid; grid-template-columns:30px minmax(0,1fr) 120px 150px; gap:12px; align-items:center; padding:8px 0; border-bottom:1px solid color-mix(in srgb, var(--color-text) 8%, transparent);">
+                <span style="color:var(--color-neutral-700);">{{ q.n }}</span><input class="input" value="{{ q.t }}" onChange="{{ noop }}"><span>{{ q.mand }}</span><span style="color:var(--color-neutral-700);">{{ q.ev }}</span>
+              </div>
+            </sc-for>
+          </sc-if>
+          <sc-if value="{{ rfqT }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:14px; max-width:860px;">
+              <div class="field"><label>Payment</label><input class="input" value="60 days from GRN" onChange="{{ noop }}"></div>
+              <div class="field"><label>Freight</label><input class="input" value="Included — quote delivered to Chakan" onChange="{{ noop }}"></div>
+              <div class="field"><label>Price validity</label><input class="input" value="Firm for the contract period; paper index clause allowed" onChange="{{ noop }}"></div>
+              <div class="field"><label>Currency</label><input class="input" value="INR only" onChange="{{ noop }}"></div>
+              <div class="field" style="grid-column:span 2;"><label>Quality</label><textarea class="input" onChange="{{ noop }}" value="Burst and BCT test report per batch. Moisture at dispatch 9% or less. Rejected lots replaced within 72 hours at vendor cost."></textarea></div>
+            </div>
+          </sc-if>
+        </section>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isResp }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:24px 40px 40px 12px; display:flex; flex-direction:column; gap:8px; max-width:1180px;">
+        <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">SE-2026-041 · Corrugated boxes, FY27 H2</span>
+        <h1 style="font-size:34px; margin:0;">Replies</h1>
+        <p style="margin:0 0 14px; color:var(--color-neutral-800); max-width:760px;">Five replies, five shapes. Each one is read twice by independent models; prices that disagree, or that could change a winner, are raised as doubts.</p>
+        <sc-for list="{{ resp }}" as="v" hint-placeholder-count="5">
+          <div style="display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr); gap:28px; padding:16px 0 20px; border-top:1px solid var(--color-divider);">
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <span style="font-size:18px; font-weight:600;">{{ v.name }}</span>
+              <span style="display:flex; align-items:center; gap:6px; color:var(--color-neutral-800);"><i class="ph-duotone {{ v.icon }}" style="font-size:18px;"></i>{{ v.file }}</span>
+              <span style="color:var(--color-neutral-700);">{{ v.shape }}</span>
+              <span style="font-size:12px; color:var(--color-neutral-700);">Received {{ v.received }} · {{ v.contact }}, {{ v.city }}</span>
+              <span style="font-size:12px; color:var(--color-accent-800);">{{ v.revised }}</span>
+              <a href="Direction A - Ledger.dc.html" style="font-size:13px; margin-top:4px;">Open original</a>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <span style="font-weight:600;">{{ v.coverTxt }}</span>
+              <div style="display:flex; gap:2px;"><sc-for list="{{ v.seg }}" as="g" hint-placeholder-count="30"><span style="{{ g }}"></span></sc-for></div>
+              <span style="font-size:12px; color:var(--color-neutral-700);">{{ v.missTxt }}</span>
+              <span>{{ v.readTxt }}</span>
+              <span style="font-size:12px; color:var(--color-neutral-700);">{{ v.convTxt }}</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <span style="font-weight:600;">Questionnaire · {{ v.qTxt }}</span>
+              <sc-for list="{{ v.docsL }}" as="d" hint-placeholder-count="2">
+                <div style="display:grid; grid-template-columns:18px 1fr; gap:4px; line-height:1.35;"><i class="ph-duotone ph-paperclip" style="color:var(--color-neutral-700); padding-top:2px;"></i><span>{{ d.n }} <span style="color:var(--color-neutral-700);">— {{ d.s }}</span></span></div>
+              </sc-for>
+              <span style="font-size:12px; color:var(--color-neutral-700);">{{ v.noDocs }}</span>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isAward }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; min-height:100%;">
+        <div style="flex:1; min-width:0; padding:24px 32px 40px 12px; display:flex; flex-direction:column; gap:22px;">
+          <div style="display:flex; align-items:flex-end; gap:14px;">
+            <div style="margin-right:auto; display:flex; flex-direction:column; gap:2px;">
+              <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Award record · SE-2026-041 · for approval by Anita Kulkarni, VP Supply Chain</span>
+              <h1 style="font-size:34px; margin:0;">Split award to three quality-cleared vendors</h1>
+            </div>
+            <a class="btn btn-secondary" href="Direction A - Ledger.dc.html#analyst" style="white-space:nowrap;">Ask a what-if</a>
+            <button class="btn btn-primary" style="white-space:nowrap;">Approve award</button>
+          </div>
+          <p style="margin:0; font-size:16px; max-width:820px; text-wrap:pretty;">{{ awardSummary }}</p>
+          <div style="display:flex; gap:48px; flex-wrap:wrap;">
+            <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+              <div style="display:flex; flex-direction:column;"><span style="font-size:26px; font-weight:600; line-height:1.15;">{{ k.v }}</span><span style="color:var(--color-neutral-700);">{{ k.t }}</span></div>
+            </sc-for>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px; max-width:900px;">
+            <h3 style="font-size:20px; margin:0;">Decisions on record</h3>
+            <sc-for list="{{ decisions }}" as="d" hint-placeholder-count="5">
+              <div style="display:grid; grid-template-columns:26px minmax(0,1fr) minmax(0,1fr); gap:12px; padding:6px 0;"><span style="color:var(--color-neutral-700);">{{ d.rank }}</span><span>{{ d.title }}</span><span style="color:var(--color-neutral-800);">{{ d.res }}</span></div>
+            </sc-for>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div style="display:flex; align-items:baseline; gap:12px;"><h3 style="font-size:20px; margin:0;">Snapshot at decision</h3><span style="display:flex; align-items:center; gap:5px; color:var(--color-neutral-700);"><i class="ph-duotone ph-lock-simple"></i>Frozen 9 Oct 2026, 16:42 · snapshot 7c41e9 · later revisions will not change these numbers</span></div>
+            <table class="table" style="font-size:13px;">
+              <thead><tr><th>Line</th><th>Box</th><th>Awarded to</th><th style="text-align:right;">₹/box</th><th style="text-align:right;">Qty</th><th style="text-align:right;">Value</th><th>Source</th></tr></thead>
+              <tbody>
+                <sc-for list="{{ awardRows }}" as="r" hint-placeholder-count="12">
+                  <tr onClick="{{ r.go }}" style="{{ r.s }}"><td>{{ r.id }}</td><td>{{ r.name }}</td><td>{{ r.vendor }}</td><td style="text-align:right;">{{ r.p }}</td><td style="text-align:right;">{{ r.qty }}</td><td style="text-align:right;">{{ r.value }}</td><td style="color:var(--color-accent-700);">{{ r.src }}</td></tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <aside style="width:470px; flex:none; background:var(--color-surface); padding:22px 22px 30px; display:flex; flex-direction:column; gap:14px; position:sticky; top:0; align-self:flex-start; max-height:100vh; overflow:auto;">
+          <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Trace · {{ trLine.id }} · {{ trLine.name }}</span>
+          <dc-import name="SourceDoc" vid="{{ trVid }}" li="{{ trLi }}" hint-size="100%,560px"></dc-import>
+        </aside>
+      </div>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;rfq&quot;,&quot;responses&quot;,&quot;award&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Screen&quot;}}">
+class Component extends DCLogic {
+  state = { screen: 'home', tab: 'All', rfqTab: 'lines', tr: 0 };
+  componentDidMount() {
+    this._h = () => { const h = (location.hash || '').slice(1); this.setState({ screen: ['rfq', 'responses', 'award'].includes(h) ? h : (this.props.startScreen || 'home') }); };
+    this._h(); window.addEventListener('hashchange', this._h);
+    if (!window.KD) this._t = setInterval(() => { if (window.KD) { clearInterval(this._t); this.forceUpdate(); } }, 120);
+  }
+  componentWillUnmount() { window.removeEventListener('hashchange', this._h); clearInterval(this._t); }
+  renderVals() {
+    const K = window.KD, S = this.state;
+    const go = s => () => this.setState({ screen: s });
+    const navS = on => ({ display: 'flex', alignItems: 'center', gap: 10, padding: '7px 10px', textDecoration: 'none', fontSize: 14, color: on ? 'var(--color-accent-800)' : 'var(--color-text)', background: on ? 'var(--color-accent-100)' : 'transparent', borderRadius: 'var(--radius-md)' });
+    const nav = [['ph-tray', 'Sourcing events', '#', 'home'], ['ph-users-three', 'Vendors', '#'], ['ph-calculator', 'Should-cost library', '#'], ['ph-files', 'Templates', '#'], ['ph-chart-line', 'Reports', '#']].map(n => ({ icon: n[0], label: n[1], href: n[2], go: n[3] ? go(n[3]) : undefined, s: navS(S.screen === 'home' && n[3] === 'home') }));
+    const evNav = [['RFQ', '#rfq', 'rfq'], ['Replies', '#responses', 'responses'], ['Comparison — A Ledger', 'Direction A - Ledger.dc.html'], ['Comparison — B Brief', 'Direction B - Brief.dc.html'], ['Comparison — C Docket', 'Direction C - Docket.dc.html'], ['Award record', '#award', 'award']].map(n => ({ label: n[0], href: n[1], go: n[2] ? go(n[2]) : undefined, s: { ...navS(S.screen === n[2]), paddingLeft: 14 } }));
+    const base = { nav, evNav, inEvent: S.screen !== 'home', isHome: S.screen === 'home', isRfq: S.screen === 'rfq', isResp: S.screen === 'responses', isAward: S.screen === 'award', noop: () => {} };
+    if (!K) return base;
+    const tabS = on => ({ whiteSpace: 'nowrap', background: 'none', border: 0, padding: '4px 0', font: 'inherit', fontSize: 14, cursor: 'pointer', color: on ? 'var(--color-text)' : 'var(--color-neutral-700)', fontWeight: on ? 600 : 400, boxShadow: on ? 'inset 0 -2px 0 var(--color-text)' : 'none' });
+    const statuses = ['All', 'Drafting', 'Collecting replies', 'Comparing', 'Awaiting approval', 'Awarded', 'Closed'];
+    const tabs = statuses.map(s => ({ label: s, n: s === 'All' ? K.events.length : K.events.filter(e => e.status === s).length, go: () => this.setState({ tab: s }), s: tabS(S.tab === s) }));
+    const tagFor = s => s === 'Comparing' ? 'tag tag-accent' : s === 'Awaiting approval' ? 'tag tag-accent-2' : s === 'Awarded' ? 'tag tag-outline' : 'tag tag-neutral';
+    const events = K.events.filter(e => S.tab === 'All' || e.status === S.tab).map(e => ({ ...e, tagCls: tagFor(e.status), valueTxt: e.value ? K.crore(e.value) : '—', href: e.current ? 'Direction A - Ledger.dc.html' : '#', action: e.current ? 'Open' : e.status === 'Drafting' ? 'Continue' : 'View', pastNote: e.past ? 'Source for “same as last year” in SE-2026-041' : '' }));
+    const rfqChat = [['Vikram', 'Same boxes as last year’s H2 event, plus the five new SKUs for the juicer and tower fan launch. Make the exhaust fan carton 5-ply — we had crushing complaints.'],
+      ['Parakh', 'Drafted 30 lines: 25 carried over from SE-2025-037, 5 new from the PLM bill of materials. L14 is now 5-ply BC, 180/120/150/120/180 GSM, BF 22. Quantities are from the H2 forecast.'],
+      ['Parakh', 'Two things to check: L28 has no artwork yet, so I set it to 2-colour. L30 is 1 lakh pieces, three times last year.'],
+      ['Vikram', 'L30 is right, warranty sleeves now ship with every SKU. Add a quality questionnaire — ISO and a recent test report are mandatory.'],
+      ['Parakh', 'Added 10 questions, 2 of them mandatory. Vendors can answer in any format; I’ll read whatever comes back.']].map(m => { const u = m[0] === 'Vikram';
+        return { who: m[0], text: m[1], s: { display: 'flex', flexDirection: 'column', gap: 3, alignItems: u ? 'flex-end' : 'flex-start', paddingLeft: u ? 40 : 0 }, ws: { fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: u ? 'var(--color-neutral-700)' : 'var(--color-accent-700)' }, ps: { margin: 0, fontSize: 14, fontStyle: u ? 'italic' : 'normal', textAlign: u ? 'right' : 'left', textWrap: 'pretty' } }; });
+    const rfqRows = K.lines.map(l => { const ch = l.i === 13; return { id: l.id, tag: ch ? 'changed by chat' : l.i >= 25 ? 'new SKU' : '', name: l.name, ply: l.ply, flute: l.flute, dims: l.dims, gsm: l.gsm, bf: l.bf, print: l.print, qtyK: l.qtyK,
+      plyS: { minHeight: 30, padding: '3px 8px', fontSize: 13, background: ch ? 'var(--color-accent-100)' : undefined, borderColor: ch ? 'var(--color-accent)' : undefined },
+      s: { display: 'grid', gridTemplateColumns: '44px minmax(180px,1.4fr) 50px 50px 120px minmax(150px,1fr) 52px 88px 66px', gap: '0 8px', alignItems: 'center', padding: '4px 0', background: ch ? 'var(--color-accent-100)' : 'transparent' } }; });
+    const rfqTabs = [['lines', 'Line items · 30'], ['q', 'Questionnaire · 10'], ['t', 'Terms']].map(t => ({ label: t[1], go: () => this.setState({ rfqTab: t[0] }), s: tabS(S.rfqTab === t[0]) }));
+    const qRows = K.questions.map((q, k) => ({ n: k + 1, t: q[0], mand: q[1] ? 'Mandatory' : 'Scored', ev: k < 2 ? 'Attach document' : 'Free answer' }));
+    const resp = K.vendors.map(v => { const miss = K.cells[v.id].filter(c => c.p == null).map(c => K.lines[c.i].id); const dbl = K.doubts.filter(d => d.vid === v.id);
+      const conv = { SB: 'No conversion. Matched their item names to our 30 lines by size, ply and BF.', VP: 'USD → ₹ at RBI reference ₹88.20; 2.5% footnote discount applied.', KP: 'Per 100 nos → per box; freight ₹38 per 100 added.', AC: 'Read from photo; perspective corrected. One hand-written correction.', RB: 'Per kg → per box from board weight; print from last year; freight estimated.' }[v.id];
+      return { ...v, revised: v.revised || '', coverTxt: `${30 - miss.length} of 30 lines quoted`, missTxt: miss.length ? `${miss.length} missing: ${miss.join(', ')}` : 'All lines quoted',
+        seg: K.cells[v.id].map(c => ({ display: 'block', width: 9, height: 14, background: c.p == null ? 'transparent' : c.kind === 'doubt' ? 'var(--color-accent-2)' : 'var(--color-neutral-700)', boxShadow: c.p == null ? 'inset 0 0 0 1px var(--color-neutral-400)' : 'none' })),
+        readTxt: dbl.length ? `Read · ${dbl.length} doubt${dbl.length > 1 ? 's' : ''} raised (${dbl.map(d => d.lineIds).join('; ')})` : 'Read · both reads agree on every price', convTxt: conv,
+        qTxt: v.q.returned ? `${v.q.score} / 100 · ${v.q.cleared ? 'cleared' : v.q.mandFail + ' mandatory items failed'}` : 'not returned', docsL: v.docs.map(d => ({ n: d[0], s: d[1] })), noDocs: v.docs.length ? '' : 'No documents attached. Reminder drafted.' }; });
+    const Q = K.qual, delta = Q.total - K.baseline.total;
+    const ly = K.lines.filter(l => l.lastYear).reduce((s, l) => s + l.lyPrice * l.qty, 0), now = K.lines.filter(l => l.lastYear).reduce((s, l) => s + Q.per[l.i].p * l.qty, 0);
+    const awardRows = Q.per.map((x, k) => { const l = K.lines[x.i], c = K.cells[x.vid][x.i]; return { id: l.id, name: l.name, vendor: K.VI[x.vid].short, p: K.num(x.p), qty: l.qty.toLocaleString('en-IN'), value: K.lakh(x.p * l.qty), src: `${K.VI[x.vid].fmt} · ${c.loc.split(';')[0]}`, go: () => this.setState({ tr: k }),
+      s: { cursor: 'pointer', background: S.tr === k ? 'var(--color-accent-100)' : undefined } }; });
+    const trx = Q.per[S.tr];
+    const res = { D1: 'Moot — Anand excluded on quality.', D4: 'Moot — Anand excluded on quality.', D3: 'Moot — Rohit Box excluded (no questionnaire).', D5: 'Moot — Rohit Box excluded (no questionnaire).', D2: 'Resolved — Vardhman confirmed by email (9 Oct, 11:05): discount applies on the half-year award value.' };
+    return { ...base, tabs, events, rfqChat, rfqRows, rfqTabs, qRows, rfqLines: S.rfqTab === 'lines', rfqQ: S.rfqTab === 'q', rfqT: S.rfqTab === 't', resp,
+      awardSummary: `Award each line to the lowest price among vendors who cleared the quality questionnaire: Shree Balaji ${Q.by.SB.lines} lines, Vardhman ${Q.by.VP.lines}, Kaveri ${Q.by.KP.lines}. This costs ${K.lakh(delta)} more than the cheapest-per-line option, which would have given 26 lines to two vendors without a valid ISO certificate or questionnaire.`,
+      kpis: [{ v: K.crore(Q.total), t: 'award value, ex-GST' }, { v: '+' + K.lakh(delta), t: 'vs cheapest per line' }, { v: '+' + ((now / ly - 1) * 100).toFixed(1) + '%', t: 'vs last year, like-for-like 25 lines' }, { v: '3', t: 'vendors · none above 50% of value' }],
+      decisions: K.doubts.map(d => ({ rank: d.rank, title: d.title, res: res[d.id] })), awardRows, trLine: K.lines[trx.i], trVid: trx.vid, trLi: trx.i };
+  }
+}
+</script>
+</body>
+</html>

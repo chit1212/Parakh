@@ -1,0 +1,2191 @@
+{
+  "event": {
+    "id": "SE-2026-041",
+    "title": "Corrugated boxes, FY27 H2",
+    "buyer_co": "Sahyadri Appliances Pvt. Ltd.",
+    "plant": "Plant 2, MIDC Chakan, Pune 410501",
+    "buyer": "Vikram Deshpande",
+    "buyer_role": "Category Buyer, Packaging",
+    "buyer_email": "vikram.deshpande@sahyadri-appliances.example",
+    "vp": "Meera Kulkarni",
+    "vp_role": "VP, Procurement",
+    "issued": "22 Sep 2026",
+    "due": "03 Oct 2026",
+    "ly_event": "SE-2025-037",
+    "basis": "Price per box (or per piece for accessories), in INR, delivered to Plant 2 Chakan, GST extra"
+  },
+  "basis": "Price per box (or per piece for accessories), in INR, delivered to Plant 2 Chakan, GST extra",
+  "usd_reference_rate": 88.2,
+  "lines": [
+    {
+      "id": "L01",
+      "name": "Steam iron, unit carton",
+      "kind": "RSC",
+      "size": "280 x 140 x 150 mm (internal)",
+      "ply": "3-ply E",
+      "ply_n": 3,
+      "colours": 4,
+      "qty": 156000,
+      "area_m2": 0.2537,
+      "weight_kg": 0.111,
+      "spec": "3-ply E, 150/120/120 GSM, top 18 BF, flute E, 4-colour flexo print",
+      "should_cost": 5.03
+    },
+    {
+      "id": "L02",
+      "name": "Steam iron, master carton (6 units)",
+      "kind": "RSC",
+      "size": "450 x 300 x 440 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 1,
+      "qty": 26000,
+      "area_m2": 1.1359,
+      "weight_kg": 0.924,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 1-colour flexo print",
+      "should_cost": 39.69
+    },
+    {
+      "id": "L03",
+      "name": "Dry iron, unit carton",
+      "kind": "RSC",
+      "size": "260 x 130 x 140 mm (internal)",
+      "ply": "3-ply B",
+      "ply_n": 3,
+      "colours": 2,
+      "qty": 104000,
+      "area_m2": 0.22,
+      "weight_kg": 0.098,
+      "spec": "3-ply B, 150/120/120 GSM, top 18 BF, flute B, 2-colour flexo print",
+      "should_cost": 4.12
+    },
+    {
+      "id": "L04",
+      "name": "Dry iron, master carton (8 units)",
+      "kind": "RSC",
+      "size": "540 x 270 x 300 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 1,
+      "qty": 13000,
+      "area_m2": 0.9434,
+      "weight_kg": 0.768,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 1-colour flexo print",
+      "should_cost": 32.98
+    },
+    {
+      "id": "L05",
+      "name": "Mixer grinder 750W, unit carton",
+      "kind": "RSC",
+      "size": "380 x 300 x 420 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 4,
+      "qty": 91000,
+      "area_m2": 1.0044,
+      "weight_kg": 0.817,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 4-colour flexo print",
+      "should_cost": 36.22
+    },
+    {
+      "id": "L06",
+      "name": "Mixer grinder, master carton (2 units)",
+      "kind": "RSC",
+      "size": "610 x 390 x 430 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 1,
+      "qty": 45500,
+      "area_m2": 1.6687,
+      "weight_kg": 1.358,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 1-colour flexo print",
+      "should_cost": 58.24
+    },
+    {
+      "id": "L07",
+      "name": "Juicer mixer, unit carton",
+      "kind": "RSC",
+      "size": "420 x 320 x 450 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 4,
+      "qty": 31000,
+      "area_m2": 1.1665,
+      "weight_kg": 0.949,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 4-colour flexo print",
+      "should_cost": 41.99
+    },
+    {
+      "id": "L08",
+      "name": "Hand blender, unit carton",
+      "kind": "RSC",
+      "size": "300 x 110 x 90 mm (internal)",
+      "ply": "3-ply E",
+      "ply_n": 3,
+      "colours": 4,
+      "qty": 65000,
+      "area_m2": 0.171,
+      "weight_kg": 0.075,
+      "spec": "3-ply E, 150/120/120 GSM, top 18 BF, flute E, 4-colour flexo print",
+      "should_cost": 3.54
+    },
+    {
+      "id": "L09",
+      "name": "Electric kettle 1.5L, unit carton",
+      "kind": "RSC",
+      "size": "230 x 200 x 250 mm (internal)",
+      "ply": "3-ply B",
+      "ply_n": 3,
+      "colours": 4,
+      "qty": 78000,
+      "area_m2": 0.4027,
+      "weight_kg": 0.179,
+      "spec": "3-ply B, 150/120/120 GSM, top 18 BF, flute B, 4-colour flexo print",
+      "should_cost": 7.79
+    },
+    {
+      "id": "L10",
+      "name": "Electric kettle, master carton (6 units)",
+      "kind": "RSC",
+      "size": "700 x 420 x 265 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 1,
+      "qty": 13000,
+      "area_m2": 1.5584,
+      "weight_kg": 1.268,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 1-colour flexo print",
+      "should_cost": 54.4
+    },
+    {
+      "id": "L11",
+      "name": "Pop-up toaster, unit carton",
+      "kind": "RSC",
+      "size": "330 x 220 x 230 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 2,
+      "qty": 39000,
+      "area_m2": 0.5108,
+      "weight_kg": 0.416,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 2-colour flexo print",
+      "should_cost": 18.16
+    },
+    {
+      "id": "L12",
+      "name": "Induction cooktop, unit carton",
+      "kind": "RSC",
+      "size": "380 x 320 x 120 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 2,
+      "qty": 52000,
+      "area_m2": 0.6314,
+      "weight_kg": 0.514,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 2-colour flexo print",
+      "should_cost": 22.39
+    },
+    {
+      "id": "L13",
+      "name": "Table fan 400mm, unit carton",
+      "kind": "RSC",
+      "size": "480 x 200 x 480 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 2,
+      "qty": 47000,
+      "area_m2": 0.9486,
+      "weight_kg": 0.772,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 2-colour flexo print",
+      "should_cost": 33.52
+    },
+    {
+      "id": "L14",
+      "name": "Exhaust fan 250mm, unit carton",
+      "kind": "RSC",
+      "size": "330 x 170 x 330 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 1,
+      "qty": 57000,
+      "area_m2": 0.5175,
+      "weight_kg": 0.421,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 1-colour flexo print",
+      "should_cost": 18.15
+    },
+    {
+      "id": "L15",
+      "name": "Pedestal fan, unit carton",
+      "kind": "RSC",
+      "size": "720 x 210 x 480 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 2,
+      "qty": 36500,
+      "area_m2": 1.3075,
+      "weight_kg": 1.064,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 2-colour flexo print",
+      "should_cost": 46.11
+    },
+    {
+      "id": "L16",
+      "name": "Wall fan, unit carton",
+      "kind": "RSC",
+      "size": "470 x 200 x 470 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 2,
+      "qty": 41500,
+      "area_m2": 0.9213,
+      "weight_kg": 0.75,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 2-colour flexo print",
+      "should_cost": 32.56
+    },
+    {
+      "id": "L17",
+      "name": "Ceiling fan 1200mm, unit carton",
+      "kind": "RSC",
+      "size": "520 x 320 x 210 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 1,
+      "qty": 117000,
+      "area_m2": 0.909,
+      "weight_kg": 0.74,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 1-colour flexo print",
+      "should_cost": 31.78
+    },
+    {
+      "id": "L18",
+      "name": "Ceiling fan, master carton (2 units)",
+      "kind": "RSC",
+      "size": "660 x 530 x 330 mm (internal)",
+      "ply": "7-ply BCB",
+      "ply_n": 7,
+      "colours": 1,
+      "qty": 58500,
+      "area_m2": 2.0769,
+      "weight_kg": 2.662,
+      "spec": "7-ply BCB, 200/140/140/140/140/140/180 GSM, top 22 BF, flutes B+C+B, 1-colour flexo print",
+      "should_cost": 120.45
+    },
+    {
+      "id": "L19",
+      "name": "Room heater 2000W, unit carton",
+      "kind": "RSC",
+      "size": "420 x 180 x 510 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 2,
+      "qty": 23500,
+      "area_m2": 0.8521,
+      "weight_kg": 0.693,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 2-colour flexo print",
+      "should_cost": 30.14
+    },
+    {
+      "id": "L20",
+      "name": "Water heater 15L, unit carton",
+      "kind": "RSC",
+      "size": "400 x 400 x 480 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 2,
+      "qty": 28500,
+      "area_m2": 1.4388,
+      "weight_kg": 1.171,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 2-colour flexo print",
+      "should_cost": 50.72
+    },
+    {
+      "id": "L21",
+      "name": "Water heater 25L, unit carton",
+      "kind": "RSC",
+      "size": "460 x 460 x 560 mm (internal)",
+      "ply": "7-ply BCB",
+      "ply_n": 7,
+      "colours": 2,
+      "qty": 21000,
+      "area_m2": 1.9125,
+      "weight_kg": 2.452,
+      "spec": "7-ply BCB, 200/140/140/140/140/140/180 GSM, top 22 BF, flutes B+C+B, 2-colour flexo print",
+      "should_cost": 111.52
+    },
+    {
+      "id": "L22",
+      "name": "Air cooler 40L, unit carton",
+      "kind": "RSC",
+      "size": "540 x 420 x 1100 mm (internal)",
+      "ply": "7-ply BCB",
+      "ply_n": 7,
+      "colours": 1,
+      "qty": 10500,
+      "area_m2": 2.9716,
+      "weight_kg": 3.809,
+      "spec": "7-ply BCB, 200/140/140/140/140/140/180 GSM, top 22 BF, flutes B+C+B, 1-colour flexo print",
+      "should_cost": 172.28
+    },
+    {
+      "id": "L23",
+      "name": "Rice cooker 1.8L, unit carton",
+      "kind": "RSC",
+      "size": "330 x 300 x 300 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 4,
+      "qty": 26000,
+      "area_m2": 0.777,
+      "weight_kg": 0.632,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 4-colour flexo print",
+      "should_cost": 28.13
+    },
+    {
+      "id": "L24",
+      "name": "Sandwich maker, unit carton",
+      "kind": "RSC",
+      "size": "290 x 250 x 120 mm (internal)",
+      "ply": "3-ply B",
+      "ply_n": 3,
+      "colours": 4,
+      "qty": 47000,
+      "area_m2": 0.4125,
+      "weight_kg": 0.184,
+      "spec": "3-ply B, 150/120/120 GSM, top 18 BF, flute B, 4-colour flexo print",
+      "should_cost": 7.97
+    },
+    {
+      "id": "L25",
+      "name": "Vegetable chopper, unit carton",
+      "kind": "RSC",
+      "size": "180 x 160 x 220 mm (internal)",
+      "ply": "3-ply E",
+      "ply_n": 3,
+      "colours": 4,
+      "qty": 52000,
+      "area_m2": 0.2717,
+      "weight_kg": 0.119,
+      "spec": "3-ply E, 150/120/120 GSM, top 18 BF, flute E, 4-colour flexo print",
+      "should_cost": 5.35
+    },
+    {
+      "id": "L26",
+      "name": "Partition set, 6-cell, for kettle master",
+      "kind": "ACC",
+      "size": "0.62 m2 board area",
+      "ply": "3-ply B",
+      "ply_n": 3,
+      "colours": 0,
+      "qty": 13000,
+      "area_m2": 0.62,
+      "weight_kg": 0.276,
+      "spec": "3-ply B, 150/120/120 GSM, top 18 BF, flute B, unprinted",
+      "should_cost": 10.63
+    },
+    {
+      "id": "L27",
+      "name": "Layer pad 1000 x 1200 mm, for pallets",
+      "kind": "ACC",
+      "size": "1.20 m2 board area",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 0,
+      "qty": 21000,
+      "area_m2": 1.2,
+      "weight_kg": 0.976,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, unprinted",
+      "should_cost": 41.5
+    },
+    {
+      "id": "L28",
+      "name": "Air fryer 4L, unit carton (new SKU)",
+      "kind": "RSC",
+      "size": "360 x 340 x 380 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 4,
+      "qty": 39000,
+      "area_m2": 1.0332,
+      "weight_kg": 0.841,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 4-colour flexo print",
+      "should_cost": 37.24
+    },
+    {
+      "id": "L29",
+      "name": "Air fryer, master carton (2 units) (new SKU)",
+      "kind": "RSC",
+      "size": "740 x 370 x 400 mm (internal)",
+      "ply": "5-ply BC",
+      "ply_n": 5,
+      "colours": 1,
+      "qty": 19500,
+      "area_m2": 1.7364,
+      "weight_kg": 1.413,
+      "spec": "5-ply BC, 180/120/120/120/150 GSM, top 20 BF, flutes B+C, 1-colour flexo print",
+      "should_cost": 60.6
+    },
+    {
+      "id": "L30",
+      "name": "Mixer grinder, die-cut jar insert",
+      "kind": "ACC",
+      "size": "0.21 m2 board area",
+      "ply": "3-ply B",
+      "ply_n": 3,
+      "colours": 0,
+      "qty": 91000,
+      "area_m2": 0.21,
+      "weight_kg": 0.094,
+      "spec": "3-ply B, 150/120/120 GSM, top 18 BF, flute B, unprinted",
+      "should_cost": 3.75
+    }
+  ],
+  "questionnaire": {
+    "pass_rule": "Questionnaire returned, score 70 or more, and both mandatory items (Q1 ISO 9001, Q2 test report within 12 months) passed",
+    "results": {
+      "SB": {
+        "returned": true,
+        "score": 84,
+        "iso": true,
+        "test_date": "12 Jun 2026"
+      },
+      "VP": {
+        "returned": true,
+        "score": 78,
+        "iso": true,
+        "test_date": "28 Apr 2026"
+      },
+      "KP": {
+        "returned": true,
+        "score": 71,
+        "iso": true,
+        "test_date": "05 Feb 2026"
+      },
+      "AC": {
+        "returned": true,
+        "score": 62,
+        "iso": false,
+        "test_date": "18 Jan 2025"
+      },
+      "RB": {
+        "returned": false,
+        "score": null,
+        "iso": null,
+        "test_date": null
+      }
+    },
+    "cleared": [
+      "SB",
+      "VP",
+      "KP"
+    ],
+    "excluded": {
+      "AC": "scored 62; no ISO 9001; test report dated 18 Jan 2025 (older than 12 months)",
+      "RB": "questionnaire not returned (replied by email only)"
+    }
+  },
+  "cells": {
+    "SB|L01": {
+      "as_written": "Rs 4.65/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G8",
+      "normalised": 5.0,
+      "calc": "4.65 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L03": {
+      "as_written": "Rs 3.67/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G9",
+      "normalised": 4.02,
+      "calc": "3.67 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L08": {
+      "as_written": "Rs 3.17/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G10",
+      "normalised": 3.52,
+      "calc": "3.17 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L09": {
+      "as_written": "Rs 7.64/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G11",
+      "normalised": 7.99,
+      "calc": "7.64 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L24": {
+      "as_written": "Rs 7.67/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G12",
+      "normalised": 8.02,
+      "calc": "7.67 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3",
+        "revised in R1 (was 7.92 ex-works in offer 0418)"
+      ]
+    },
+    "SB|L25": {
+      "as_written": "Rs 5.19/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G13",
+      "normalised": 5.54,
+      "calc": "5.19 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L26": {
+      "as_written": "Rs 10.06/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G14",
+      "normalised": 10.41,
+      "calc": "10.06 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L30": {
+      "as_written": "Rs 3.48/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G15",
+      "normalised": 3.83,
+      "calc": "3.48 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L02": {
+      "as_written": "Rs 38.57/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G17",
+      "normalised": 38.92,
+      "calc": "38.57 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L04": {
+      "as_written": "Rs 34.03/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G18",
+      "normalised": 34.38,
+      "calc": "34.03 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L05": {
+      "as_written": "Rs 35.03/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G19",
+      "normalised": 35.38,
+      "calc": "35.03 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3",
+        "revised in R1 (was 36.31 ex-works in offer 0418)"
+      ]
+    },
+    "SB|L06": {
+      "as_written": "Rs 59.18/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G20",
+      "normalised": 59.53,
+      "calc": "59.18 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L07": {
+      "as_written": "Rs 42.05/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G21",
+      "normalised": 42.4,
+      "calc": "42.05 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L10": {
+      "as_written": "Rs 54.70/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G22",
+      "normalised": 55.05,
+      "calc": "54.70 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L11": {
+      "as_written": "Rs 17.61/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G23",
+      "normalised": 17.96,
+      "calc": "17.61 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3",
+        "revised in R1 (was 18.36 ex-works in offer 0418)"
+      ]
+    },
+    "SB|L12": {
+      "as_written": "Rs 22.48/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G24",
+      "normalised": 22.83,
+      "calc": "22.48 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L13": {
+      "as_written": "Rs 34.37/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G25",
+      "normalised": 34.72,
+      "calc": "34.37 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L14": {
+      "as_written": "Rs 17.79/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G26",
+      "normalised": 18.14,
+      "calc": "17.79 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L15": {
+      "as_written": "Rs 44.55/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G27",
+      "normalised": 44.9,
+      "calc": "44.55 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L16": {
+      "as_written": "Rs 31.34/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G28",
+      "normalised": 31.69,
+      "calc": "31.34 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L17": {
+      "as_written": "Rs 32.23/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G29",
+      "normalised": 32.58,
+      "calc": "32.23 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L19": {
+      "as_written": "Rs 30.36/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G30",
+      "normalised": 30.71,
+      "calc": "30.36 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L20": {
+      "as_written": "Rs 51.18/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G31",
+      "normalised": 51.53,
+      "calc": "51.18 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L23": {
+      "as_written": "Rs 26.73/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G32",
+      "normalised": 27.08,
+      "calc": "26.73 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L27": {
+      "as_written": "Rs 42.21/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G33",
+      "normalised": 42.56,
+      "calc": "42.21 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L28": {
+      "as_written": "Rs 37.86/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G34",
+      "normalised": 38.21,
+      "calc": "37.86 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L29": {
+      "as_written": "Rs 58.50/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G35",
+      "normalised": 58.85,
+      "calc": "58.50 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L18": {
+      "as_written": "Rs 117.08/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G37",
+      "normalised": 117.43,
+      "calc": "117.08 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L21": {
+      "as_written": "Rs 107.28/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G38",
+      "normalised": 107.63,
+      "calc": "107.28 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "SB|L22": {
+      "as_written": "Rs 177.22/pc ex-works",
+      "source": "SBC_Offer_0418-R1_REVISED.xlsx, sheet Offer, cell G39",
+      "normalised": 177.57,
+      "calc": "177.22 + 0.35 freight",
+      "flags": [
+        "ex-works price; freight Rs 0.35/box is on the T&C sheet, cell B3"
+      ]
+    },
+    "VP|L01": {
+      "as_written": "USD 0.0551/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L01",
+      "normalised": 4.86,
+      "calc": "0.0551 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 4.74,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L02": {
+      "as_written": "USD 0.4668/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L02",
+      "normalised": 41.17,
+      "calc": "0.4668 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 40.14,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L03": {
+      "as_written": "USD 0.0475/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L03",
+      "normalised": 4.19,
+      "calc": "0.0475 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 4.09,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L04": {
+      "as_written": "USD 0.3900/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L04",
+      "normalised": 34.4,
+      "calc": "0.3900 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 33.54,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L05": {
+      "as_written": "USD 0.3941/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L05",
+      "normalised": 34.76,
+      "calc": "0.3941 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 33.89,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L06": {
+      "as_written": "USD 0.6494/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L06",
+      "normalised": 57.28,
+      "calc": "0.6494 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 55.85,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L07": {
+      "as_written": "USD 0.4812/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L07",
+      "normalised": 42.44,
+      "calc": "0.4812 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 41.38,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L08": {
+      "as_written": "USD 0.0405/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L08",
+      "normalised": 3.57,
+      "calc": "0.0405 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 3.48,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L09": {
+      "as_written": "USD 0.0858/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L09",
+      "normalised": 7.57,
+      "calc": "0.0858 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 7.38,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L10": {
+      "as_written": "USD 0.6383/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L10",
+      "normalised": 56.3,
+      "calc": "0.6383 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 54.89,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L11": {
+      "as_written": "USD 0.2124/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L11",
+      "normalised": 18.73,
+      "calc": "0.2124 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 18.26,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L12": {
+      "as_written": "USD 0.2493/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L12",
+      "normalised": 21.99,
+      "calc": "0.2493 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 21.44,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L13": {
+      "as_written": "USD 0.3679/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L13",
+      "normalised": 32.45,
+      "calc": "0.3679 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 31.64,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L14": {
+      "as_written": "USD 0.2088/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L14",
+      "normalised": 18.42,
+      "calc": "0.2088 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 17.96,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L15": {
+      "as_written": "USD 0.5184/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L15",
+      "normalised": 45.72,
+      "calc": "0.5184 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 44.58,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L16": {
+      "as_written": "USD 0.3746/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L16",
+      "normalised": 33.04,
+      "calc": "0.3746 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 32.21,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L17": {
+      "as_written": "USD 0.3601/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L17",
+      "normalised": 31.76,
+      "calc": "0.3601 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 30.97,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L18": {
+      "as_written": "USD 1.3527/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L18",
+      "normalised": 119.31,
+      "calc": "1.3527 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 116.33,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L19": {
+      "as_written": "USD 0.3270/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L19",
+      "normalised": 28.84,
+      "calc": "0.3270 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 28.12,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L20": {
+      "as_written": "USD 0.5561/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L20",
+      "normalised": 49.05,
+      "calc": "0.5561 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 47.82,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L21": {
+      "as_written": "USD 1.2596/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L21",
+      "normalised": 111.1,
+      "calc": "1.2596 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 108.32,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L22": {
+      "as_written": "USD 1.9934/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L22",
+      "normalised": 175.82,
+      "calc": "1.9934 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 171.42,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L23": {
+      "as_written": "USD 0.3168/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L23",
+      "normalised": 27.94,
+      "calc": "0.3168 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 27.24,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L24": {
+      "as_written": "USD 0.0924/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L24",
+      "normalised": 8.15,
+      "calc": "0.0924 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 7.95,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L25": {
+      "as_written": "USD 0.0609/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L25",
+      "normalised": 5.37,
+      "calc": "0.0609 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 5.24,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L26": {
+      "as_written": "USD 0.1246/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L26",
+      "normalised": 10.99,
+      "calc": "0.1246 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 10.72,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L27": {
+      "as_written": "USD 0.4771/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L27",
+      "normalised": 42.08,
+      "calc": "0.4771 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 41.03,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L28": {
+      "as_written": "USD 0.4154/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L28",
+      "normalised": 36.64,
+      "calc": "0.4154 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 35.72,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L29": {
+      "as_written": "USD 0.6647/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L29",
+      "normalised": 58.63,
+      "calc": "0.6647 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 57.16,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "VP|L30": {
+      "as_written": "USD 0.0408/box delivered",
+      "source": "Vardhman_Quotation_VPE-Q-2611.pdf, page 1, row L30",
+      "normalised": 3.6,
+      "calc": "0.0408 x 88.2 (reference rate, 01 Oct 2026; vendor invoices at invoice-date rate)",
+      "with_conditional_discount": 3.51,
+      "flags": [
+        "quoted in USD",
+        "2.5% discount in footnote on page 3 applies only if a single PO exceeds Rs 25 lakh"
+      ]
+    },
+    "KP|L01": {
+      "as_written": "Rs 446.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L01",
+      "normalised": 4.92,
+      "calc": "446.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L02": {
+      "as_written": "Rs 4,134.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L02",
+      "normalised": 41.8,
+      "calc": "4134.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L03": {
+      "as_written": "Rs 388.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L03",
+      "normalised": 4.34,
+      "calc": "388.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L04": {
+      "as_written": "Rs 3,394.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L04",
+      "normalised": 34.4,
+      "calc": "3394.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L05": {
+      "as_written": "Rs 3,519.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L05",
+      "normalised": 35.65,
+      "calc": "3519.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L06": {
+      "as_written": "Rs 5,980.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L06",
+      "normalised": 60.26,
+      "calc": "5980.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L07": {
+      "as_written": "Rs 4,093.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L07",
+      "normalised": 41.39,
+      "calc": "4093.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L08": {
+      "as_written": "Rs 328.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L08",
+      "normalised": 3.74,
+      "calc": "328.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L09": {
+      "as_written": "Rs 579.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L09",
+      "normalised": 6.25,
+      "calc": "579.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph",
+        "OUT OF RANGE: Rs 5.79/box is about 25% below should-cost for this spec. Likely a typo. Must be confirmed by the vendor before it can win the line"
+      ]
+    },
+    "KP|L10": {
+      "as_written": "Rs 5,627.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L10",
+      "normalised": 56.73,
+      "calc": "5627.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L11": {
+      "as_written": "Rs 1,825.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L11",
+      "normalised": 18.71,
+      "calc": "1825.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L12": {
+      "as_written": "Rs 2,221.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L12",
+      "normalised": 22.67,
+      "calc": "2221.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L13": {
+      "as_written": "Rs 3,480.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L13",
+      "normalised": 35.26,
+      "calc": "3480.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L14": {
+      "as_written": "Rs 1,882.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L14",
+      "normalised": 19.28,
+      "calc": "1882.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L15": {
+      "as_written": "Rs 4,548.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L15",
+      "normalised": 45.94,
+      "calc": "4548.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L16": {
+      "as_written": "Rs 3,256.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L16",
+      "normalised": 33.02,
+      "calc": "3256.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L17": {
+      "as_written": "Rs 3,264.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L17",
+      "normalised": 33.1,
+      "calc": "3264.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L18": {
+      "as_written": "Rs 12,439.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L18",
+      "normalised": 124.85,
+      "calc": "12439.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L19": {
+      "as_written": "Rs 3,004.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L19",
+      "normalised": 30.5,
+      "calc": "3004.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L20": {
+      "as_written": "Rs 5,104.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L20",
+      "normalised": 51.5,
+      "calc": "5104.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L21": {
+      "as_written": "Rs 11,808.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L21",
+      "normalised": 118.54,
+      "calc": "11808.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L22": {
+      "as_written": "Rs 17,172.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L22",
+      "normalised": 172.18,
+      "calc": "17172.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L23": {
+      "as_written": "Rs 2,749.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L23",
+      "normalised": 27.95,
+      "calc": "2749.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L24": {
+      "as_written": "Rs 781.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L24",
+      "normalised": 8.27,
+      "calc": "781.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L25": {
+      "as_written": "Rs 489.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L25",
+      "normalised": 5.35,
+      "calc": "489.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L26": {
+      "as_written": "Rs 1,077.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L26",
+      "normalised": 11.23,
+      "calc": "1077.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L27": {
+      "as_written": "Rs 4,121.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L27",
+      "normalised": 41.67,
+      "calc": "4121.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L28": {
+      "as_written": "Rs 3,898.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L28",
+      "normalised": 39.44,
+      "calc": "3898.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L29": {
+      "as_written": "Rs 6,068.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L29",
+      "normalised": 61.14,
+      "calc": "6068.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "KP|L30": {
+      "as_written": "Rs 350.00 per 100 pcs ex-works",
+      "source": "Kaveri_Quotation_SE-2026-041.docx, table 1, row L30",
+      "normalised": 3.96,
+      "calc": "350.00 / 100 + 0.40 x 1.15",
+      "flags": [
+        "priced per 100 pieces",
+        "ex-works; freight Rs 0.40/box plus 15% handling is in the commercial paragraph"
+      ]
+    },
+    "AC|L01": {
+      "as_written": "Rs 5.07/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 1",
+      "normalised": 5.07,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L02": {
+      "as_written": "Rs 39.91/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 2",
+      "normalised": 39.91,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L03": {
+      "as_written": "Rs 3.95/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 3",
+      "normalised": 3.95,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L04": {
+      "as_written": "Rs 31.50/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 4",
+      "normalised": 31.5,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L05": {
+      "as_written": "Rs 34.17/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 5",
+      "normalised": 34.17,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L06": {
+      "as_written": "Rs 55.72/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 6",
+      "normalised": 55.72,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L07": {
+      "as_written": "not quoted",
+      "source": "Anand_RateCard_photo.jpg, footnote 'We do not make'",
+      "normalised": null,
+      "calc": null,
+      "flags": [
+        "not quoted (27 of 30 lines)"
+      ]
+    },
+    "AC|L08": {
+      "as_written": "Rs 3.35/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 7",
+      "normalised": 3.35,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L09": {
+      "as_written": "Rs 7.49/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 8",
+      "normalised": 7.49,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L10": {
+      "as_written": "Rs 53.91/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 9",
+      "normalised": 53.91,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L11": {
+      "as_written": "Rs 17.33/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 10",
+      "normalised": 17.33,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L12": {
+      "as_written": "Rs 21.71/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 11",
+      "normalised": 21.71,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L13": {
+      "as_written": "Rs 32.21/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 12",
+      "normalised": 32.21,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L14": {
+      "as_written": "Rs 8.85/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 13",
+      "normalised": 8.85,
+      "calc": "as written",
+      "flags": [
+        "ALTERNATE: quoted 3-ply where 5-ply BC was asked. Not comparable; buyer must accept or reject the substitute"
+      ]
+    },
+    "AC|L15": {
+      "as_written": "Rs 43.86/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 14",
+      "normalised": 43.86,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L16": {
+      "as_written": "Rs 33.51/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 15",
+      "normalised": 33.51,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L17": {
+      "as_written": "Rs 31.58/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 16",
+      "normalised": 31.58,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L18": {
+      "as_written": "Rs 120.92/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 17",
+      "normalised": 120.92,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L19": {
+      "as_written": "Rs 31.20/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 18",
+      "normalised": 31.2,
+      "calc": "as written",
+      "flags": [
+        "HANDWRITTEN: printed 29.83 is struck out; pen value reads 31.20 but the 1 looks like a 7 (37.20). Confirm with vendor"
+      ]
+    },
+    "AC|L20": {
+      "as_written": "Rs 49.95/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 19",
+      "normalised": 49.95,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L21": {
+      "as_written": "Rs 114.50/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 20",
+      "normalised": 114.5,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L22": {
+      "as_written": "not quoted",
+      "source": "Anand_RateCard_photo.jpg, footnote 'We do not make'",
+      "normalised": null,
+      "calc": null,
+      "flags": [
+        "not quoted (27 of 30 lines)"
+      ]
+    },
+    "AC|L23": {
+      "as_written": "Rs 28.51/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 21",
+      "normalised": 28.51,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L24": {
+      "as_written": "Rs 7.52/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 22",
+      "normalised": 7.52,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L25": {
+      "as_written": "Rs 5.31/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 23",
+      "normalised": 5.31,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L26": {
+      "as_written": "Rs 10.89/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 24",
+      "normalised": 10.89,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L27": {
+      "as_written": "Rs 41.39/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 25",
+      "normalised": 41.39,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L28": {
+      "as_written": "Rs 36.72/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 26",
+      "normalised": 36.72,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L29": {
+      "as_written": "Rs 60.50/pc delivered",
+      "source": "Anand_RateCard_photo.jpg, row 27",
+      "normalised": 60.5,
+      "calc": "as written",
+      "flags": []
+    },
+    "AC|L30": {
+      "as_written": "not quoted",
+      "source": "Anand_RateCard_photo.jpg, footnote 'We do not make'",
+      "normalised": null,
+      "calc": null,
+      "flags": [
+        "not quoted (27 of 30 lines)"
+      ]
+    },
+    "RB|L01": {
+      "as_written": "Rs 38/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 5.02,
+      "calc": "0.111 kg x 38 + 0.80 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 5.32
+    },
+    "RB|L02": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 39.01,
+      "calc": "0.924 kg x 42 + 0.20 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 39.31
+    },
+    "RB|L03": {
+      "as_written": "Rs 38/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 4.12,
+      "calc": "0.098 kg x 38 + 0.40 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 4.42
+    },
+    "RB|L04": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 32.46,
+      "calc": "0.768 kg x 42 + 0.20 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 32.76
+    },
+    "RB|L05": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 35.11,
+      "calc": "0.817 kg x 42 + 0.80 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 35.41
+    },
+    "RB|L06": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 57.24,
+      "calc": "1.358 kg x 42 + 0.20 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 57.54
+    },
+    "RB|L07": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 40.66,
+      "calc": "0.949 kg x 42 + 0.80 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 40.96
+    },
+    "RB|L08": {
+      "as_written": "Rs 38/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 3.65,
+      "calc": "0.075 kg x 38 + 0.80 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 3.95
+    },
+    "RB|L09": {
+      "as_written": "Rs 38/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 7.6,
+      "calc": "0.179 kg x 38 + 0.80 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 7.9
+    },
+    "RB|L10": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 53.46,
+      "calc": "1.268 kg x 42 + 0.20 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 53.76
+    },
+    "RB|L11": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 17.87,
+      "calc": "0.416 kg x 42 + 0.40 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 18.17
+    },
+    "RB|L12": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 21.99,
+      "calc": "0.514 kg x 42 + 0.40 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 22.29
+    },
+    "RB|L13": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 32.82,
+      "calc": "0.772 kg x 42 + 0.40 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 33.12
+    },
+    "RB|L14": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 17.88,
+      "calc": "0.421 kg x 42 + 0.20 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 18.18
+    },
+    "RB|L15": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 45.09,
+      "calc": "1.064 kg x 42 + 0.40 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 45.39
+    },
+    "RB|L16": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 31.9,
+      "calc": "0.750 kg x 42 + 0.40 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 32.2
+    },
+    "RB|L17": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 31.28,
+      "calc": "0.740 kg x 42 + 0.20 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 31.58
+    },
+    "RB|L18": {
+      "as_written": "Rs 44/kg (last year)",
+      "source": "Re_RFQ_SE-2026-041.eml, last year's rate (SE-2025-037, Rohit Box quote sheet), via 'rest same as last year'",
+      "normalised": 117.33,
+      "calc": "2.662 kg x 44 + 0.20 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "7-ply rate resolved from last year's quote",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 117.63
+    },
+    "RB|L19": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 29.51,
+      "calc": "0.693 kg x 42 + 0.40 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 29.81
+    },
+    "RB|L20": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 49.58,
+      "calc": "1.171 kg x 42 + 0.40 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 49.88
+    },
+    "RB|L21": {
+      "as_written": "Rs 44/kg (last year)",
+      "source": "Re_RFQ_SE-2026-041.eml, last year's rate (SE-2025-037, Rohit Box quote sheet), via 'rest same as last year'",
+      "normalised": 108.29,
+      "calc": "2.452 kg x 44 + 0.40 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "7-ply rate resolved from last year's quote",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 108.59
+    },
+    "RB|L22": {
+      "as_written": "Rs 44/kg (last year)",
+      "source": "Re_RFQ_SE-2026-041.eml, last year's rate (SE-2025-037, Rohit Box quote sheet), via 'rest same as last year'",
+      "normalised": 167.8,
+      "calc": "3.809 kg x 44 + 0.20 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "7-ply rate resolved from last year's quote",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 168.1
+    },
+    "RB|L23": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 27.34,
+      "calc": "0.632 kg x 42 + 0.80 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 27.64
+    },
+    "RB|L24": {
+      "as_written": "Rs 38/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 7.79,
+      "calc": "0.184 kg x 38 + 0.80 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 8.09
+    },
+    "RB|L25": {
+      "as_written": "Rs 38/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 5.32,
+      "calc": "0.119 kg x 38 + 0.80 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 5.62
+    },
+    "RB|L26": {
+      "as_written": "Rs 38/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 10.49,
+      "calc": "0.276 kg x 38 + 0.00 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)"
+      ],
+      "with_ly_freight": 10.79
+    },
+    "RB|L27": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 40.99,
+      "calc": "0.976 kg x 42 + 0.00 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)"
+      ],
+      "with_ly_freight": 41.29
+    },
+    "RB|L28": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 36.12,
+      "calc": "0.841 kg x 42 + 0.80 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 36.42
+    },
+    "RB|L29": {
+      "as_written": "Rs 42/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 59.55,
+      "calc": "1.413 kg x 42 + 0.20 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 59.85
+    },
+    "RB|L30": {
+      "as_written": "Rs 38/kg",
+      "source": "Re_RFQ_SE-2026-041.eml, email body",
+      "normalised": 3.72,
+      "calc": "0.094 kg x 38 + 0.15 print",
+      "flags": [
+        "priced per kg; box weight computed from the RFQ spec",
+        "freight extra, amount not given (last year it was Rs 0.30/box)",
+        "printing and die-cutting at last year's rates"
+      ],
+      "with_ly_freight": 4.02
+    }
+  },
+  "scenarios": {
+    "cheapest_overall_all_vendors": {
+      "total_inr": 40077050,
+      "winners": {
+        "L01": "VP",
+        "L02": "SB",
+        "L03": "AC",
+        "L04": "AC",
+        "L05": "AC",
+        "L06": "AC",
+        "L07": "RB",
+        "L08": "AC",
+        "L09": "AC",
+        "L10": "RB",
+        "L11": "AC",
+        "L12": "AC",
+        "L13": "AC",
+        "L14": "RB",
+        "L15": "AC",
+        "L16": "SB",
+        "L17": "RB",
+        "L18": "RB",
+        "L19": "VP",
+        "L20": "VP",
+        "L21": "SB",
+        "L22": "RB",
+        "L23": "SB",
+        "L24": "AC",
+        "L25": "AC",
+        "L26": "SB",
+        "L27": "RB",
+        "L28": "RB",
+        "L29": "VP",
+        "L30": "VP"
+      }
+    },
+    "cheapest_per_line_quality_cleared": {
+      "total_inr": 40578360,
+      "winners": {
+        "L01": "VP",
+        "L02": "SB",
+        "L03": "SB",
+        "L04": "SB",
+        "L05": "VP",
+        "L06": "VP",
+        "L07": "KP",
+        "L08": "SB",
+        "L09": "VP",
+        "L10": "SB",
+        "L11": "SB",
+        "L12": "VP",
+        "L13": "VP",
+        "L14": "SB",
+        "L15": "SB",
+        "L16": "SB",
+        "L17": "VP",
+        "L18": "SB",
+        "L19": "VP",
+        "L20": "VP",
+        "L21": "SB",
+        "L22": "KP",
+        "L23": "SB",
+        "L24": "SB",
+        "L25": "KP",
+        "L26": "SB",
+        "L27": "KP",
+        "L28": "VP",
+        "L29": "VP",
+        "L30": "VP"
+      }
+    },
+    "quality_cleared_if_vardhman_discount_applies": {
+      "total_inr": 39984145,
+      "winners": {
+        "L01": "VP",
+        "L02": "SB",
+        "L03": "SB",
+        "L04": "VP",
+        "L05": "VP",
+        "L06": "VP",
+        "L07": "VP",
+        "L08": "VP",
+        "L09": "VP",
+        "L10": "VP",
+        "L11": "SB",
+        "L12": "VP",
+        "L13": "VP",
+        "L14": "VP",
+        "L15": "VP",
+        "L16": "SB",
+        "L17": "VP",
+        "L18": "VP",
+        "L19": "VP",
+        "L20": "VP",
+        "L21": "SB",
+        "L22": "VP",
+        "L23": "SB",
+        "L24": "VP",
+        "L25": "VP",
+        "L26": "SB",
+        "L27": "VP",
+        "L28": "VP",
+        "L29": "VP",
+        "L30": "VP"
+      }
+    },
+    "all_vendors_with_rohit_ly_freight": {
+      "total_inr": 40167170,
+      "winners": {
+        "L01": "VP",
+        "L02": "SB",
+        "L03": "AC",
+        "L04": "AC",
+        "L05": "AC",
+        "L06": "AC",
+        "L07": "RB",
+        "L08": "AC",
+        "L09": "AC",
+        "L10": "RB",
+        "L11": "AC",
+        "L12": "AC",
+        "L13": "AC",
+        "L14": "SB",
+        "L15": "AC",
+        "L16": "SB",
+        "L17": "AC",
+        "L18": "SB",
+        "L19": "VP",
+        "L20": "VP",
+        "L21": "SB",
+        "L22": "RB",
+        "L23": "SB",
+        "L24": "AC",
+        "L25": "AC",
+        "L26": "SB",
+        "L27": "RB",
+        "L28": "RB",
+        "L29": "VP",
+        "L30": "VP"
+      }
+    }
+  },
+  "expected_doubts": [
+    {
+      "id": "D1",
+      "title": "Vardhman's 2.5% discount applies only if a single PO exceeds Rs 25 lakh",
+      "why": "Footnote on page 3. The RFQ says monthly POs per vendor run Rs 15-30 lakh, so whether it applies depends on how the award is split and how POs are raised.",
+      "route": "vendor",
+      "lines_that_change_in_quality_scenario": [
+        "L04",
+        "L07",
+        "L08",
+        "L10",
+        "L14",
+        "L15",
+        "L18",
+        "L22",
+        "L24",
+        "L25",
+        "L27"
+      ]
+    },
+    {
+      "id": "D2",
+      "title": "Rohit Box: freight extra, amount not given",
+      "why": "Rohit wins lines in the cheapest-overall view only before freight. Last year's freight was Rs 0.30/box.",
+      "route": "vendor",
+      "lines_that_change_if_ly_freight_added": [
+        "L14",
+        "L17",
+        "L18"
+      ]
+    },
+    {
+      "id": "D3",
+      "title": "Anand offered 3-ply on L14 where 5-ply was asked",
+      "why": "If accepted, Anand wins L14 at a much lower price.",
+      "route": "buyer (judgement)",
+      "lines_that_change_if_accepted": [
+        "L14"
+      ]
+    },
+    {
+      "id": "D4",
+      "title": "Kaveri L09 at Rs 5.79/box is far below should-cost",
+      "why": "Looks like a typo in the per-100 rate. If real, Kaveri wins L09 in the quality scenario.",
+      "route": "vendor",
+      "lines_that_change_if_accepted": [
+        "L09"
+      ]
+    },
+    {
+      "id": "D5",
+      "title": "Anand L19 handwritten correction: 31.20 or 37.20?",
+      "why": "Ambiguous pen digit.",
+      "route": "vendor",
+      "lines_that_change_if_37_20": [],
+      "expected_behaviour": "Should be logged, not escalated: neither reading changes who wins L19."
+    }
+  ],
+  "expected_logged_not_escalated": [
+    "Kaveri per-100 to per-box conversion (deterministic)",
+    "Shree Balaji ex-works plus Rs 0.35 freight from the T&C sheet",
+    "Shree Balaji revised offer R1 supersedes 0418 for L05, L11, L24",
+    "Vardhman USD converted at the reference rate Rs 88.20 (01 Oct 2026)",
+    "Rohit Box 7-ply rate and printing resolved from last year's quote",
+    "L21 is 73% above last year's price because it changed from 5-ply to 7-ply (explained, not an anomaly)",
+    "Anand did not quote L07, L22, L30"
+  ],
+  "exclusions_from_winning_by_default": [
+    "AC L14 alternate (3-ply) until the buyer accepts it",
+    "KP L09 out-of-range until the vendor confirms"
+  ],
+  "failure_cases": {
+    "F1_corrupt_quote.pdf": "truncated PDF; should be marked unreadable and a resend request drafted",
+    "F2_not_a_quote.eml": "vendor says rates will come Monday; not a quote, mark as pending, no prices",
+    "F3_spam.eml": "not related to the RFQ; ignore",
+    "F4_missing_page_quote.pdf": "only page 1 of 2 (15 lines); flag missing page, do not treat as 15 of 30 quoted without asking"
+  }
+}

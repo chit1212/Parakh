@@ -1,0 +1,14 @@
+# secrets: the API key lives here, never committed
+.env
+.env.local
+.env*.local
+
+# build and dependencies
+node_modules/
+.next/
+out/
+.vercel/
+
+# OS clutter
+.DS_Store
+__MACOSX/

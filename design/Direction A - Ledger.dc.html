@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/broadsheet-b2904ec4-9842-45c9-b4be-2ac94f55f925/styles.css">
+<script src="_ds/broadsheet-b2904ec4-9842-45c9-b4be-2ac94f55f925/_ds_bundle.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<script src="data.js"></script>
+<style>body{margin:0;background:var(--color-bg)}a{color:var(--color-accent)}a:hover{color:var(--color-accent-600)}</style>
+</helmet>
+<div style="display:flex; height:100vh; min-width:1360px; font-size:13px; line-height:1.4; color:var(--color-text); font-variant-numeric:tabular-nums; overflow:hidden;">
+
+  <nav style="width:68px; flex:none; display:flex; flex-direction:column; align-items:center; gap:4px; padding:18px 0;">
+    <a href="Shared Screens.dc.html" style="font-size:22px; font-weight:600; color:var(--color-text); text-decoration:none; margin-bottom:18px;">P</a>
+    <sc-for list="{{ rail }}" as="r" hint-placeholder-count="6">
+      <a href="{{ r.href }}" style="{{ r.s }}"><i class="ph-duotone {{ r.icon }}" style="font-size:20px;"></i><span style="font-size:10px;">{{ r.label }}</span></a>
+    </sc-for>
+  </nav>
+
+  <main style="flex:1; min-width:0; display:flex; flex-direction:column; overflow-y:auto;">
+    <header style="display:flex; align-items:flex-end; gap:24px; padding:18px 28px 10px 8px;">
+      <div style="display:flex; flex-direction:column; gap:2px; margin-right:auto;">
+        <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">SE-2026-041 · Sahyadri Appliances, Chakan · Vikram Deshpande</span>
+        <h1 style="font-size:26px; margin:0;">Corrugated boxes, FY27 H2</h1>
+      </div>
+      <span style="color:var(--color-neutral-700); max-width:330px; text-align:right;">Every price per box, in rupees, delivered Chakan, GST 18% extra.</span>
+      <button class="btn btn-secondary"><i class="ph-duotone ph-export" style="font-size:16px;"></i>Export</button>
+      <a class="btn btn-primary" href="Shared Screens.dc.html#award" style="color:var(--color-bg); white-space:nowrap;"><i class="ph-duotone ph-seal-check" style="font-size:16px;"></i>Freeze for award</a>
+    </header>
+
+    <div style="display:flex; align-items:center; gap:22px; padding:0 28px 0 8px;">
+      <button onClick="{{ toCompare }}" style="{{ tabC }}">Comparison</button>
+      <button onClick="{{ toDoubts }}" style="{{ tabD }}" title="Doubts">Doubts <span style="color:var(--color-accent-2-700);">{{ doubtCount }}</span> · {{ stakeL }} at stake</button>
+      <span style="margin-left:auto; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Direction A — Ledger</span>
+    </div>
+
+    <sc-if value="{{ isCompare }}" hint-placeholder-val="{{ true }}">
+      <sc-if value="{{ legendShut }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:12px 28px 6px 8px;"><button onClick="{{ toggleLegend }}" style="display:flex; align-items:center; gap:6px; background:none; border:0; padding:0; font:inherit; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-accent-800); cursor:pointer;"><i class="ph-duotone ph-caret-right"></i>How to read a price</button></div>
+      </sc-if>
+      <sc-if value="{{ legendOpen }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px 26px; padding:14px 28px 10px 8px; font-size:12px; line-height:1.25;">
+        <button onClick="{{ toggleLegend }}" style="display:flex; align-items:center; gap:6px; background:none; border:0; padding:0; font:inherit; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700); cursor:pointer;"><i class="ph-duotone ph-caret-down"></i>How to read a price</button>
+        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider);">24.60</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Checked</span><span style="color:var(--color-neutral-700);">as written, two reads agree</span></span></span>
+        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider);"><span style="text-decoration:underline dotted var(--color-neutral-600); text-underline-offset:3px;">24.60</span></span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Converted</span><span style="color:var(--color-neutral-700);">dotted line = a sum, click it</span></span></span>
+        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider); font-style:italic; color:var(--color-neutral-800);">24.60<sup style="font-size:8px; font-style:normal; letter-spacing:0.04em; margin-left:1px;">LY</sup></span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Last year’s price</span><span style="color:var(--color-neutral-700);">italic, from SE-2025-037</span></span></span>
+        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider);">24.60<sup style="font-size:10px; font-weight:600; margin-left:1px;">↑</sup></span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Unusual price</span><span style="color:var(--color-neutral-700);">↑ or ↓ over 12% from should-cost</span></span></span>
+        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider); color:var(--color-neutral-500);">—</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Not quoted</span><span style="color:var(--color-neutral-700);">vendor skipped this line</span></span></span>
+        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; background:var(--color-accent-2-100); color:var(--color-accent-2-800); font-weight:600;">24.60?</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600; color:var(--color-accent-2-800);">Doubt</span><span style="color:var(--color-neutral-700);">could change who wins</span></span></span>
+        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider); font-weight:600;">24.60</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Lowest</span><span style="color:var(--color-neutral-700);">bold = cheapest on the line</span></span></span>
+      </div>
+      </sc-if>
+
+      <div style="display:flex; align-items:center; gap:10px 14px; padding:2px 28px 8px 8px;">
+        <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700); flex:none;">Table shows</span>
+        <div style="flex:1; min-width:0; display:flex; gap:8px; overflow-x:auto; padding:2px;">
+          <sc-for list="{{ scenTabs }}" as="t" hint-placeholder-count="2">
+            <button onClick="{{ t.go }}" style="{{ t.s }}">{{ t.label }}</button>
+          </sc-for>
+        </div>
+        <div style="flex:none; display:flex; gap:8px; align-items:center;">
+          <div class="seg"><button onClick="{{ viewTable }}" style="{{ segT }}">Table</button><button onClick="{{ viewChart }}" style="{{ segC }}">Chart</button></div>
+          <button class="btn btn-secondary" style="padding:6px 10px; white-space:nowrap;"><i class="ph-duotone ph-file-xls" style="font-size:15px;"></i>Export view</button>
+        </div>
+      </div>
+
+      <sc-if value="{{ scen }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid; grid-template-columns:minmax(0,1.8fr) minmax(0,1fr) auto; gap:24px; padding:10px 28px 12px 8px; font-size:12.5px; background:var(--color-accent-100); margin:0 0 4px;">
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-accent-800);">{{ scenName }} · rules applied</span>
+            <div style="display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:4px 18px;">
+              <sc-for list="{{ rules }}" as="r" hint-placeholder-count="4">
+                <div style="display:grid; grid-template-columns:24px 1fr; gap:4px; line-height:1.35;"><span style="color:var(--color-accent-800); font-weight:600;">{{ r.n }}</span><span>{{ r.t }}</span></div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-accent-800);">Excluded, and why</span>
+            <sc-for list="{{ excluded }}" as="x" hint-placeholder-count="2">
+              <div><span style="font-weight:600;">{{ x.name }}</span> — {{ x.why }}</div>
+            </sc-for>
+            <span style="font-size:12px; color:var(--color-neutral-700); padding-top:4px;">{{ askedBy }}</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+            <div style="display:flex; flex-direction:column; align-items:flex-end; text-align:right;"><span style="font-size:24px; font-weight:600; line-height:1.15;">{{ scenTotal }}</span><span style="color:var(--color-accent-800);">{{ scenDelta }}</span><span style="font-size:12px; color:var(--color-neutral-700);">{{ scenSplit }}</span></div>
+            <button class="btn btn-ghost" onClick="{{ clearScen }}">Back to as quoted</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <div style="flex:1 0 460px; min-height:460px; display:flex;">
+        <sc-if value="{{ showGrid }}" hint-placeholder-val="{{ true }}">
+          <div style="flex:1; min-width:0; overflow:auto; padding:0 20px 0 8px;">
+            <div style="{{ headS }}">
+              <span style="font-size:11px; color:var(--color-neutral-700);">Line</span>
+              <span style="font-size:11px; color:var(--color-neutral-700);">Box &amp; spec</span>
+              <span style="font-size:11px; color:var(--color-neutral-700); text-align:right;">Qty</span>
+              <span style="font-size:11px; color:var(--color-neutral-700); text-align:right; padding-right:6px;">Should-cost</span>
+              <sc-for list="{{ heads }}" as="h" hint-placeholder-count="5">
+                <div style="{{ h.s }}">
+                  <span style="font-weight:600; font-size:13px; line-height:1.15;">{{ h.short }}</span>
+                  <span style="display:flex; align-items:center; gap:4px; color:var(--color-neutral-700); font-size:11px;"><i class="ph-duotone {{ h.icon }}"></i>{{ h.fmt }}</span>
+                  <span style="font-size:11px;">{{ h.qLabel }}</span>
+                  <span style="font-size:10.5px; color:var(--color-neutral-700); line-height:1.25;">{{ h.note }}</span>
+                </div>
+              </sc-for>
+              <span style="font-size:11px; color:var(--color-neutral-700); padding-left:12px;">Lowest</span>
+            </div>
+            <sc-for list="{{ rows }}" as="row" hint-placeholder-count="12">
+              <div style="{{ row.s }}">
+                <span style="color:var(--color-neutral-700);">{{ row.id }}</span>
+                <span style="display:flex; flex-direction:column; min-width:0; padding-right:8px;"><span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ row.name }}</span><span style="font-size:11px; color:var(--color-neutral-700); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ row.spec }}</span></span>
+                <span style="text-align:right; color:var(--color-neutral-700);">{{ row.qty }}</span>
+                <span style="text-align:right; color:var(--color-neutral-700); padding-right:6px;">{{ row.sc }}</span>
+                <sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="5">
+                  <button onClick="{{ c.open }}" style="{{ c.s }}" title="{{ c.tip }}"><span style="{{ c.ns }}">{{ c.txt }}<sup style="{{ c.ms }}">{{ c.mark }}</sup></span></button>
+                </sc-for>
+                <span style="display:flex; flex-direction:column; padding-left:12px; line-height:1.2;"><span>{{ row.win }}</span><span style="font-size:11px; color:var(--color-accent-800);">{{ row.was }}</span></span>
+              </div>
+            </sc-for>
+            <div style="{{ footS }}">
+              <span></span><span style="font-weight:600;">Lines won · award value</span><span></span><span></span>
+              <sc-for list="{{ foot }}" as="f" hint-placeholder-count="5">
+                <span style="text-align:right; padding-right:10px; display:flex; flex-direction:column;"><span style="font-weight:600;">{{ f.lines }}</span><span style="font-size:11px; color:var(--color-neutral-700);">{{ f.value }}</span></span>
+              </sc-for>
+              <span style="padding-left:12px; font-weight:600;">{{ total }}</span>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showChart }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1; min-width:0; overflow:auto; padding:16px 28px 24px 8px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:40px;">
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <h3 style="font-size:20px; margin:0;">Award value by vendor</h3>
+              <div style="display:flex; gap:18px; font-size:12px; color:var(--color-neutral-700);"><span style="display:flex; align-items:center; gap:6px;"><span style="width:14px; height:8px; background:var(--color-neutral-400);"></span>Cheapest overall</span><span style="display:flex; align-items:center; gap:6px;"><span style="width:14px; height:8px; background:var(--color-accent);"></span>{{ scenName }}</span></div>
+              <sc-for list="{{ bars }}" as="b" hint-placeholder-count="5">
+                <div style="display:grid; grid-template-columns:120px 1fr; gap:12px; align-items:center;">
+                  <span style="display:flex; flex-direction:column; line-height:1.2;"><span style="font-weight:600;">{{ b.name }}</span><span style="font-size:11px; color:var(--color-neutral-700);">{{ b.sub }}</span></span>
+                  <div style="display:flex; flex-direction:column; gap:3px;">
+                    <div style="display:flex; align-items:center; gap:8px;"><span style="{{ b.bs }}"></span><span style="font-size:11px; color:var(--color-neutral-700);">{{ b.bv }}</span></div>
+                    <div style="display:flex; align-items:center; gap:8px;"><span style="{{ b.ss }}"></span><span style="font-size:11px;">{{ b.sv }}</span></div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <h3 style="font-size:20px; margin:0;">Lines that change hands</h3>
+              <table class="table" style="font-size:13px;">
+                <thead><tr><th>Line</th><th>From</th><th>To</th><th style="text-align:right;">+ ₹/box</th><th style="text-align:right;">+ value</th></tr></thead>
+                <tbody>
+                  <sc-for list="{{ changed }}" as="x" hint-placeholder-count="8">
+                    <tr><td>{{ x.id }}</td><td>{{ x.from }}</td><td>{{ x.to }}</td><td style="text-align:right;">{{ x.d }}</td><td style="text-align:right;">{{ x.dv }}</td></tr>
+                  </sc-for>
+                </tbody>
+              </table>
+              <sc-if value="{{ noChanged }}" hint-placeholder-val="{{ false }}"><span style="color:var(--color-neutral-700);">No lines change hands — this is the as-quoted view.</span></sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isDoubts }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1; min-height:0; overflow:auto; padding:18px 28px 32px 8px; display:flex; flex-direction:column; gap:16px; max-width:1180px;">
+        <p style="margin:0; max-width:760px; color:var(--color-neutral-800); text-wrap:pretty;">Only doubts that could change who wins a line, ranked by rupees at stake. {{ loggedCount }} more were checked and logged — none of them changes a winner.</p>
+        <div style="display:grid; grid-template-columns:40px minmax(0,1fr) 120px 110px 120px; gap:0 16px; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700); padding-bottom:6px; border-bottom:1px solid var(--color-text);">
+          <span>Rank</span><span>Doubt</span><span>Lines</span><span>Goes to</span><span style="text-align:right;">At stake</span>
+        </div>
+        <sc-for list="{{ doubtRows }}" as="d" hint-placeholder-count="5">
+          <div style="display:flex; flex-direction:column; border-bottom:1px solid var(--color-divider); padding-bottom:14px;">
+            <button onClick="{{ d.toggle }}" style="display:grid; grid-template-columns:40px minmax(0,1fr) 120px 110px 120px; gap:0 16px; align-items:baseline; background:none; border:0; padding:4px 0; text-align:left; font:inherit; color:inherit; cursor:pointer;">
+              <span style="font-size:22px; font-weight:600; color:var(--color-accent-2-700);">{{ d.rank }}</span>
+              <span style="display:flex; flex-direction:column; gap:3px;"><span style="font-size:16px; font-weight:600;">{{ d.title }}</span><span style="color:var(--color-neutral-800); text-wrap:pretty;">{{ d.why }}</span></span>
+              <span>{{ d.lineIds }}</span>
+              <span>{{ d.routeLabel }}</span>
+              <span style="text-align:right; font-size:16px; font-weight:600;">{{ d.stakeL }}</span>
+            </button>
+            <sc-if value="{{ d.open }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid; grid-template-columns:40px minmax(0,1fr); gap:0 16px; padding-top:10px;">
+                <span></span>
+                <div style="display:flex; flex-direction:column; gap:10px; max-width:820px;">
+                  <span style="font-weight:600;">{{ d.ask }}</span>
+                  <sc-if value="{{ d.hasEmail }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                      <span style="font-size:12px; color:var(--color-neutral-700);">To {{ d.email.to }} · {{ d.email.subject }}</span>
+                      <textarea class="input" style="min-height:170px; white-space:pre-wrap;" value="{{ d.email.body }}" onChange="{{ noop }}"></textarea>
+                      <div style="display:flex; gap:8px;"><button class="btn btn-primary">Approve &amp; send</button><button class="btn btn-secondary">Edit in mail</button><button class="btn btn-ghost">I’ll call instead</button></div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ d.hasOptions }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                      <sc-for list="{{ d.opts }}" as="o" hint-placeholder-count="3">
+                        <label class="radio"><input type="radio" name="{{ d.id }}"><span class="dot"></span>{{ o }}</label>
+                      </sc-for>
+                      <div style="display:flex; gap:8px;"><button class="btn btn-primary">Record decision</button><button class="btn btn-ghost">See source</button></div>
+                    </div>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </main>
+  <sc-if value="{{ isCompare }}" hint-placeholder-val="{{ true }}">
+        <aside style="width:440px; flex:none; background:var(--color-surface); display:flex; flex-direction:column; min-height:0;">
+          <div style="display:flex; gap:22px; padding:22px 22px 0;">
+            <button onClick="{{ toConv }}" style="{{ paneConvS }}"><i class="ph-duotone ph-chats-circle" style="font-size:16px;"></i>Conversation</button>
+            <button onClick="{{ toSrc }}" style="{{ paneSrcS }}"><i class="ph-duotone ph-file-magnifying-glass" style="font-size:16px;"></i>{{ srcTabLabel }}</button>
+          </div>
+
+          <sc-if value="{{ isConv }}" hint-placeholder-val="{{ true }}">
+            <div ref="{{ threadRef }}" style="flex:1; min-height:0; overflow:auto; padding:16px 22px; display:flex; flex-direction:column; gap:18px;">
+              <sc-for list="{{ msgs }}" as="m" hint-placeholder-count="3">
+                <sc-if value="{{ m.isBot }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex; flex-direction:column; gap:6px;">
+                    <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-accent-700);">Parakh</span>
+                    <p style="margin:0; font-size:14px; text-wrap:pretty;">{{ m.text }}</p>
+                    <sc-if value="{{ m.hasScen }}" hint-placeholder-val="{{ false }}">
+                      <div style="background:var(--color-bg); box-shadow:var(--shadow-sm); padding:12px 14px; display:flex; flex-direction:column; gap:6px;">
+                        <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-accent-800);">{{ m.scenName }} · applied to the table</span>
+                        <span style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;"><span style="font-size:20px; font-weight:600;">{{ m.total }}</span><span style="color:var(--color-accent-800);">{{ m.delta }}</span></span>
+                        <span style="color:var(--color-neutral-800);">{{ m.split }}</span>
+                        <span style="font-size:12px; color:var(--color-neutral-700);">{{ m.ruleTxt }}</span>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; padding-top:2px;">
+                          <button class="btn btn-secondary" onClick="{{ m.view }}" style="padding:4px 10px; font-size:12px;"><i class="ph-duotone ph-table" style="font-size:14px;"></i>Table</button>
+                          <button class="btn btn-secondary" onClick="{{ m.chart }}" style="padding:4px 10px; font-size:12px;"><i class="ph-duotone ph-chart-bar-horizontal" style="font-size:14px;"></i>Chart</button>
+                          <button class="btn btn-secondary" style="padding:4px 10px; font-size:12px;"><i class="ph-duotone ph-file-xls" style="font-size:14px;"></i>Export</button>
+                        </div>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ m.isHuman }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end; padding-left:44px;">
+                    <span style="display:flex; gap:6px; align-items:center; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">{{ m.who }}<span class="{{ m.tagCls }}" style="letter-spacing:0.04em; padding:1px 6px;">{{ m.role }}</span></span>
+                    <p style="margin:0; font-size:15px; font-style:italic; text-align:right; text-wrap:pretty;">{{ m.text }}</p>
+                  </div>
+                </sc-if>
+              </sc-for>
+            </div>
+            <div style="padding:10px 22px 16px; display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <sc-for list="{{ sugg }}" as="s" hint-placeholder-count="2">
+                  <button onClick="{{ s.go }}" style="background:var(--color-bg); border:0; padding:4px 10px; font:inherit; font-size:12px; cursor:pointer; color:var(--color-accent-800); border-radius:var(--radius-md); text-align:left;">{{ s.t }}</button>
+                </sc-for>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--color-neutral-700);">
+                <span>Asking as</span>
+                <div class="seg"><button onClick="{{ asBuyer }}" style="{{ asBuyerS }}">Vikram · buyer</button><button onClick="{{ asVp }}" style="{{ asVpS }}">Anita · VP</button></div>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <textarea class="input" style="min-height:58px; background:var(--color-bg);" placeholder="Ask a what-if — e.g. cap any one vendor at 40%" value="{{ q }}" onChange="{{ onQ }}"></textarea>
+                <button class="btn btn-primary btn-icon" onClick="{{ ask }}" style="align-self:flex-end;" title="Ask"><i class="ph-duotone ph-paper-plane-right" style="font-size:18px;"></i></button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isSrc }}" hint-placeholder-val="{{ false }}">
+            <div style="flex:1; min-height:0; overflow:auto; padding:16px 22px 24px; display:flex; flex-direction:column; gap:16px;">
+              <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex; align-items:flex-start; gap:10px;">
+                  <div style="display:flex; flex-direction:column; gap:2px; margin-right:auto;">
+                    <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Source · {{ selLine.id }}</span>
+                    <span style="font-size:18px; font-weight:600; line-height:1.2;">{{ selLine.name }}</span>
+                    <span style="font-size:12px; color:var(--color-neutral-700);">{{ selLine.spec }} · {{ selLine.qtyK }}k boxes</span>
+                  </div>
+                  <button class="btn btn-ghost btn-icon" onClick="{{ closeSel }}" title="Close"><i class="ph-duotone ph-x" style="font-size:18px;"></i></button>
+                </div>
+                <dc-import name="SourceDoc" vid="{{ selVid }}" li="{{ selLi }}" hint-size="100%,560px"></dc-import>
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Same line, every vendor</span>
+                  <sc-for list="{{ selPeers }}" as="p" hint-placeholder-count="5">
+                    <button onClick="{{ p.open }}" style="{{ p.s }}"><span>{{ p.name }}</span><span style="color:var(--color-neutral-700); font-size:12px;">{{ p.state }}</span><span style="text-align:right; font-weight:600;">{{ p.price }}</span></button>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ noSel }}" hint-placeholder-val="{{ false }}">
+                <p style="margin:0; color:var(--color-neutral-700); max-width:320px;">Click any price in the table to see the original document, the exact place it was read from, and the arithmetic.</p>
+              </sc-if>
+            </div>
+          </sc-if>
+        </aside>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;compare&quot;,&quot;analyst&quot;,&quot;doubts&quot;],&quot;default&quot;:&quot;compare&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Screen&quot;}}">
+class Component extends DCLogic {
+  constructor(p) {
+    super(p); const s = (location.hash.slice(1)) || (p && p.startScreen) || 'compare';
+    this.state = { tab: s === 'doubts' ? 'doubts' : 'compare', sel: s === 'compare' ? { vid: 'AC', li: 13 } : null, pane: s === 'compare' ? 'src' : 'conv',
+      scen: s === 'analyst' ? 'S1' : 'base', asked: [{ id: 'S1', asker: 'VP' }], asker: 'VP', view: 'table', openD: 'D1', q: '' };
+    this.threadRef = React.createRef();
+  }
+  componentDidMount() { if (!window.KD) { this._t = setInterval(() => { if (window.KD) { clearInterval(this._t); this.forceUpdate(); this.scroll(); } }, 120); } else this.scroll(); }
+  componentDidUpdate(pp, ps) { if (ps.asked !== this.state.asked || ps.pane !== this.state.pane) this.scroll(); }
+  componentWillUnmount() { clearInterval(this._t); }
+  scroll() { setTimeout(() => { const el = this.threadRef.current; if (el) el.scrollTop = el.scrollHeight; }, 60); }
+  defs() {
+    return {
+      S1: { name: 'Scenario 1', title: 'Quality-cleared, cheapest per line', short: 'Split cheapest per line, quality-cleared only', q: 'What if we split it, cheapest per line, but only among vendors who cleared the quality questionnaire?', elig: true },
+      S2: { name: 'Scenario 2', title: 'Quality-cleared, doubts at worst case', short: 'Same, but assume open doubts go against us', q: 'Same split, but assume every open doubt goes against us.', elig: true, worst: true },
+      S3: { name: 'Scenario 3', title: 'Quality-cleared, no vendor above 40%', short: 'Cap any one vendor at 40% of the value', q: 'Keep it to quality-cleared vendors, but don’t let any one vendor take more than 40% of the value.', elig: true, cap: 0.4 }
+    };
+  }
+  worstP(c) { if (c.p == null) return null; if (c.vid === 'VP') return c.gross; if (c.kind !== 'doubt') return c.p; return { D1: null, D3: c.p + 0.38, D4: c.alt, D5: c.p + 1.10 }[c.doubt] ?? c.p; }
+  solve(d) {
+    const K = window.KD; if (!d) return K.baseline;
+    const elig = d.elig ? K.vendors.filter(v => v.q.cleared).map(v => v.id) : K.vendors.map(v => v.id);
+    const opts = K.lines.map(l => elig.map(id => { const c = K.cells[id][l.i]; return { vid: id, p: d.worst ? this.worstP(c) : c.p }; }).filter(o => o.p != null).sort((a, b) => a.p - b.p));
+    const pick = opts.map(() => 0); let moved = 0;
+    const tally = () => { let total = 0; const by = {}; K.vendors.forEach(v => by[v.id] = { lines: 0, value: 0 }); K.lines.forEach(l => { const o = opts[l.i][pick[l.i]]; total += o.p * l.qty; by[o.vid].lines++; by[o.vid].value += o.p * l.qty; }); return { total, by }; };
+    if (d.cap) for (let it = 0; it < 60; it++) { const t = tally(); const over = K.vendors.find(v => t.by[v.id].value > d.cap * t.total); if (!over) break;
+      let best = null; K.lines.forEach(l => { const k = pick[l.i]; if (opts[l.i][k].vid !== over.id || !opts[l.i][k + 1]) return; const cost = (opts[l.i][k + 1].p - opts[l.i][k].p) * l.qty; if (!best || cost < best.cost) best = { i: l.i, cost }; });
+      if (!best) break; pick[best.i]++; moved++; }
+    const t = tally();
+    return { per: K.lines.map(l => { const o = opts[l.i][pick[l.i]]; return { i: l.i, vid: o.vid, p: o.p, changed: o.vid !== K.baseline.per[l.i].vid }; }), total: t.total, by: t.by, moved };
+  }
+  renderVals() {
+    const K = window.KD, S = this.state;
+    const tabS = on => ({ whiteSpace: 'nowrap', background: 'none', border: 0, padding: '6px 0', font: 'inherit', fontSize: 15, cursor: 'pointer', color: on ? 'var(--color-text)' : 'var(--color-neutral-700)', fontWeight: on ? 600 : 400, boxShadow: on ? 'inset 0 -2px 0 var(--color-text)' : 'none' });
+    const railItems = [['ph-tray', 'Events', 'Shared Screens.dc.html'], ['ph-note-pencil', 'RFQ', 'Shared Screens.dc.html#rfq'], ['ph-envelope-open', 'Replies', 'Shared Screens.dc.html#responses'], ['ph-table', 'Compare', '#'], ['ph-seal-check', 'Award', 'Shared Screens.dc.html#award']];
+    const rail = railItems.map(r => ({ icon: r[0], label: r[1], href: r[2], s: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, padding: '8px 0', width: 56, textDecoration: 'none', color: r[1] === 'Compare' ? 'var(--color-accent)' : 'var(--color-neutral-700)' } }));
+    const base = { rail, threadRef: this.threadRef, toCompare: () => this.setState({ tab: 'compare' }), toDoubts: () => this.setState({ tab: 'doubts' }), tabC: tabS(S.tab === 'compare'), tabD: tabS(S.tab === 'doubts'), isCompare: S.tab === 'compare', isDoubts: S.tab === 'doubts' };
+    if (!K) return base;
+    const D = this.defs(), def = D[S.scen], sols = {};
+    const solFor = id => sols[id] || (sols[id] = this.solve(D[id]));
+    const sol = S.scen === 'base' ? K.baseline : solFor(S.scen);
+    const elig = def && def.elig ? K.vendors.filter(v => v.q.cleared).map(v => v.id) : null;
+    const sel = S.sel;
+    const cols = '40px minmax(170px,1fr) 44px 64px repeat(5, minmax(76px,96px)) 104px';
+    const open = (vid, li) => () => this.setState({ sel: { vid, li }, view: 'table', pane: 'src' });
+    const heads = K.vendors.map(v => { const ex = elig && !elig.includes(v.id);
+      return { short: v.short, icon: v.icon, fmt: v.fmt, qLabel: v.q.returned ? `Quality ${v.q.score} ${v.q.cleared ? '✓' : '✕'}` : 'No questionnaire', note: ex ? 'Excluded in ' + def.name.toLowerCase() : v.colNote,
+        s: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', textAlign: 'right', gap: 1, paddingRight: 10, opacity: ex ? 0.45 : 1 } }; });
+    const rows = K.lines.map(l => { const w = sol.per[l.i]; const isSelRow = sel && sel.li === l.i;
+      const cells = K.vendors.map(v => { const c = K.cells[v.id][l.i], ex = elig && !elig.includes(v.id), win = w.vid === v.id, isSel = sel && sel.vid === v.id && sel.li === l.i;
+        const k = c.kind, doubt = k === 'doubt' && !ex;
+        const ns = { color: k === 'miss' ? 'var(--color-neutral-500)' : doubt ? 'var(--color-accent-2-800)' : k === 'ly' ? 'var(--color-neutral-800)' : 'var(--color-text)', fontStyle: k === 'ly' ? 'italic' : 'normal', fontWeight: win || doubt ? 600 : 400,
+          textDecoration: (c.kind === 'conv' || (c.kind !== 'ok' && c.kind !== 'miss' && (v.id === 'VP' || v.id === 'KP' || v.id === 'RB')) && k !== 'ly') ? 'underline dotted var(--color-neutral-600)' : 'none', textUnderlineOffset: 3 };
+        const mark = k === 'ly' ? 'LY' : k === 'oor' ? (c.ratio > 1 ? '↑' : '↓') : k === 'doubt' ? '?' : '';
+        return { open: open(v.id, l.i), txt: c.p == null ? '—' : K.num(c.p), mark, ns, tip: `${v.short} · ${l.id}: ${c.raw}`,
+          ms: { fontSize: k === 'ly' ? 8 : 10, fontStyle: 'normal', fontWeight: 600, marginLeft: 1, letterSpacing: '0.04em', textDecoration: 'none', display: 'inline-block' },
+          s: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', height: '100%', minHeight: 38, padding: '0 10px', border: 0, font: 'inherit', fontSize: 13.5, cursor: 'pointer', opacity: ex ? 0.4 : 1,
+            background: doubt ? 'var(--color-accent-2-100)' : 'transparent', outline: isSel ? '2px solid var(--color-accent)' : 'none', outlineOffset: -2 } }; });
+      const bw = K.baseline.per[l.i];
+      return { id: l.id, name: l.name, spec: l.spec, qty: l.qtyK + 'k', sc: K.num(l.sc), cells, win: K.VI[w.vid].short, was: def && w.changed ? 'was ' + K.VI[bw.vid].short : '',
+        s: { display: 'grid', gridTemplateColumns: cols, alignItems: 'stretch', borderBottom: '1px solid color-mix(in srgb, var(--color-text) 8%, transparent)', background: isSelRow ? 'var(--color-neutral-200)' : 'transparent' } }; });
+    const foot = K.vendors.map(v => ({ lines: sol.by[v.id].lines || '—', value: sol.by[v.id].lines ? K.lakh(sol.by[v.id].value) : '' }));
+    const pct = x => (x / K.baseline.total * 100).toFixed(1);
+    const dTxt = s2 => { const d = s2.total - K.baseline.total; return (d >= 0 ? '+' : '−') + K.lakh(Math.abs(d)) + ' (' + (d >= 0 ? '+' : '−') + Math.abs(+pct(d)) + '%) vs cheapest overall'; };
+    const split = s2 => K.vendors.filter(v => s2.by[v.id].lines).map(v => `${v.short} ${s2.by[v.id].lines}`).join(' · ') + ' lines';
+    const rulesFor = d => { const r = [{ n: 'R1', t: 'Basis unchanged: per box, ₹, delivered Chakan, GST extra.' }];
+      if (d.elig) r.push({ n: 'R2', t: 'Eligible: questionnaire returned, score 70 or more, both mandatory items passed.' });
+      r.push({ n: 'R3', t: 'Each line goes to the lowest eligible price.' });
+      r.push(d.worst ? { n: 'R4', t: 'Open doubts priced against us: Vardhman without the 2.5% footnote discount, freight ₹0.80, ₹37.20 on L19, no 3-ply substitute.' } : { n: 'R4', t: 'Open doubts priced as read; flagged where they still matter.' });
+      if (d.cap) r.push({ n: 'R5', t: `No vendor above ${d.cap * 100}% of award value; lines move to the next-cheapest eligible vendor, cheapest moves first.` });
+      return r; };
+    const quals = K.vendors.filter(v => v.q.cleared).map(v => v.id);
+    const s1 = solFor('S1');
+    const answers = {
+      S1: () => { let risk = 0; s1.per.forEach(x => { if (x.vid !== 'VP') return; const alt = Math.min(...quals.filter(id => id !== 'VP').map(id => K.cells[id][x.i].p)); if (K.cells.VP[x.i].gross > alt) risk++; });
+        return `Split three ways — Shree Balaji ${s1.by.SB.lines} lines, Vardhman ${s1.by.VP.lines}, Kaveri ${s1.by.KP.lines}. It costs ${K.lakh(s1.total - K.baseline.total)} more than cheapest-per-line, because the two vendors left out held 26 of the 30 lines. Four of the five open doubts stop mattering. One still does: ${risk} of Vardhman’s lines assume the 2.5% footnote discount.`; },
+      S2: () => { const s2 = solFor('S2'), lost = s1.per.filter((x, i) => x.vid === 'VP' && s2.per[i].vid !== 'VP').length;
+        return `If Vardhman’s footnote discount doesn’t apply, Vardhman loses ${lost} line${lost === 1 ? '' : 's'} and keeps ${s2.by.VP.lines}. Total ${K.crore(s2.total)} — ${K.lakh(s2.total - s1.total)} above Scenario 1. That is the most the open doubts can cost us inside the quality-cleared set.`; },
+      S3: () => { const s3 = solFor('S3'), top = K.vendors.map(v => ({ v, sh: s3.by[v.id].value / s3.total })).sort((a, b) => b.sh - a.sh)[0];
+        return `In Scenario 1 Vardhman takes ${(s1.by.VP.value / s1.total * 100).toFixed(0)}% of the value. Capping at 40% moves ${s3.moved} line${s3.moved === 1 ? '' : 's'} to the next-cheapest cleared vendor, for ${K.lakh(s3.total - s1.total)} more than Scenario 1. Largest share is now ${top.v.short} at ${(top.sh * 100).toFixed(0)}%.`; }
+    };
+    const who = a => a === 'VP' ? { who: 'Anita Kulkarni', role: 'VP', tagCls: 'tag tag-accent-2' } : { who: 'Vikram Deshpande', role: 'Buyer', tagCls: 'tag tag-neutral' };
+    const msgs = [{ isBot: true, isHuman: false, hasScen: false, text: `All five replies are read and on one basis. ${K.doubts.length} doubts could change a winner (${K.lakh(K.totalStake)} at stake) — see the Doubts tab. Ask me anything about this table; every answer is applied to it as a scenario you can keep, compare and export.` }];
+    S.asked.forEach(a => { const d = D[a.id], s2 = solFor(a.id);
+      msgs.push({ isBot: false, isHuman: true, hasScen: false, text: a.text || d.q, ...who(a.asker) });
+      msgs.push({ isBot: true, isHuman: false, hasScen: true, text: answers[a.id](), scenName: d.name, total: K.crore(s2.total), delta: dTxt(s2), split: split(s2), ruleTxt: `${rulesFor(d).length} rules · ${d.elig ? '2 vendors excluded' : 'no vendors excluded'}`,
+        view: () => this.setState({ scen: a.id, view: 'table' }), chart: () => this.setState({ scen: a.id, view: 'chart' }) }); });
+    const askId = id => { const S2 = this.state; const asked = S2.asked.some(x => x.id === id) ? S2.asked : S2.asked.concat({ id, asker: S2.asker, text: S2.q.trim() || null }); this.setState({ asked, scen: id, view: 'table', pane: 'conv', q: '' }); };
+    const nextId = ['S1', 'S2', 'S3'].find(id => !S.asked.some(x => x.id === id));
+    const sugg = ['S1', 'S2', 'S3'].filter(id => !S.asked.some(x => x.id === id)).map(id => ({ t: D[id].short, go: () => askId(id) }));
+    const scTab = on => ({ flex: 'none', whiteSpace: 'nowrap', background: on ? 'var(--color-accent)' : 'transparent', color: on ? 'var(--color-bg)' : 'var(--color-accent-800)', border: 0, boxShadow: on ? 'none' : 'inset 0 0 0 1px var(--color-divider)', padding: '5px 10px', font: 'inherit', fontSize: 13, cursor: 'pointer', borderRadius: 'var(--radius-md)' });
+    const scenTabs = [{ label: 'As quoted', go: () => this.setState({ scen: 'base' }), s: scTab(S.scen === 'base') }].concat(S.asked.map(a => ({ label: `${D[a.id].name} · ${D[a.id].title}`, go: () => this.setState({ scen: a.id }), s: scTab(S.scen === a.id) })));
+    const mx = Math.max(...K.vendors.map(v => Math.max(K.baseline.by[v.id].value, sol.by[v.id].value)));
+    const bar = (x, c) => ({ display: 'block', height: 12, width: Math.max(2, x / mx * 100) + '%', maxWidth: 'calc(100% - 70px)', background: c });
+    const bars = K.vendors.map(v => ({ name: v.short, sub: elig && !elig.includes(v.id) ? 'excluded' : sol.by[v.id].lines + ' lines', bs: bar(K.baseline.by[v.id].value, 'var(--color-neutral-400)'), ss: bar(sol.by[v.id].value, 'var(--color-accent)'), bv: K.baseline.by[v.id].value ? K.lakh(K.baseline.by[v.id].value) : '—', sv: sol.by[v.id].value ? K.lakh(sol.by[v.id].value) : '—' }));
+    const changed = sol.per.filter(x => x.changed).map(x => { const b = K.baseline.per[x.i], l = K.lines[x.i]; return { id: l.id, from: K.VI[b.vid].short, to: K.VI[x.vid].short, d: K.num(x.p - b.p), dv: K.lakh((x.p - b.p) * l.qty) }; });
+    const sl = sel ? K.lines[sel.li] : null;
+    const selPeers = sel ? K.vendors.map(v => { const c = K.cells[v.id][sel.li]; const lbl = { ok: 'checked', conv: 'converted', ly: 'last year’s price', oor: 'unusual price', miss: 'not quoted', doubt: 'doubt' }[c.kind];
+      return { name: v.short, state: lbl, price: c.p == null ? '—' : K.inr(c.p), open: open(v.id, sel.li), s: { display: 'grid', gridTemplateColumns: '1fr 1fr 80px', gap: 8, padding: '5px 6px', background: v.id === sel.vid ? 'var(--color-accent-100)' : 'transparent', border: 0, font: 'inherit', color: 'inherit', textAlign: 'left', cursor: 'pointer' } }; }) : [];
+    const doubtRows = K.doubts.map(d => ({ ...d, routeLabel: d.route === 'vendor' ? 'Vendor — email drafted' : 'You — judgement', open: S.openD === d.id, hasEmail: !!d.email, hasOptions: !!d.options, opts: d.options || [], toggle: () => this.setState({ openD: S.openD === d.id ? null : d.id }) }));
+    const seg = on => ({ border: 0, padding: '6px 12px', font: 'inherit', fontSize: 13, cursor: 'pointer', background: on ? 'var(--color-accent)' : 'transparent', color: on ? 'var(--color-bg)' : 'inherit', whiteSpace: 'nowrap' });
+    const paneS = on => ({ display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap', background: 'none', border: 0, padding: '4px 0', font: 'inherit', fontSize: 14, cursor: 'pointer', color: on ? 'var(--color-text)' : 'var(--color-neutral-700)', fontWeight: on ? 600 : 400, boxShadow: on ? 'inset 0 -2px 0 var(--color-text)' : 'none' });
+    const askedEntry = S.asked.find(a => a.id === S.scen);
+    return { ...base, scen: !!def, headS: { position: 'sticky', top: 0, zIndex: 2, background: 'var(--color-bg)', display: 'grid', gridTemplateColumns: cols, alignItems: 'end', padding: '8px 0', borderBottom: '1px solid var(--color-text)' },
+      footS: { display: 'grid', gridTemplateColumns: cols, padding: '10px 0 24px', borderTop: '1px solid var(--color-text)', alignItems: 'baseline' }, heads, rows, foot, total: K.crore(sol.total),
+      showGrid: S.view === 'table', showChart: S.view === 'chart', legendOpen: S.legend ?? !def, legendShut: !(S.legend ?? !def), toggleLegend: () => this.setState({ legend: !(S.legend ?? !def) }), scenTabs, scenName: def ? def.name : 'As quoted',
+      rules: def ? rulesFor(def) : [], excluded: K.vendors.filter(v => !v.q.cleared).map(v => ({ name: v.name, why: v.q.returned ? `scored ${v.q.score}; no ISO 9001 certificate, test report dated Jan 2025.` : 'questionnaire not returned (replied by email only).' })),
+      askedBy: askedEntry ? `Asked by ${who(askedEntry.asker).who}, ${askedEntry.asker === 'VP' ? 'VP Supply Chain' : 'buyer'}` : '',
+      scenTotal: K.crore(sol.total), scenDelta: def ? dTxt(sol) : '', scenSplit: split(sol), bars, changed, noChanged: !changed.length,
+      viewTable: () => this.setState({ view: 'table' }), viewChart: () => this.setState({ view: 'chart' }), segT: seg(S.view === 'table'), segC: seg(S.view === 'chart'), clearScen: () => this.setState({ scen: 'base' }),
+      isConv: S.pane === 'conv', isSrc: S.pane === 'src', toConv: () => this.setState({ pane: 'conv' }), toSrc: () => this.setState({ pane: 'src' }), paneConvS: paneS(S.pane === 'conv'), paneSrcS: paneS(S.pane === 'src'),
+      srcTabLabel: sel ? `Source · ${K.lines[sel.li].id} ${K.VI[sel.vid].short}` : 'Source',
+      msgs, sugg, asBuyer: () => this.setState({ asker: 'Buyer' }), asVp: () => this.setState({ asker: 'VP' }), asBuyerS: seg(S.asker === 'Buyer'), asVpS: seg(S.asker === 'VP'),
+      hasSel: !!sel, noSel: !sel, selLine: sl || {}, selVid: sel ? sel.vid : 'SB', selLi: sel ? sel.li : 0, selPeers, closeSel: () => this.setState({ sel: null }),
+      doubtCount: K.doubts.length, stakeL: K.lakh(K.totalStake), doubtRows, loggedCount: K.loggedCount, noop: () => {},
+      q: S.q, onQ: e => this.setState({ q: e.target.value }), ask: () => nextId ? askId(nextId) : this.setState({ q: '' })
+    };
+  }
+}
+</script>
+</body>
+</html>
