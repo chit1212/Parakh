@@ -1,12 +1,13 @@
 // Reading one reply, end to end: open (code) → sort (AI) → read prices and sweep terms (AI)
 // → check every source (code) → coverage (code).
 import type { z } from "zod";
-import type { Usage } from "../ai";
+import { MissingKeyError, type Usage } from "../ai";
+import { RateLimitedError } from "../guard";
 import { MODELS } from "../config";
 import { workbookToText } from "../files/xlsx";
 import { loadHistory } from "../rfq";
 import type { Reply, ReplyFile, SourcingEvent, Verification } from "../types";
-import { callStructured } from "./call";
+import { callStructured, QuotaError } from "./call";
 import { buyerRecordBlock, fileBlocks } from "./content";
 import { classifySystem, extractionSystem, termsSystem } from "./prompts";
 import {
@@ -46,10 +47,18 @@ export interface ReplyReading {
   usage: Usage[];
   cached: boolean;
   ms: number;
+  /** When the model read this reply (latest model answer), ISO time. Null if no model was called. */
+  readAt: string | null;
+  /** The models that actually answered, in order. */
+  models: string[];
+  /** Set when served from data/readings (a saved run of this pipeline), not read just now. */
+  saved?: boolean;
+  /** True when the error is the free quota (or the demo's own limit), not a problem with the file. */
+  quota?: boolean;
   error?: string;
 }
 
-export type Stage = "opening" | "sorting" | "reading prices" | "sweeping terms" | "checking sources" | "done";
+export type Stage = "opening" | "sorting" | "reading prices" | "sweeping terms" | "waiting for the free quota" | "checking sources" | "done";
 export type OnProgress = (stage: Stage, detail?: string) => void;
 
 const PAGE_OF = /page\s+(\d+)\s+of\s+(\d+)/gi;
@@ -75,7 +84,7 @@ function empty(reply: Reply, ev: SourcingEvent): ReplyReading {
     status: "read", headline: "", nextStep: { kind: "none", text: "" },
     classification: null, prices: [], rateRules: [], notQuoted: [], terms: [], questionnaire: [], qualityDocs: [],
     revision: null, readingNotes: [], coverage: { quoted: [], missing: ev.lines.map((l) => l.id), total: ev.lines.length },
-    unsourced: 0, usage: [], cached: true, ms: 0,
+    unsourced: 0, usage: [], cached: true, ms: 0, readAt: null, models: [],
   };
 }
 
@@ -94,10 +103,13 @@ export async function readReply(
   const say = opts.onProgress ?? (() => {});
   const out = empty(reply, ev);
   const all = [...(reply.cover ? [reply.cover] : []), ...reply.files];
-  const track = (r: { usage: Usage | null; cached: boolean }) => {
+  const track = (r: { usage: Usage | null; cached: boolean; model: string; at: string }) => {
     if (r.usage) out.usage.push(r.usage);
     if (!r.cached) out.cached = false;
+    if (!out.models.includes(r.model)) out.models.push(r.model);
+    if (!out.readAt || r.at > out.readAt) out.readAt = r.at;
   };
+  const onWait = (s: number) => say("waiting for the free quota", `retrying in ${s}s`);
 
   try {
     // 1. Open (code). A reply whose only content cannot be opened is unreadable; no model call.
@@ -121,13 +133,14 @@ export async function readReply(
       system: classifySystem(ev),
       content: [
         ...fileBlocks(all, { textExcerpt: 2500 }),
-        { type: "text", text: `Sort this reply. Received: ${reply.receivedAt ?? "unknown"}. From: ${reply.from ?? "unknown (no email)"}.` },
+        { text: `Sort this reply. Received: ${reply.receivedAt ?? "unknown"}. From: ${reply.from ?? "unknown (no email)"}.` },
       ],
       schema: Classification,
       effort: "low",
       maxTokens: 4000,
       fresh: opts.fresh,
       beforeCall: opts.beforeCall,
+      onWait,
     });
     track(cls);
     const c = cls.data;
@@ -172,13 +185,14 @@ export async function readReply(
       content: [
         ...fileBlocks(quoteFiles),
         ...recordBlocks,
-        { type: "text", text: `Read every price in this reply from ${vendorName || "an unknown vendor"}. Report every RFQ line it does not price in not_quoted.` },
+        { text: `Read every price in this reply from ${vendorName || "an unknown vendor"}. Report every RFQ line it does not price in not_quoted.` },
       ],
       schema: Extraction,
       effort: "medium",
       maxTokens: 32000,
       fresh: opts.fresh,
       beforeCall: opts.beforeCall,
+      onWait,
     }).then((r) => { say("sweeping terms"); return r; });
     const termsP = callStructured({
       step: "terms",
@@ -186,13 +200,14 @@ export async function readReply(
       system: termsSystem(ev),
       content: [
         ...fileBlocks(readable),
-        { type: "text", text: `Find every commercial term, questionnaire answer and quality document in this reply from ${vendorName || "an unknown vendor"}.` },
+        { text: `Find every commercial term, questionnaire answer and quality document in this reply from ${vendorName || "an unknown vendor"}.` },
       ],
       schema: TermsSweep,
       effort: "medium",
       maxTokens: 24000,
       fresh: opts.fresh,
       beforeCall: opts.beforeCall,
+      onWait,
     });
     const [ex, tm] = await Promise.all([extractP, termsP]);
     track(ex);
@@ -254,9 +269,11 @@ export async function readReply(
   } catch (e) {
     out.status = "error";
     out.cached = false;
+    // Quota, demo limit and missing key are not problems with the file: say so calmly.
+    out.quota = e instanceof QuotaError || e instanceof RateLimitedError || e instanceof MissingKeyError;
     out.error = (e as Error).message;
-    out.headline = `Reading stopped: ${(e as Error).message}`;
-    out.nextStep = { kind: "check_reply", text: "Try reading it again." };
+    out.headline = out.quota ? (e as Error).message : `Reading stopped: ${(e as Error).message}`;
+    out.nextStep = { kind: "check_reply", text: out.quota ? "Nothing is wrong with the file. Read it again later." : "Try reading it again." };
     return out;
   } finally {
     out.ms = Date.now() - t0;

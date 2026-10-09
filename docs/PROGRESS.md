@@ -13,13 +13,13 @@ Built:
 - `npm run scorecard` grades the reader against `06_answer_key` (grading only; `test/isolation.test.ts` pins that nothing else reads the key).
 - Per-visitor limit on paid model calls (`src/lib/guard.ts`).
 
-- Saved demo readings (`data/saved-readings/`, committed): `npm run scorecard -- --save` stores the model answers a clean full run used; the reader checks them after its own cache, so the live demo opens without paid calls. Keyed by file + prompt + model, so edits never get stale answers.
+- AI provider switched to the Google Gemini API free tier (`@google/genai`): `gemini-3.8-flash` reads, `gemini-3.5-flash-lite` sorts (`src/lib/config.ts`, with fallbacks). JSON-schema structured output, checked again with zod. Busy/rate-limited calls retry with backoff, then fall back, then show a calm message (`src/lib/reader/call.ts`).
+- Saved readings (`data/readings/`, committed, `src/lib/saved.ts`): `npm run scorecard -- --save` writes one file per reply, stamped with date and model and fingerprinted against the reply's files. The demo opens with them ("read on <date> by <model>") and each reply has "Read again live".
 
-Waiting on: an API key visible to the dev session (`ANTHROPIC_API_KEY` or `PARAKH_ANTHROPIC_API_KEY` env var, or the network secret; only new sessions pick up environment changes). Then: `npm run scorecard -- --fresh --save`, tune prompts against the misses, re-run with `--save`, commit `data/saved-readings`.
+Next: first real run (`npm run scorecard -- --only=5_rohit_email`, then a full run), tune prompts against the misses, then `npm run scorecard -- --save` and commit `data/readings/`. The free tier may allow only ~20 Flash calls a day; a full run is ~20-25 calls.
 
 ## Decisions (technical)
-- "Strict schema" is done with structured outputs (`output_config.format`), the supported way on Sonnet 5.5, which does not accept forced tool choice.
-- The app reads `ANTHROPIC_API_KEY`, or `PARAKH_ANTHROPIC_API_KEY` in a dev container where the plain name would clash with the container's own tools. The client pins the API base URL so a machine-wide `ANTHROPIC_BASE_URL` is never picked up.
-- Model outputs are cached by content hash (`.cache/readings`, or `/tmp` on Vercel) so re-reading an unchanged file costs nothing.
+- "Strict schema" is Gemini's `responseJsonSchema`, generated from the zod schemas, and the answer is validated again in code.
+- The app reads `GEMINI_API_KEY`, or `PARAKH_GEMINI_API_KEY` in a dev container. In a container with an egress proxy (never on Vercel), Node's fetch is pointed at the proxy.
+- Model outputs are cached by content hash (`.cache/readings`, or `/tmp` on Vercel) so re-reading an unchanged file uses no quota (development only; the demo uses `data/readings/`).
 - Fonts and icons are bundled from npm (no CDN at runtime).
-- Cloud dev sessions: the key is a *network secret* (header `x-api-key` for `api.anthropic.com`, added by the environment's egress proxy). With no key on the machine and `HTTPS_PROXY` set (not on Vercel), `src/lib/ai.ts` sends API calls through that proxy and leaves the header for the proxy to add. Locally and on Vercel, set `ANTHROPIC_API_KEY` as usual.

@@ -5,7 +5,7 @@ import { Shell } from "@/components/Shell";
 import { useReadings, type ReplyState } from "@/components/useReadings";
 import type { ReplyReading } from "@/lib/reader/pipeline";
 import type { FileSummary, ReplySummary } from "@/lib/summary";
-import { where } from "@/lib/format";
+import { readStamp, where } from "@/lib/format";
 import type { SourcingEvent } from "@/lib/types";
 
 const KIND_ICON: Record<string, typeof File> = { xlsx: FileXls, pdf: FilePdf, docx: FileDoc, image: Camera, eml: Envelope };
@@ -18,10 +18,11 @@ const STAGE_LABEL: Record<string, string> = {
   sorting: "Sorting: what is this reply?",
   "reading prices": "Reading every price",
   "sweeping terms": "Sweeping the terms: footnotes, second sheets, the cover email",
+  "waiting for the free quota": "Waiting for the free AI quota, then carrying on",
   "checking sources": "Checking every number against the original",
   done: "",
 };
-const STAGE_STEP: Record<string, number> = { queued: 0, waiting: 0, opening: 1, sorting: 2, "reading prices": 3, "sweeping terms": 4, "checking sources": 5, done: 6 };
+const STAGE_STEP: Record<string, number> = { queued: 0, waiting: 0, opening: 1, sorting: 2, "reading prices": 3, "sweeping terms": 4, "waiting for the free quota": 4, "checking sources": 5, done: 6 };
 
 const when = (iso: string | null) =>
   iso ? new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Kolkata" }) : "date unknown";
@@ -120,6 +121,7 @@ function Row({ r, st, ev, onRead }: { r: ReplySummary; st: ReplyState | undefine
         {reading ? (
           <div>
             <div className="font-semibold">{STAGE_LABEL[st.stage] ?? st.stage}</div>
+            {st.detail && <div className="text-n-700 text-[13px]">{st.detail}</div>}
             <div className="h-[3px] bg-n-300 mt-[8px]">
               <div className="h-[3px] bg-accent transition-all duration-500" style={{ width: `${(100 * (STAGE_STEP[st.stage] ?? 0)) / 6}%` }} />
             </div>
@@ -160,10 +162,11 @@ function Row({ r, st, ev, onRead }: { r: ReplySummary; st: ReplyState | undefine
                 {rd.nextStep.text && <div className="text-n-700 text-[13px] mt-[6px]">Next: {rd.nextStep.text}</div>}
               </>
             )}
+            {st?.notice && <div className="text-[13px] text-n-800 bg-n-100 px-[8px] py-[4px] mt-[8px] rounded-[var(--radius-md)]">{st.notice}</div>}
             <div className="text-[12px] text-n-500 mt-[8px]">
-              {rd.cached ? "From this session's reading" : `Read in ${(rd.ms / 1000).toFixed(0)}s · $${rd.usage.reduce((s, u) => s + u.costUsd, 0).toFixed(3)}`}
+              {rd.status === "error" ? "Not read yet" : `${rd.saved ? "Saved reading, " : "Read live, "}${readStamp(rd)}`}
               {" · "}
-              <button className="underline" onClick={() => onRead(true)}>Read again</button>
+              <button className="underline" onClick={() => onRead(true)}>Read again live</button>
             </div>
           </>
         ) : null}
@@ -326,10 +329,11 @@ export default function RepliesPage() {
       <p className="text-[15px] max-w-[760px] mt-[6px] text-n-800">
         {data.replies.length} replies in the event inbox, in whatever shape the vendors chose. Each one is read by AI, then every number is
         checked by code against the original file. A value that cannot be found where the reader says never enters the comparison.
+        The demo opens with saved readings, each marked with when and by which model it was read; any reply can be read again live.
       </p>
       {!data.keyConfigured && (
         <div className="mt-[var(--space-4)] p-[var(--space-3)] bg-d-100 text-[14px] rounded-[var(--radius-md)]">
-          Reading is paused: no Anthropic API key is set on the server yet.
+          Live reading is off: no Gemini API key is set on the server yet. Saved readings still show.
         </div>
       )}
       {blocked && <div className="mt-[var(--space-4)] p-[var(--space-3)] bg-d-100 text-[14px] rounded-[var(--radius-md)]">{blocked}</div>}

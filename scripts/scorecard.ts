@@ -1,9 +1,9 @@
 // Run the reader on every reply in the demo inbox and grade it against the answer key.
-//   npm run scorecard            uses cached readings when the files and prompts are unchanged
-//   npm run scorecard -- --fresh reads everything again (costs API credit)
+//   npm run scorecard            uses cached model answers when the files and prompts are unchanged
+//   npm run scorecard -- --fresh reads everything again (uses the free Gemini quota)
 //   npm run scorecard -- --only=4_anand_photo
-//   npm run scorecard -- --save  after a full run with no errors, save the model answers it used to
-//                                data/saved-readings (committed), so the demo opens without paid calls
+//   npm run scorecard -- --save  after a full run with no errors, save each reply's reading to
+//                                data/readings/ (committed), stamped with date and model; the demo opens with these
 import fs from "node:fs";
 import path from "node:path";
 import { loadEnv } from "./env";
@@ -11,9 +11,10 @@ loadEnv();
 
 import { hasApiKey } from "@/lib/ai";
 import { loadDemoInbox } from "@/lib/inbox";
-import { saveUsedReadings } from "@/lib/reader/call";
 import { readReply, type ReplyReading } from "@/lib/reader/pipeline";
 import { loadEvent } from "@/lib/rfq";
+import { saveReadings } from "@/lib/saved";
+import { readStamp } from "@/lib/format";
 import { grade, loadKey } from "@/lib/scorecard";
 
 const args = process.argv.slice(2);
@@ -24,7 +25,7 @@ const pct = (a: number, b: number) => (b ? `${((100 * a) / b).toFixed(1)}%` : "-
 
 async function main() {
   if (!hasApiKey()) {
-    console.error("No API key. Put ANTHROPIC_API_KEY=... in .env.local (see README).");
+    console.error("No API key. Put GEMINI_API_KEY=... in .env.local (see README).");
     process.exit(1);
   }
   const ev = await loadEvent();
@@ -35,14 +36,17 @@ async function main() {
     for (let r = queue.shift(); r; r = queue.shift()) {
       const reply = r;
       const t = Date.now();
-      const res = await readReply(reply, ev, { fresh });
+      const res = await readReply(reply, ev, {
+        fresh,
+        onProgress: (stage, detail) => { if (detail) console.log(`  ${reply.id.padEnd(24)} ${stage}: ${detail}`); },
+      });
       readings.push(res);
-      const cost = res.usage.reduce((s, u) => s + u.costUsd, 0);
-      console.log(`  ${reply.id.padEnd(24)} ${res.status.padEnd(11)} ${((Date.now() - t) / 1000).toFixed(1).padStart(5)}s ${res.cached ? "(cached)" : `$${cost.toFixed(3)}`}  ${res.headline}`);
+      const calls = res.usage.length;
+      console.log(`  ${reply.id.padEnd(24)} ${res.status.padEnd(11)} ${((Date.now() - t) / 1000).toFixed(1).padStart(5)}s ${res.cached ? "(cached)" : `${calls} call${calls === 1 ? "" : "s"}`}  ${readStamp(res)}  ${res.headline}`);
     }
   };
   console.log(`Reading ${inbox.length} replies...`);
-  await Promise.all([worker(), worker(), worker(), worker()]);
+  await Promise.all([worker(), worker()]); // the free tier allows only a few calls a minute
 
   const out = path.join(process.cwd(), ".cache");
   fs.mkdirSync(out, { recursive: true });
@@ -71,12 +75,13 @@ async function main() {
   console.log("\nFailure cases");
   for (const e of sc.failures) console.log(`  ${e.ok ? "PASS" : "FAIL"}  ${e.name}  [${e.detail}]`);
   console.log(`\nNot graded yet: ${sc.notYet.join("; ")}`);
-  console.log(`API cost this run: $${sc.costUsd.toFixed(3)}`);
+  const tokens = readings.flatMap((r) => r.usage).reduce((s, u) => s + u.inputTokens + u.outputTokens + u.thinkingTokens, 0);
+  console.log(`Model calls this run: ${sc.modelCalls} (${tokens.toLocaleString("en-IN")} tokens, free tier). Models: ${sc.models.join(", ")}`);
 
   if (save) {
     const failed = readings.filter((r) => r.status === "error");
     if (failed.length) console.log(`\nNot saved: ${failed.length} replies stopped with an error (${failed.map((r) => r.replyId).join(", ")}).`);
-    else console.log(`\nSaved ${await saveUsedReadings()} model answers to data/saved-readings.`);
+    else console.log(`\nSaved ${await saveReadings(inbox, readings)} readings to data/readings/.`);
   }
 }
 

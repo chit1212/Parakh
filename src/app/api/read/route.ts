@@ -25,8 +25,8 @@ export async function POST(req: Request) {
           beforeCall: budget,
           onProgress: (stage, detail) => send({ type: "progress", stage, detail }),
         });
-        // A refused or keyless read is reported as such, not as a broken file.
-        if (reading.status === "error" && /API key|limit/i.test(reading.error ?? "")) send({ type: "blocked", message: reading.error });
+        // A keyless or over-limit read is reported as such, not as a broken file.
+        if (reading.status === "error" && /API key|reading limit/i.test(reading.error ?? "")) send({ type: "blocked", message: reading.error });
         send({ type: "result", reading });
       } catch (e) {
         const blocked = e instanceof RateLimitedError || e instanceof MissingKeyError;

@@ -92,7 +92,11 @@ export interface Scorecard {
   edges: Check[];
   failures: Check[];
   notYet: string[];
-  costUsd: number;
+  /** Model calls made in this run (0 when every answer came from the cache or saved readings). */
+  modelCalls: number;
+  /** Which models read these replies, and when the latest reading happened. */
+  models: string[];
+  readAt: string | null;
 }
 
 const unitOf = (u: string) => (u === "per_piece" ? "per_box" : u);
@@ -235,6 +239,8 @@ export function grade(ev: SourcingEvent, key: Key, readings: ReplyReading[]): Sc
       "Normalised values (per box, INR, delivered): milestone 2",
       "Which expected doubts are escalated vs only logged: milestone 4",
     ],
-    costUsd: readings.flatMap((r) => r.usage).reduce((s, u) => s + u.costUsd, 0),
+    modelCalls: readings.flatMap((r) => r.usage).length,
+    models: [...new Set(readings.flatMap((r) => r.models))],
+    readAt: readings.map((r) => r.readAt).filter((t): t is string => Boolean(t)).sort().at(-1) ?? null,
   };
 }

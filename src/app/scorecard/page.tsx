@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Shell } from "@/components/Shell";
 import { useReadings } from "@/components/useReadings";
+import { readStamp } from "@/lib/format";
 import type { Scorecard } from "@/lib/scorecard";
 
 const pct = (a: number, b: number) => (b ? `${((100 * a) / b).toFixed(1)}%` : "–");
@@ -35,7 +36,8 @@ export default function ScorecardPage() {
         field by field. The answer key is only used here, for grading. The app never reads it.
       </p>
       {blocked && <div className="mt-[var(--space-4)] p-[var(--space-3)] bg-d-100 text-[14px]">{blocked}</div>}
-      {data && !data.keyConfigured && <div className="mt-[var(--space-4)] p-[var(--space-3)] bg-d-100 text-[14px]">No API key yet, so nothing can be read.</div>}
+      {sc?.readAt && <p className="text-[13px] text-n-700 mt-[6px]">Graded readings: {readStamp({ readAt: sc.readAt, models: sc.models })} (latest).</p>}
+      {data && !data.keyConfigured && done < total && <div className="mt-[var(--space-4)] p-[var(--space-3)] bg-d-100 text-[14px]">Some replies have no saved reading and no Gemini API key is set, so they cannot be read yet.</div>}
       {!sc && data?.keyConfigured && <div className="mt-[var(--space-4)] text-n-700">Reading replies: {done} of {total} done…</div>}
 
       {sc && (
@@ -54,8 +56,8 @@ export default function ScorecardPage() {
               <div className="text-[13px] text-n-700 mt-[4px]">failure files handled</div>
             </div>
             <div>
-              <div className="text-[44px] leading-none">${sc.costUsd.toFixed(2)}</div>
-              <div className="text-[13px] text-n-700 mt-[4px]">API cost of this run (0 when cached)</div>
+              <div className="text-[44px] leading-none">{sc.modelCalls}</div>
+              <div className="text-[13px] text-n-700 mt-[4px]">live model calls on this page (0 when all readings are saved)</div>
             </div>
           </div>
 
