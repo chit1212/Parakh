@@ -10,7 +10,7 @@ export function Rail() {
   const path = usePathname();
   const items = [
     { icon: Tray, label: "Events", href: "/events" },
-    { icon: NotePencil, label: "RFQ", href: null },
+    { icon: NotePencil, label: "RFQ", href: `/events/${EVENT}/rfq` },
     { icon: EnvelopeOpen, label: "Replies", href: `/events/${EVENT}/replies` },
     { icon: Table, label: "Compare", href: HOME },
     { icon: SealCheck, label: "Award", href: `/events/${EVENT}/award` },

@@ -45,3 +45,9 @@ Built:
 - Chat (`/api/chat`): Gemini function calling with read_comparison, run_scenario, get_cell_source, show_view; the model never does sums. The client re-solves each returned rule set in code and applies it to the table: scenario pills, rules/excluded strip, "was X", faded excluded vendors, chart view.
 - Free tier: on 9 Oct the three Flash models hit their daily limit; Flash-Lite models are now the last fallback for reading and chat, and daily-limited models are skipped until the next day. A busy model (503) is no longer reported as "used up for today".
 - Not done: a 0-100 quality score (no marking scheme in the RFQ); the header shows pass/fail with reasons.
+
+## Milestones 6 and 7 (done)
+- Freeze for award (Compare) -> snapshot in the browser; Award record `/events/SE-2026-041/award` with KPIs, rules, decisions on record (doubt decisions and overrides), frozen table and trace panel; VP approval; Excel and PDF memo from `/api/export` (exceljs, pdf-lib).
+- Upload a reply (Replies) -> `/api/upload` parses in code and streams the real reading; kept in the browser session; a later reply replaces only the lines it prices.
+- L17 revised quote: what changed and whether it moves a winner (Replies). L32 override with audit trail (source panel). L29 counter-offer drafted by Gemini (source panel), target set in code, no other vendor named. L0 RFQ co-pilot `/events/SE-2026-041/rfq`: Gemini edits the draft via tools; start from the issued RFQ or clone SE-2025-037.
+- Open: a 0-100 quality score (the RFQ has no marking scheme; pass/fail is shown with reasons). Uploaded files are not drawn in the source panel (not kept on the server).

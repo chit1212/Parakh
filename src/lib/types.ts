@@ -42,6 +42,8 @@ export interface SourcingEvent {
   issued: string;
   due: string;
   basis: string;
+  /** Commercial terms as the RFQ states them (section 2 of the RFQ document). */
+  terms: Record<string, string>;
   lyEventId: string;
   lines: RfqLine[];
   questions: Question[];
