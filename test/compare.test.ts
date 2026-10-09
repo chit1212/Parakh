@@ -12,7 +12,7 @@ const key = JSON.parse(fs.readFileSync("dataset/06_answer_key/answer_key.json", 
 describe("comparison, as quoted", async () => {
   const [ev, inbox, history] = await Promise.all([loadEvent(), loadDemoInbox(), loadHistory()]);
   const saved = await loadSavedReadings(inbox);
-  const grid = buildGrid(ev, Object.values(saved), history, {});
+  const grid = buildGrid(ev, Object.values(saved), history, {}, history.lines);
 
   it("picks the same winner as the answer key on every line", () => {
     const want = key.scenarios.cheapest_overall_all_vendors.winners as Record<string, string>;
@@ -28,5 +28,14 @@ describe("comparison, as quoted", async () => {
     expect(grid.cells["AC|L14"].canWin).toBe(false);
     expect(grid.cells["KP|L09"].canWin).toBe(false);
     expect(grid.cells["KP|L09"].band).toBe("low");
+  });
+
+  it("explains L21's jump against last year by its spec change, and finds no history for new SKUs", () => {
+    const c = grid.cells["SB|L21"];
+    expect(c.lastYear!.delta).toBeGreaterThan(0.6);
+    expect(c.lastYear!.note).toMatch(/spec changed from 5-ply/);
+    expect(grid.cells["SB|L28"].lastYear).toBeNull();
+    expect(grid.cells["SB|L29"].lastYear).toBeNull();
+    expect(Object.values(grid.cells).filter((x) => x.unitWarning)).toEqual([]);
   });
 });

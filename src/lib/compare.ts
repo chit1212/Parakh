@@ -4,7 +4,7 @@ import { SHOULD_COST } from "./config";
 import type { Sheet } from "./files/xlsx";
 import { normalise, type NormCell, type VendorBasis } from "./normalise";
 import type { ReplyReading } from "./reader/pipeline";
-import type { RfqLine, SourcingEvent } from "./types";
+import type { LastYearLine, RfqLine, SourcingEvent } from "./types";
 
 /** How a price is shown (design: "How to read a price"). */
 export type CellKind =
@@ -26,6 +26,10 @@ export interface GridCell {
   /** Can this price win the line as quoted? If not, why (for the buyer). */
   canWin: boolean;
   whyNot: string | null;
+  /** L18: against last year's awarded price for the line, with a known spec change explained. */
+  lastYear: { price: number; delta: number; note: string } | null;
+  /** L18: a price so far from should-cost that the unit was probably misread. */
+  unitWarning: string | null;
   norm: NormCell;
 }
 
@@ -91,11 +95,34 @@ export function solve(ev: SourcingEvent, cells: Record<string, GridCell>, vendor
   return { per, byVendor, total };
 }
 
+/** Compare with last year's awarded price; a different board this year explains a big move. */
+function lastYearCheck(l: RfqLine, perBox: number | null, ly: LastYearLine[]): GridCell["lastYear"] {
+  const was = ly.find((x) => x.lineId === l.id);
+  if (!was || perBox == null) return null;
+  const delta = perBox / was.price - 1;
+  const plyThen = Number(was.board.match(/(\d)-ply/)?.[1]);
+  const pct = `${delta >= 0 ? "+" : "−"}${Math.abs(Math.round(delta * 100))}%`;
+  const note = plyThen && plyThen !== l.plyN
+    ? `${pct} vs last year (₹${was.price.toFixed(2)}), explained: the spec changed from ${was.board} to ${l.ply}.`
+    : `${pct} vs last year's ₹${was.price.toFixed(2)} (${was.vendor}, ${was.board}).`;
+  return { price: was.price, delta, note };
+}
+
+/** A price 5x off should-cost or more is more likely a misread unit (per 100, per 1,000) than a real price. */
+function unitCheck(deviation: number | null): string | null {
+  if (deviation == null) return null;
+  const ratio = deviation + 1;
+  if (ratio >= 5) return `${ratio.toFixed(0)}× should-cost: the unit may have been misread (per 100 or per 1,000 read as per box?).`;
+  if (ratio <= 0.2) return `${(1 / ratio).toFixed(0)}× below should-cost: the unit may have been misread.`;
+  return null;
+}
+
 export function buildGrid(
   ev: SourcingEvent,
   readings: ReplyReading[],
   history: { sheets: Sheet[] },
   files: Record<string, { kind: string; name: string } | undefined>,
+  lastYear: LastYearLine[] = [],
 ): Grid {
   const bases = normalise(ev, readings, history);
   const cells: Grid["cells"] = {};
@@ -118,7 +145,10 @@ export function buildGrid(
       else if (latest?.status === "incomplete") whyNot = "the reply looks incomplete; held until the buyer decides";
       else if (n.alternate) whyNot = `a different spec was offered (${n.alternate}); it can win only once the buyer accepts it`;
       else if (band === "low") whyNot = `${Math.round(-deviation! * 100)}% below should-cost; it can win only once the vendor confirms it`;
-      cells[cellKey(v.id, l.id)] = { vendorId: v.id, lineId: l.id, kind: kindOf(n), perBox: n.perBox, deviation, band, canWin: whyNot === null, whyNot, norm: n };
+      cells[cellKey(v.id, l.id)] = {
+        vendorId: v.id, lineId: l.id, kind: kindOf(n), perBox: n.perBox, deviation, band, canWin: whyNot === null, whyNot,
+        lastYear: lastYearCheck(l, n.perBox, lastYear), unitWarning: unitCheck(deviation), norm: n,
+      };
     }
     const quoted = ev.lines.filter((l) => cells[cellKey(v.id, l.id)].perBox != null).length;
     const notes: string[] = [];

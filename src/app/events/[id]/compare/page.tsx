@@ -34,7 +34,7 @@ export default function ComparePage() {
   const grid = useMemo(() => {
     if (!data) return null;
     const files = Object.fromEntries(data.replies.map((r) => [r.id, mainFile(r, state[r.id]?.reading ?? null) ?? undefined]));
-    return buildGrid(data.event, readings, { sheets: data.historySheets }, files);
+    return buildGrid(data.event, readings, { sheets: data.historySheets }, files, data.lastYear);
   }, [data, readings, state]);
 
   // Where each file lives, to link "Open original".
@@ -273,6 +273,8 @@ function SourcePanel({ grid, sel, readings, paths, onSelect, onClose }: {
             <> Should-cost {inr(line.shouldCost)}; this is {Math.abs(Math.round(c.deviation * 100))}% {c.deviation >= 0 ? "above" : "below"}
               {c.band ? <b>, outside the ±12% band</b> : ", inside the ±12% band"}.</>
           )}
+          {c.unitWarning && <b> {c.unitWarning}</b>}
+          {c.perBox != null && (c.lastYear ? <> {c.lastYear.note}</> : <> No price on record from last year: a new item.</>)}
         </>
       ),
     });
