@@ -49,6 +49,8 @@ export interface NormCell {
   matchReason: string | null;
   /** The number exactly as written, for finding it in the original. */
   raw: { text: string; value: number } | null;
+  /** The reader's mark on how clearly the number could be read. */
+  legibility: "clear" | "unclear" | "corrected_by_hand";
 }
 
 export interface VendorBasis {
@@ -163,7 +165,7 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
       const cell: NormCell = {
         vendorId, lineId: line.id, status: "unclear", asWritten: "", source: null, verification: null, perBox: null, calc: null,
         lastYear: false, variants: {}, alternatives: [], alternate: null, flags: [], replyId: latest.replyId,
-        vendorWording: null, matchReason: null, raw: null,
+        vendorWording: null, matchReason: null, raw: null, legibility: "clear",
       };
       if (held) cell.flags.push("This reply looks incomplete; held out of the comparison until the buyer decides.");
       const price: Price | undefined = latest.prices.find((p) => p.line_id === line.id && ok(p.verification));
@@ -181,6 +183,7 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
         cell.vendorWording = price.vendor_wording;
         cell.matchReason = price.match_reason;
         cell.raw = { text: price.raw_value_text, value: price.raw_value };
+        cell.legibility = price.legibility;
         const r = toPerBox(price.raw_value, price.unit, price.currency, line);
         if ("reason" in r) cell.flags.push(r.reason);
         else base = r;

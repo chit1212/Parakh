@@ -78,7 +78,7 @@ export default function ScorecardPage() {
             </div>
           </div>
 
-          {[["Planted edges", sc.edges], ["Failure files", sc.failures]].map(([title, list]) => (
+          {[["Planted edges", sc.edges], ["Doubts and scenarios", sc.doubts], ["Failure files", sc.failures]].map(([title, list]) => (
             <div key={title as string} className="mt-[var(--space-8)]">
               <h2 className="text-[20px] mb-[var(--space-2)]">{title as string}</h2>
               <table className="w-full text-[14px]">

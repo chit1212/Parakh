@@ -7,7 +7,10 @@ import {
 } from "@phosphor-icons/react";
 import { Rail } from "@/components/Rail";
 import { SourceDoc } from "@/components/SourceDoc";
+import { DoubtsView } from "@/components/DoubtsView";
 import { useReadings } from "@/components/useReadings";
+import { findDoubts, type Doubt, type DoubtReport } from "@/lib/doubts";
+import { qualityOf, type Quality } from "@/lib/quality";
 import { buildGrid, cellKey, type Grid, type GridCell } from "@/lib/compare";
 import { crore, day, inr, lakh, num2, where } from "@/lib/format";
 import type { ReplyReading } from "@/lib/reader/pipeline";
@@ -18,6 +21,11 @@ const FORMAT_ICON: Record<string, typeof File> = { Excel: FileXls, PDF: FilePdf,
 const COLS = "40px minmax(170px,1fr) 44px 64px repeat(5, minmax(76px,96px)) 104px";
 const label11 = { fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--color-neutral-700)" };
 
+const tabS = (on: boolean): React.CSSProperties => ({
+  whiteSpace: "nowrap", background: "none", border: 0, padding: "6px 0", font: "inherit", fontSize: 15,
+  color: on ? "var(--color-text)" : "var(--color-neutral-700)", fontWeight: on ? 600 : 400, boxShadow: on ? "inset 0 -2px 0 var(--color-text)" : "none",
+});
+
 const STATE_LABEL: Record<GridCell["kind"], string> = {
   checked: "checked", converted: "converted", last_year: "last year’s rate", not_quoted: "not quoted", unclear: "not on the basis",
 };
@@ -26,6 +34,7 @@ export default function ComparePage() {
   const { data, state } = useReadings();
   const [sel, setSel] = useState<{ v: string; l: string } | null>(null);
   const [legend, setLegend] = useState(true);
+  const [tab, setTab] = useState<"compare" | "doubts">("compare");
 
   const readings = useMemo(
     () => (data ? data.replies.map((r) => state[r.id]?.reading).filter((r): r is ReplyReading => Boolean(r && r.status !== "error")) : []),
@@ -37,12 +46,28 @@ export default function ComparePage() {
     return buildGrid(data.event, readings, { sheets: data.historySheets }, files, data.lastYear);
   }, [data, readings, state]);
 
+  // Quality (code, from the questionnaire as read) and the doubts that could change a winner.
+  const quality = useMemo(() => (data ? data.event.vendors.map((v) => qualityOf(data.event, v.id, readings)) : []), [data, readings]);
+  const report = useMemo(
+    () => (data && grid ? findDoubts(data.event, grid, quality.filter((q) => q.cleared).map((q) => q.vendorId)) : null),
+    [data, grid, quality],
+  );
+  // Each cell a raised doubt is about, on the lines where it would change the winner.
+  const doubtAt = useMemo(() => {
+    const m = new Map<string, { d: Doubt; rank: number }>();
+    report?.raised.forEach((d, i) => {
+      const changed = new Set(d.changes.map((c) => c.lineId));
+      for (const l of d.lineIds) if (changed.has(l) && !m.has(cellKey(d.vendorId, l))) m.set(cellKey(d.vendorId, l), { d, rank: i + 1 });
+    });
+    return m;
+  }, [report]);
+
   // Where each file lives, to link "Open original".
   const paths: Record<string, string> = {};
   for (const r of data?.replies ?? []) for (const f of [...(r.cover ? [r.cover] : []), ...r.files]) paths[`${r.id}|${f.name.toLowerCase()}`] = f.path;
   paths[`history|se-2025-037_award_summary.xlsx`] = "dataset/04_history/SE-2025-037_Award_Summary.xlsx";
 
-  if (!data || !grid) return <div style={{ padding: 40, color: "var(--color-neutral-700)" }}>Loading the event…</div>;
+  if (!data || !grid || !report) return <div style={{ padding: 40, color: "var(--color-neutral-700)" }}>Loading the event…</div>;
   const ev = data.event;
   const pending = data.replies.filter((r) => !state[r.id] || state[r.id].stage !== "done").length;
 
@@ -61,10 +86,17 @@ export default function ComparePage() {
         </header>
 
         <div style={{ display: "flex", alignItems: "center", gap: 22, padding: "0 28px 0 8px" }}>
-          <span style={{ padding: "6px 0", fontSize: 15, fontWeight: 600, boxShadow: "inset 0 -2px 0 var(--color-text)" }}>Comparison</span>
+          <button onClick={() => setTab("compare")} style={tabS(tab === "compare")}>Comparison</button>
+          <button onClick={() => setTab("doubts")} style={tabS(tab === "doubts")}>
+            Doubts <span style={{ color: "var(--color-accent-2-700)" }}>{report.raised.length}</span> · {lakh(report.raised.reduce((a, d) => a + d.stake, 0))} at stake
+          </button>
           {pending > 0 && <span style={{ color: "var(--color-neutral-700)" }}>Reading {pending} more repl{pending === 1 ? "y" : "ies"}…</span>}
         </div>
 
+        {tab === "doubts" ? (
+          <DoubtsView grid={grid} report={report} onSee={(v, l) => { setSel({ v, l }); setTab("compare"); }} />
+        ) : (
+        <>
         <Legend open={legend} toggle={() => setLegend(!legend)} />
 
         <div style={{ display: "flex", alignItems: "center", gap: "10px 14px", padding: "2px 28px 8px 8px" }}>
@@ -76,9 +108,11 @@ export default function ComparePage() {
 
         <div style={{ flex: "1 0 460px", minHeight: 460, display: "flex" }}>
           <div style={{ flex: 1, minWidth: 0, overflow: "auto", padding: "0 20px 0 8px" }}>
-            <GridTable grid={grid} sel={sel} onSelect={(v, l) => setSel({ v, l })} />
+            <GridTable grid={grid} sel={sel} quality={quality} doubtAt={doubtAt} onSelect={(v, l) => setSel({ v, l })} />
           </div>
         </div>
+        </>
+        )}
       </main>
 
       <aside style={{ width: 440, flex: "none", background: "var(--color-surface)", display: "flex", flexDirection: "column", minHeight: 0 }}>
@@ -90,7 +124,7 @@ export default function ComparePage() {
         </div>
         <div style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "16px 22px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
           {sel ? (
-            <SourcePanel grid={grid} sel={sel} readings={readings} paths={paths} onSelect={(v) => setSel({ v, l: sel.l })} onClose={() => setSel(null)} />
+            <SourcePanel grid={grid} sel={sel} readings={readings} paths={paths} doubt={doubtAt.get(cellKey(sel.v, sel.l))} report={report} onSelect={(v) => setSel({ v, l: sel.l })} onClose={() => setSel(null)} />
           ) : (
             <p style={{ margin: 0, color: "var(--color-neutral-700)", maxWidth: 320 }}>
               Click any price in the table to see where it was read, what the vendor wrote, and the arithmetic that put it on our basis.
@@ -129,12 +163,15 @@ function Legend({ open, toggle }: { open: boolean; toggle: () => void }) {
       {item(<span style={{ ...chip, fontStyle: "italic", color: "var(--color-neutral-800)" }}>24.60<sup style={{ fontSize: 8, fontStyle: "normal", letterSpacing: "0.04em", marginLeft: 1 }}>LY</sup></span>, "Last year’s price", "italic, from SE-2025-037")}
       {item(<span style={chip}>24.60<sup style={{ fontSize: 10, fontWeight: 600, marginLeft: 1 }}>↑</sup></span>, "Unusual price", "↑ or ↓ over 12% from should-cost")}
       {item(<span style={{ ...chip, color: "var(--color-neutral-500)" }}>—</span>, "Not quoted", "vendor skipped this line")}
+      {item(<span style={{ ...chip, boxShadow: "none", background: "var(--color-accent-2-100)", color: "var(--color-accent-2-800)", fontWeight: 600 }}>24.60?</span>, "Doubt", "could change who wins", "var(--color-accent-2-800)")}
       {item(<span style={{ ...chip, fontWeight: 600 }}>24.60</span>, "Lowest", "bold = cheapest on the line")}
     </div>
   );
 }
 
-function GridTable({ grid, sel, onSelect }: { grid: Grid; sel: { v: string; l: string } | null; onSelect: (v: string, l: string) => void }) {
+function GridTable({ grid, sel, quality, doubtAt, onSelect }: {
+  grid: Grid; sel: { v: string; l: string } | null; quality: Quality[]; doubtAt: Map<string, { d: Doubt; rank: number }>; onSelect: (v: string, l: string) => void;
+}) {
   const award = grid.asQuoted;
   const muted = { fontSize: 11, color: "var(--color-neutral-700)" };
   return (
@@ -150,7 +187,10 @@ function GridTable({ grid, sel, onSelect }: { grid: Grid; sel: { v: string; l: s
             <div key={v.id} style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", textAlign: "right", gap: 1, paddingRight: 10 }}>
               <span style={{ fontWeight: 600, fontSize: 13, lineHeight: 1.15 }}>{v.short}</span>
               <span style={{ display: "flex", alignItems: "center", gap: 4, ...muted }}><Icon weight="duotone" />{v.format}</span>
-              <span style={{ fontSize: 11 }}>{v.questionnaire.returned ? `Questionnaire ${v.questionnaire.answers}/${grid.questions}` : "No questionnaire"}</span>
+              {(() => {
+                const q = quality.find((x) => x.vendorId === v.id);
+                return <span style={{ fontSize: 11 }} title={q?.why}>{!q?.returned ? "No questionnaire" : `Quality ${q.cleared ? "✓" : "✕"}`}</span>;
+              })()}
               <span style={{ fontSize: 10.5, color: "var(--color-neutral-700)", lineHeight: 1.25 }}>{v.note}</span>
             </div>
           );
@@ -170,7 +210,7 @@ function GridTable({ grid, sel, onSelect }: { grid: Grid; sel: { v: string; l: s
             <span style={{ textAlign: "right", color: "var(--color-neutral-700)", alignSelf: "center" }}>{Math.round(l.qty / 1000)}k</span>
             <span style={{ textAlign: "right", color: "var(--color-neutral-700)", paddingRight: 6, alignSelf: "center" }}>{num2(l.shouldCost)}</span>
             {grid.vendors.map((v) => (
-              <Cell key={v.id} c={grid.cells[cellKey(v.id, l.id)]} win={w?.vendorId === v.id} selected={sel?.v === v.id && sel.l === l.id} onClick={() => onSelect(v.id, l.id)} tip={`${v.short} · ${l.id}: ${grid.cells[cellKey(v.id, l.id)].norm.asWritten}`} />
+              <Cell key={v.id} c={grid.cells[cellKey(v.id, l.id)]} doubt={doubtAt.has(cellKey(v.id, l.id))} win={w?.vendorId === v.id} selected={sel?.v === v.id && sel.l === l.id} onClick={() => onSelect(v.id, l.id)} tip={`${v.short} · ${l.id}: ${grid.cells[cellKey(v.id, l.id)].norm.asWritten}`} />
             ))}
             <span style={{ display: "flex", flexDirection: "column", justifyContent: "center", paddingLeft: 12, lineHeight: 1.2 }}>
               <span>{w ? grid.vendors.find((v) => v.id === w.vendorId)?.short : "—"}</span>
@@ -196,21 +236,21 @@ function GridTable({ grid, sel, onSelect }: { grid: Grid; sel: { v: string; l: s
   );
 }
 
-function Cell({ c, win, selected, onClick, tip }: { c: GridCell; win: boolean; selected: boolean; onClick: () => void; tip: string }) {
+function Cell({ c, doubt, win, selected, onClick, tip }: { c: GridCell; doubt: boolean; win: boolean; selected: boolean; onClick: () => void; tip: string }) {
   const k = c.kind;
   const ns = {
-    color: k === "not_quoted" || k === "unclear" ? "var(--color-neutral-500)" : k === "last_year" ? "var(--color-neutral-800)" : "var(--color-text)",
+    color: doubt ? "var(--color-accent-2-800)" : k === "not_quoted" || k === "unclear" ? "var(--color-neutral-500)" : k === "last_year" ? "var(--color-neutral-800)" : "var(--color-text)",
     fontStyle: k === "last_year" ? ("italic" as const) : ("normal" as const),
-    fontWeight: win ? 600 : 400,
+    fontWeight: win || doubt ? 600 : 400,
     textDecoration: k === "converted" ? "underline dotted var(--color-neutral-600)" : "none",
     textUnderlineOffset: 3,
   };
-  const mark = k === "last_year" ? "LY" : c.band === "high" ? "↑" : c.band === "low" ? "↓" : "";
+  const mark = doubt ? "?" : k === "last_year" ? "LY" : c.band === "high" ? "↑" : c.band === "low" ? "↓" : "";
   return (
     <button
       onClick={onClick}
       title={tip}
-      style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", height: "100%", minHeight: 38, padding: "0 10px", border: 0, font: "inherit", fontSize: 13.5, background: "transparent", outline: selected ? "2px solid var(--color-accent)" : "none", outlineOffset: -2, color: "inherit" }}
+      style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", height: "100%", minHeight: 38, padding: "0 10px", border: 0, font: "inherit", fontSize: 13.5, background: doubt ? "var(--color-accent-2-100)" : "transparent", outline: selected ? "2px solid var(--color-accent)" : "none", outlineOffset: -2, color: "inherit" }}
     >
       <span style={ns}>
         {c.perBox == null ? (k === "unclear" ? "n/a" : "—") : num2(c.perBox)}
@@ -220,8 +260,9 @@ function Cell({ c, win, selected, onClick, tip }: { c: GridCell; win: boolean; s
   );
 }
 
-function SourcePanel({ grid, sel, readings, paths, onSelect, onClose }: {
-  grid: Grid; sel: { v: string; l: string }; readings: ReplyReading[]; paths: Record<string, string>; onSelect: (v: string) => void; onClose: () => void;
+function SourcePanel({ grid, sel, readings, paths, doubt, report, onSelect, onClose }: {
+  grid: Grid; sel: { v: string; l: string }; readings: ReplyReading[]; paths: Record<string, string>;
+  doubt: { d: Doubt; rank: number } | undefined; report: DoubtReport; onSelect: (v: string) => void; onClose: () => void;
 }) {
   const line = grid.lines.find((l) => l.id === sel.l)!;
   const c = grid.cells[cellKey(sel.v, sel.l)];
@@ -281,7 +322,8 @@ function SourcePanel({ grid, sel, readings, paths, onSelect, onClose }: {
   }
   steps.push({
     stage: "Decide", who: "You",
-    text: c.perBox == null ? "Nothing to decide on this cell."
+    text: doubt ? <>{doubt.d.ask} {doubt.d.route === "vendor" ? "An email is ready to draft on the Doubts tab." : "Decide on the Doubts tab."}</>
+      : c.perBox == null ? "Nothing to decide on this cell."
       : !c.canWin ? <>Shown, but cannot win yet: {c.whyNot}.</>
       : w?.vendorId === sel.v ? "Lowest on the line as quoted."
       : <>{inr(c.perBox - (w?.perBox ?? 0))} a box above the lowest ({winner?.short}).</>,
@@ -297,6 +339,11 @@ function SourcePanel({ grid, sel, readings, paths, onSelect, onClose }: {
         </div>
         <button className="btn btn-ghost btn-icon" onClick={onClose} title="Close"><X size={18} weight="duotone" /></button>
       </div>
+      {doubt && (
+        <div style={{ color: "var(--color-accent-2-800)", fontWeight: 600 }}>
+          Doubt {doubt.rank} of {report.raised.length} · {lakh(doubt.d.stake)} at stake. {doubt.d.title}
+        </div>
+      )}
 
       {n.source && (
         <SourceDoc

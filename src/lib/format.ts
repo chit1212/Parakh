@@ -6,8 +6,9 @@ export function where(s: SourceRef | null): string {
   const parts = [s.file];
   if (s.sheet) parts.push(`sheet ${s.sheet}${s.cell ? `, cell ${s.cell}` : ""}`);
   if (s.page) parts.push(`page ${s.page}`);
-  if (s.table) parts.push(`table ${s.table}${s.row ? `, row ${s.row}` : ""}`);
-  else if (s.row) parts.push(`row ${s.row}`);
+  const row = s.row?.replace(/^(table\s*\d+\s*,\s*)?row\s*/i, "");
+  if (s.table) parts.push(`table ${s.table}${row ? `, row ${row}` : ""}`);
+  else if (row) parts.push(`row ${row}`);
   return parts.join(", ");
 }
 

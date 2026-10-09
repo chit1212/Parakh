@@ -74,7 +74,11 @@ function kindOf(n: NormCell): CellKind {
 }
 
 /** Who wins each line among the given cells: lowest price that is allowed to win. */
-export function solve(ev: SourcingEvent, cells: Record<string, GridCell>, vendorIds: string[], price: (c: GridCell) => number | null = (c) => c.perBox): Award {
+/** The price a cell competes at; null if it cannot win. Scenarios and doubts pass their own. */
+export type PriceRule = (c: GridCell) => number | null;
+export const asQuotedPrice: PriceRule = (c) => (c.canWin ? c.perBox : null);
+
+export function solve(ev: SourcingEvent, cells: Record<string, GridCell>, vendorIds: string[], price: PriceRule = asQuotedPrice): Award {
   const per: Award["per"] = {};
   const byVendor: Award["byVendor"] = Object.fromEntries(vendorIds.map((v) => [v, { lines: 0, value: 0 }]));
   let total = 0;
@@ -82,7 +86,7 @@ export function solve(ev: SourcingEvent, cells: Record<string, GridCell>, vendor
     let best: { vendorId: string; perBox: number } | null = null;
     for (const v of vendorIds) {
       const c = cells[cellKey(v, l.id)];
-      const p = c && c.canWin ? price(c) : null;
+      const p = c ? price(c) : null;
       if (p != null && (!best || p < best.perBox)) best = { vendorId: v, perBox: p };
     }
     per[l.id] = best;
@@ -134,7 +138,7 @@ export function buildGrid(
       const n: NormCell = basis?.cells.find((c) => c.lineId === l.id) ?? {
         vendorId: v.id, lineId: l.id, status: "not_quoted", asWritten: "no reply read", source: null, verification: null, perBox: null,
         calc: null, lastYear: false, variants: {}, alternatives: [], alternate: null, flags: ["No reply from this vendor has been read."], replyId: "",
-        vendorWording: null, matchReason: null, raw: null,
+        vendorWording: null, matchReason: null, raw: null, legibility: "clear",
       };
       const deviation = n.perBox != null ? n.perBox / l.shouldCost - 1 : null;
       const band = deviation == null || Math.abs(deviation) <= SHOULD_COST.band ? null : deviation > 0 ? "high" : "low";

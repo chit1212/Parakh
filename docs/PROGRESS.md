@@ -33,3 +33,9 @@ Built:
 - The app reads `GEMINI_API_KEY`, or `PARAKH_GEMINI_API_KEY` in a dev container. In a container with an egress proxy (never on Vercel), Node's fetch is pointed at the proxy.
 - Model outputs are cached by content hash (`.cache/readings`, or `/tmp` on Vercel) so re-reading an unchanged file uses no quota (development only; the demo uses `data/readings/`).
 - Fonts and icons are bundled from npm (no CDN at runtime).
+
+## Milestones 3 and 4 (done)
+- L18 checks: last year's price per cell, spec change named (L21 5-ply to 7-ply); unit sanity (5x off should-cost).
+- Quality (`src/lib/quality.ts`): cleared = questionnaire returned + valid ISO 9001 + test report within 12 months of the RFQ, all checked in code. The 0-100 score needs a marking scheme the RFQ does not give: milestone 5 (L26).
+- Doubts (`src/lib/doubts.ts`): every candidate (conditional discount, unknown freight, substitute spec, far below should-cost, hard-to-read number) is re-solved in the cheapest-overall and quality-cleared views; raised only if a winner changes, ranked by rupees, routed to vendor or buyer. Doubts tab and magenta doubt cells on Compare. Vendor emails drafted by Gemini on request (`/api/draft`), only that vendor's own figures; approve is stubbed.
+- Scorecard grades doubts and totals against the answer key: 9 of 9 pass.
