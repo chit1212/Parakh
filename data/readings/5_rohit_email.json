@@ -329,11 +329,12 @@
   "unsourced": 0,
   "usage": [],
   "cached": true,
-  "ms": 6,
+  "ms": 3,
   "readAt": "2026-10-09T12:19:50.982Z",
   "models": [
    "gemini-3.5-flash-lite",
    "gemini-3.5-flash"
-  ]
+  ],
+  "receivedAt": "2026-10-03T16:17:12.000Z"
  }
 }

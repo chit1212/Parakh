@@ -43,6 +43,22 @@ const save = (r: Record<string, ReplyReading>) => {
   }
 };
 
+const UPLOADS = "parakh.uploads.v1";
+const loadUploads = (): ReplySummary[] => {
+  try {
+    return JSON.parse(sessionStorage.getItem(UPLOADS) ?? "[]");
+  } catch {
+    return [];
+  }
+};
+const saveUploads = (u: ReplySummary[]) => {
+  try {
+    sessionStorage.setItem(UPLOADS, JSON.stringify(u));
+  } catch {
+    /* blocked: uploads last until the page is refreshed */
+  }
+};
+
 export function useReadings() {
   const [data, setData] = useState<EventData | null>(null);
   const [state, setState] = useState<Record<string, ReplyState>>({});
@@ -52,12 +68,12 @@ export function useReadings() {
   const set = (id: string, patch: Partial<ReplyState>) =>
     setState((s) => ({ ...s, [id]: { ...(s[id] ?? { stage: "queued", reading: null, error: null }), ...patch } }));
 
-  const readOne = useCallback(async (id: string, fresh = false) => {
-    // The current reading stays on screen until a new one arrives.
-    set(id, { stage: "opening", error: null, notice: null, detail: null });
+  /** Follow a streamed reading (one JSON object per line) for reply `id0` (an upload learns its id from the stream). */
+  const follow = useCallback(async (res: Response, id0: string | null) => {
+    let id = id0 ?? "";
     try {
-      const res = await fetch("/api/read", { method: "POST", body: JSON.stringify({ replyId: id, fresh }) });
       if (!res.body) throw new Error(`Server answered ${res.status}`);
+      if (!res.ok && res.headers.get("content-type")?.includes("json")) throw new Error((await res.json()).error ?? `Server answered ${res.status}`);
       const reader = res.body.getReader();
       const dec = new TextDecoder();
       let buf = "";
@@ -69,7 +85,15 @@ export function useReadings() {
         while ((nl = buf.indexOf("\n")) >= 0) {
           const msg = JSON.parse(buf.slice(0, nl));
           buf = buf.slice(nl + 1);
-          if (msg.type === "progress") set(id, { stage: msg.stage, detail: msg.detail ?? null });
+          if (msg.type === "reply") {
+            // A new upload: it joins the event's replies for this session, newest first.
+            const r = msg.reply as ReplySummary;
+            id = r.id;
+            setData((d) => (d ? { ...d, replies: [r, ...d.replies.filter((x) => x.id !== r.id)] } : d));
+            const ups = loadUploads().filter((x) => x.id !== r.id);
+            saveUploads([r, ...ups]);
+            set(id, { stage: "opening", reading: null, error: null });
+          } else if (msg.type === "progress") set(id, { stage: msg.stage, detail: msg.detail ?? null });
           else if (msg.type === "blocked") {
             setBlocked(msg.message);
             set(id, { stage: "done", notice: msg.message });
@@ -92,15 +116,41 @@ export function useReadings() {
         }
       }
     } catch (e) {
-      set(id, { stage: "done", error: (e as Error).message });
+      if (id) set(id, { stage: "done", error: (e as Error).message });
+      else setBlocked((e as Error).message);
     }
   }, []);
+
+  const readOne = useCallback(async (id: string, fresh = false) => {
+    // The current reading stays on screen until a new one arrives.
+    set(id, { stage: "opening", error: null, notice: null, detail: null });
+    try {
+      await follow(await fetch("/api/read", { method: "POST", body: JSON.stringify({ replyId: id, fresh }) }), id);
+    } catch (e) {
+      set(id, { stage: "done", error: (e as Error).message });
+    }
+  }, [follow]);
+
+  /** Upload a new reply: parsed in code, read live by the real pipeline. */
+  const upload = useCallback(async (files: File[], vendorId: string) => {
+    const form = new FormData();
+    files.forEach((f) => form.append("files", f));
+    form.append("vendorId", vendorId);
+    setBlocked(null);
+    try {
+      await follow(await fetch("/api/upload", { method: "POST", body: form }), null);
+    } catch (e) {
+      setBlocked((e as Error).message);
+    }
+  }, [follow]);
 
   useEffect(() => {
     if (started.current) return;
     started.current = true;
     (async () => {
-      const d = (await (await fetch("/api/event")).json()) as EventData;
+      const d0 = (await (await fetch("/api/event")).json()) as EventData;
+      // Replies uploaded earlier in this session come first (newest), then the demo inbox.
+      const d = { ...d0, replies: [...loadUploads(), ...d0.replies] };
       setData(d);
       const kept = load(); // live readings done in this browser session win over saved ones
       const todo: string[] = [];
@@ -108,6 +158,7 @@ export function useReadings() {
       for (const r of d.replies) {
         const have = kept[r.id] ?? d.saved[r.id];
         if (have) init[r.id] = { stage: "done", reading: have, error: null };
+        else if (r.origin === "upload") init[r.id] = { stage: "done", reading: null, error: "This upload was not read; upload it again." };
         else {
           init[r.id] = { stage: d.keyConfigured ? "queued" : "waiting", reading: null, error: null };
           todo.push(r.id);
@@ -124,5 +175,5 @@ export function useReadings() {
     })();
   }, [readOne]);
 
-  return { data, state, blocked, readOne };
+  return { data, state, blocked, readOne, upload };
 }

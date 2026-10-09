@@ -94,4 +94,15 @@ describe("one basis: INR per box, delivered", () => {
     expect(c.perBox).toBe(31.2);
     expect(c.alternatives).toEqual([{ value: 37.2, perBox: 37.2, reason: "1 could be 7" }]);
   });
+
+  it("a later reply replaces only the lines it prices; the rest stand from the earlier offer", async () => {
+    const [ev, history] = await Promise.all([loadEvent(), loadHistory()]);
+    const r1 = reading("SB", { replyId: "r1", receivedAt: "2026-10-07T00:00:00Z", prices: [price("L01", 4.65, "per_box", "INR", "delivered"), price("L02", 38.57, "per_box", "INR", "delivered")] });
+    const later = reading("SB", { replyId: "later", receivedAt: "2026-10-09T00:00:00Z", prices: [price("L01", 4.8, "per_box", "INR", "delivered")] });
+    const cells = normalise(ev, [r1, later], history)[0].cells;
+    const c1 = cells.find((c) => c.lineId === "L01")!, c2 = cells.find((c) => c.lineId === "L02")!;
+    expect([c1.perBox, c1.replyId]).toEqual([4.8, "later"]);
+    expect(c1.flags.join(" ")).toMatch(/revised \(was 4.65/);
+    expect([c2.perBox, c2.replyId]).toEqual([38.57, "r1"]);
+  });
 });

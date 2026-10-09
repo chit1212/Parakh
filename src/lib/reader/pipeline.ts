@@ -51,6 +51,8 @@ export interface ReplyReading {
   readAt: string | null;
   /** The models that actually answered, in order. */
   models: string[];
+  /** When the reply arrived (from its email, or the upload time), so the newest offer wins. */
+  receivedAt?: string | null;
   /** Set when served from data/readings (a saved run of this pipeline), not read just now. */
   saved?: boolean;
   /** True when the error is the free quota (or the demo's own limit), not a problem with the file. */
@@ -84,7 +86,7 @@ function empty(reply: Reply, ev: SourcingEvent): ReplyReading {
     status: "read", headline: "", nextStep: { kind: "none", text: "" },
     classification: null, prices: [], rateRules: [], notQuoted: [], terms: [], questionnaire: [], qualityDocs: [],
     revision: null, readingNotes: [], coverage: { quoted: [], missing: ev.lines.map((l) => l.id), total: ev.lines.length },
-    unsourced: 0, usage: [], cached: true, ms: 0, readAt: null, models: [],
+    unsourced: 0, usage: [], cached: true, ms: 0, readAt: null, models: [], receivedAt: reply.receivedAt,
   };
 }
 

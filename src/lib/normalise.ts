@@ -143,7 +143,10 @@ function byVendor(readings: ReplyReading[]): Map<string, ReplyReading[]> {
     if (!r.vendorId || (r.status !== "read" && r.status !== "incomplete")) continue;
     m.set(r.vendorId, [...(m.get(r.vendorId) ?? []), r]);
   }
-  for (const list of m.values()) list.sort((a, b) => Number(Boolean(b.revision?.is_revision)) - Number(Boolean(a.revision?.is_revision)));
+  // Newest first, by arrival; a reply that says it revises an earlier one wins a tie.
+  const t = (r: ReplyReading) => (r.receivedAt ? Date.parse(r.receivedAt) : 0);
+  for (const list of m.values())
+    list.sort((a, b) => t(b) - t(a) || Number(Boolean(b.revision?.is_revision)) - Number(Boolean(a.revision?.is_revision)));
   return m;
 }
 
@@ -159,17 +162,22 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
     const fr = freightOf(terms);
     const disc = conditionalDiscount(terms);
     const lyFreight = fr.unknown && vendor ? lastYearFreight(history.sheets, vendor.name) : null;
-    const held = latest.status === "incomplete";
-
     const cells: NormCell[] = ev.lines.map((line) => {
+      // A later reply replaces only the lines it prices; the rest stand from the earlier offer.
+      const pricesLine = (r: ReplyReading) =>
+        r.prices.some((p) => p.line_id === line.id && ok(p.verification)) ||
+        r.rateRules.some((x) => x.component === "board_per_kg" && ok(x.verification) && (x.applies_to_ply === line.plyN || x.applies_to_ply === null));
+      const src = list.find(pricesLine) ?? latest;
+      const earlierThan = list.slice(list.indexOf(src) + 1);
+      const held = src.status === "incomplete";
       const cell: NormCell = {
         vendorId, lineId: line.id, status: "unclear", asWritten: "", source: null, verification: null, perBox: null, calc: null,
-        lastYear: false, variants: {}, alternatives: [], alternate: null, flags: [], replyId: latest.replyId,
+        lastYear: false, variants: {}, alternatives: [], alternate: null, flags: [], replyId: src.replyId,
         vendorWording: null, matchReason: null, raw: null, legibility: "clear",
       };
       if (held) cell.flags.push("This reply looks incomplete; held out of the comparison until the buyer decides.");
-      const price: Price | undefined = latest.prices.find((p) => p.line_id === line.id && ok(p.verification));
-      const rate: Rule | undefined = latest.rateRules.find(
+      const price: Price | undefined = src.prices.find((p) => p.line_id === line.id && ok(p.verification));
+      const rate: Rule | undefined = src.rateRules.find(
         (r) => r.component === "board_per_kg" && ok(r.verification) && (r.applies_to_ply === line.plyN || r.applies_to_ply === null),
       );
 
@@ -196,10 +204,9 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
           if (!("reason" in ar)) cell.alternatives.push({ value: a.value, perBox: ar.v, reason: a.reason });
         }
         // A revision: show what changed against the earlier offer.
-        for (const e of earlier) {
-          const was = e.prices.find((p) => p.line_id === line.id && ok(p.verification));
-          if (was && was.raw_value !== price.raw_value) cell.flags.push(`revised (was ${was.raw_value_text} in the earlier offer)`);
-        }
+        // Against the most recent earlier offer that priced this line.
+        const was = earlierThan.map((e) => e.prices.find((p) => p.line_id === line.id && ok(p.verification))).find(Boolean);
+        if (was && was.raw_value !== price.raw_value) cell.flags.push(`revised (was ${was.raw_value_text} in the earlier offer)`);
       } else if (rate) {
         // Priced by rate: weight from the RFQ spec x rate per kg, plus printing and die-cutting rates.
         cell.asWritten = `${money(rate.currency, rate.value_text)}/kg${rate.from_earlier_record ? " (last year's rate)" : ""}`;
@@ -215,7 +222,7 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
         if ("reason" in r) cell.flags.push(r.reason);
         else {
           base = r;
-          const extra = (component: Rule["component"]) => latest.rateRules.find((x) => x.component === component && ok(x.verification));
+          const extra = (component: Rule["component"]) => src.rateRules.find((x) => x.component === component && ok(x.verification));
           const print = extra("printing_per_colour");
           const die = extra("die_cutting_per_piece");
           if (line.colours > 0) {
@@ -232,7 +239,7 @@ export function normalise(ev: SourcingEvent, readings: ReplyReading[], history: 
           if (base && (print?.from_earlier_record || die?.from_earlier_record)) cell.flags.push("printing and die-cutting at last year's rates");
         }
       } else {
-        const nq = latest.notQuoted.find((n) => n.line_id === line.id);
+        const nq = src.notQuoted.find((n) => n.line_id === line.id);
         cell.status = "not_quoted";
         cell.asWritten = "not quoted";
         cell.source = nq?.source ?? null;

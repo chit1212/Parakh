@@ -159,8 +159,8 @@ function Row({ r, st, ev, onRead }: { r: ReplySummary; st: ReplyState | undefine
             {st?.notice && <div className="text-[13px] text-n-800 bg-n-100 px-[8px] py-[4px] mt-[8px] rounded-[var(--radius-md)]">{st.notice}</div>}
             <div className="text-[12px] text-n-500 mt-[8px]">
               {rd.status === "error" ? "Not read yet" : `${rd.saved ? "Saved reading, " : "Read live, "}${readStamp(rd)}`}
-              {" · "}
-              <button className="underline" onClick={() => onRead(true)}>Read again live</button>
+              {r.origin !== "upload" && <>{" · "}<button className="underline" onClick={() => onRead(true)}>Read again live</button></>}
+              {r.origin === "upload" && " · uploaded in this session"}
             </div>
           </>
         ) : null}
@@ -303,8 +303,41 @@ function Detail({ rd, ev }: { rd: ReplyReading; ev: SourcingEvent }) {
   );
 }
 
+/** Upload a reply that arrived outside the event inbox; the real pipeline reads it live. */
+function Upload({ vendors, onUpload, disabled }: { vendors: SourcingEvent["vendors"]; onUpload: (files: File[], vendorId: string) => Promise<void>; disabled: boolean }) {
+  const [files, setFiles] = useState<File[]>([]);
+  const [vendorId, setVendorId] = useState("");
+  const [busy, setBusy] = useState(false);
+  return (
+    <form
+      className="mt-[var(--space-4)] flex flex-wrap items-center gap-[12px] text-[14px] p-[var(--space-3)] bg-surface rounded-[var(--radius-md)]"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        if (!files.length) return;
+        setBusy(true);
+        await onUpload(files, vendorId);
+        setBusy(false);
+        setFiles([]);
+        (e.target as HTMLFormElement).reset();
+      }}
+    >
+      <span className="font-semibold">Upload a reply</span>
+      <input type="file" multiple accept=".xlsx,.docx,.pdf,.jpg,.jpeg,.png,.eml,.txt,.csv" onChange={(e) => setFiles([...(e.target.files ?? [])])} disabled={busy || disabled} />
+      <label className="flex items-center gap-[6px]">
+        From
+        <select className="input" style={{ width: 220, minHeight: 32, padding: "4px 8px" }} value={vendorId} onChange={(e) => setVendorId(e.target.value)} disabled={busy || disabled}>
+          <option value="">Work it out (sender or letterhead)</option>
+          {vendors.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
+        </select>
+      </label>
+      <button className="btn btn-primary" type="submit" disabled={!files.length || busy || disabled}>{busy ? "Reading…" : "Read it"}</button>
+      <span className="text-n-700 text-[12px]">Read live by AI, checked by code; it joins the comparison for this session. Up to 4 MB.</span>
+    </form>
+  );
+}
+
 export default function RepliesPage() {
-  const { data, state, blocked, readOne } = useReadings();
+  const { data, state, blocked, readOne, upload } = useReadings();
   if (!data) return <Shell><div className="text-n-700">Loading the event…</div></Shell>;
   const ev = data.event;
   // Quotes first (in arrival order), then everything kept out of the comparison.
@@ -331,6 +364,7 @@ export default function RepliesPage() {
           Live reading is off: no Gemini API key is set on the server yet. Saved readings still show.
         </div>
       )}
+      <Upload vendors={ev.vendors} onUpload={upload} disabled={!data.keyConfigured} />
       {blocked && <div className="mt-[var(--space-4)] p-[var(--space-3)] bg-d-100 text-[14px] rounded-[var(--radius-md)]">{blocked}</div>}
       {data.keyConfigured && done < data.replies.length && (
         <div className="text-[13px] text-n-700 mt-[var(--space-3)]">Reading: {done} of {data.replies.length} done</div>
