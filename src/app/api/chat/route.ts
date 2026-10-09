@@ -100,7 +100,10 @@ function scenarioFacts(grid: Grid, r: ScenarioResult, title: string) {
     "split by vendor": grid.vendors.filter((v) => r.award.byVendor[v.id].lines).map((v) => `${v.short} ${r.award.byVendor[v.id].lines} lines, ${lakh(r.award.byVendor[v.id].value)}`),
     "left out, and why": r.excluded.map((e) => `${e.name}: ${e.why}`),
     "rules applied": r.rules,
-    "lines changing hands": r.changed.map((c) => `${c.lineId} ${name(c.from)} → ${name(c.to)} (${c.delta >= 0 ? "+" : "−"}₹${Math.abs(c.delta).toFixed(2)}/box, ${c.deltaValue >= 0 ? "+" : "−"}${lakh(Math.abs(c.deltaValue))})`),
+    "number of lines changing hands": r.changed.length,
+    "lines in the event": grid.lines.length,
+    // More than 10: code picks the five that move the most rupees, so the model never ranks numbers.
+    [r.changed.length > 10 ? "the five lines changing hands that move the most rupees (ranked by code)" : "lines changing hands"]: [...r.changed].sort((a, b) => (r.changed.length > 10 ? Math.abs(b.deltaValue) - Math.abs(a.deltaValue) : 0)).slice(0, r.changed.length > 10 ? 5 : undefined).map((c) => `${c.lineId} ${name(c.from)} → ${name(c.to)} (${c.delta >= 0 ? "+" : "−"}₹${Math.abs(c.delta).toFixed(2)}/box, ${c.deltaValue >= 0 ? "+" : "−"}${lakh(Math.abs(c.deltaValue))})`),
     "lines left unawarded": Object.entries(r.award.per).filter(([, w]) => !w).map(([l]) => l),
     notes: r.notes,
   };
@@ -130,10 +133,11 @@ function tableFacts(ev: SourcingEvent, grid: Grid, quality: Quality[], report: D
 function codeAnswer(f: Record<string, unknown>): string {
   if ("scenario" in f) {
     const x = f as ReturnType<typeof scenarioFacts>;
-    const moves = x["lines changing hands"];
+    const moves = (x["lines changing hands"] ?? x["the five lines changing hands that move the most rupees (ranked by code)"]) as string[];
+    const n = x["number of lines changing hands"];
     return `${x.scenario}: ${x["new total"]}, ${x["change against as quoted"]} against as quoted (${x["total as quoted (cheapest per line, all vendors)"]}). Split: ${x["split by vendor"].join("; ")}.`
       + (x["left out, and why"].length ? ` Left out: ${x["left out, and why"].join("; ")}.` : "")
-      + (moves.length ? ` ${moves.length} line${moves.length === 1 ? "" : "s"} change hands: ${moves.join("; ")}.` : " No line changes hands.")
+      + (n ? ` ${n} line${n === 1 ? "" : "s"} change hands${n > moves.length ? `; the five that move the most: ` : ": "}${moves.join("; ")}.` : " No line changes hands.")
       + (x["lines left unawarded"].length ? ` Not awarded: ${x["lines left unawarded"].join(", ")}.` : "")
       + " Solved in code; the buyer decides.";
   }
@@ -215,9 +219,9 @@ Defaults when the question does not say: eligible "all", no exclusions, assumeDi
               config: {
                 systemInstruction: `You are Parakh, a procurement analyst for ${ev.buyer} (buyer) and ${ev.vp} (${ev.vpRole}). Answer the question from the facts only, in 2 to 5 plain sentences.
 - Never calculate: every number you write must appear in the facts, copied exactly.
-- For a scenario: give the new total and the change against as quoted, who is left out and why, and every line that changes hands if there are 10 or fewer; otherwise say how many and name the largest few. Mention a note only if it matters.
+- For a scenario: give the new total and the change against as quoted, who is left out and why (briefly), and the lines changing hands exactly as listed: all of them if the facts list them all, otherwise say how many change hands out of the lines in the event (e.g. "25 of 30") and name the five the facts give. Mention a note only if it matters.
 - Write in plain words; never repeat the facts' field names. Do not address people by name. No headings, no bullet points.
-- If you add a view, keep it to one short closing clause; the buyer decides the award.`,
+- For a scenario only, you may end with one short clause that the buyer decides the award. For other questions, do not.`,
                 maxOutputTokens: 900, temperature: 0.2, abortSignal: signal,
               },
             });
