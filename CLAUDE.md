@@ -93,3 +93,8 @@ Build in this order. A milestone is done when it works on the dataset and I've s
 ## Done means
 
 On the live link, a reviewer can open the demo event, watch the five replies get read, click any number and see where it came from, see only the doubts that matter, ask the VP's question and get a correct, explained answer, upload a new file and see it read, and freeze and export an award.
+
+## Decisions on record
+
+- 2026-10-09: The VP is **Meera Kulkarni** (as in `dataset/README.md`). Where the design says "Anita", use Meera.
+- 2026-10-09: **One AI read per reply**, plus the independent code checks. The design's "read twice by independent models" and the "two reads agree" cell state are left out for now (a second read roughly doubles AI cost); a verified cell means "read and passed the code checks". May return later as an option.
