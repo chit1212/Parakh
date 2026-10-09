@@ -4,7 +4,8 @@ import { Camera, Envelope, File, FileDoc, FilePdf, FileXls, Paperclip, Warning }
 import Link from "next/link";
 import { ScreenHead } from "@/components/Rail";
 import { Shell } from "@/components/Shell";
-import { useReadings, type ReplyState } from "@/components/useReadings";
+import { useReadings, type EventData, type ReplyState } from "@/components/useReadings";
+import { buildGrid, cellKey } from "@/lib/compare";
 import type { ReplyReading } from "@/lib/reader/pipeline";
 import { mainFile, type ReplySummary } from "@/lib/summary";
 import { readStamp, where } from "@/lib/format";
@@ -72,7 +73,7 @@ function termLine(rd: ReplyReading): string[] {
   return out;
 }
 
-function Row({ r, st, ev, onRead }: { r: ReplySummary; st: ReplyState | undefined; ev: SourcingEvent; onRead: (fresh: boolean) => void }) {
+function Row({ r, st, ev, onRead, impact }: { r: ReplySummary; st: ReplyState | undefined; ev: SourcingEvent; onRead: (fresh: boolean) => void; impact?: string | null }) {
   const [open, setOpen] = useState(false);
   const rd = st?.reading ?? null;
   const f = mainFile(r, rd);
@@ -101,6 +102,7 @@ function Row({ r, st, ev, onRead }: { r: ReplySummary; st: ReplyState | undefine
           {r.contact ? ` · ${r.contact}` : r.from ? ` · ${r.from}` : " · no sender (arrived without an email)"}
         </div>
         {rd?.revision?.is_revision && <div className="text-[13px] text-a-700 mt-[4px]">Revised offer{rd.revision.supersedes ? `: supersedes ${rd.revision.supersedes}` : ""}</div>}
+        {impact && <div className="text-[13px] text-n-800 mt-[2px]">{impact}</div>}
         <div className="flex gap-[var(--space-3)] mt-[var(--space-2)] text-[14px]">
           {f && <a href={`/api/file?path=${encodeURIComponent(f.path)}`} target="_blank" rel="noreferrer">Open original</a>}
           {rd && (rd.prices.length > 0 || rd.terms.length > 0) && (
@@ -336,6 +338,39 @@ function Upload({ vendors, onUpload, disabled }: { vendors: SourcingEvent["vendo
   );
 }
 
+/**
+ * L17: for a reply that revises a vendor's earlier offer, what changed and whether it moves a winner.
+ * Code compares the table with and without this reply.
+ */
+function revisionImpact(data: EventData, state: Record<string, ReplyState>, id: string): string | null {
+  const rd = state[id]?.reading;
+  if (!rd?.vendorId || rd.status !== "read") return null;
+  const all = data.replies.map((x) => state[x.id]?.reading).filter((x): x is ReplyReading => Boolean(x && x.status !== "error"));
+  const others = all.filter((x) => x.replyId !== id);
+  if (!others.some((x) => x.vendorId === rd.vendorId)) return null; // nothing earlier to revise
+  const files = Object.fromEntries(data.replies.map((x) => [x.id, mainFile(x, state[x.id]?.reading ?? null) ?? undefined]));
+  const g1 = buildGrid(data.event, all, { sheets: data.historySheets }, files, data.lastYear);
+  // Lines whose price as written differs from the vendor's previous offer.
+  const changed = data.event.lines.filter((l) => {
+    const n = g1.cells[cellKey(rd.vendorId!, l.id)].norm;
+    return n.replyId === id && n.flags.some((f) => f.startsWith("revised (was"));
+  });
+  if (!changed.length) return "No price differs from the earlier offer.";
+  // The same table with only those lines put back to the earlier offer's price (terms unchanged).
+  const ids = new Set(changed.map((l) => l.id));
+  const earlier = others.filter((x) => x.vendorId === rd.vendorId);
+  const undone: ReplyReading = {
+    ...rd,
+    prices: rd.prices.map((p) => (p.line_id && ids.has(p.line_id) ? earlier.map((e) => e.prices.find((q) => q.line_id === p.line_id)).find(Boolean) ?? p : p)),
+  };
+  const g0 = buildGrid(data.event, [...others, undone], { sheets: data.historySheets }, files, data.lastYear);
+  const short = (v: string | undefined) => data.event.vendors.find((x) => x.id === v)?.short ?? "nobody";
+  const moves = data.event.lines.filter((l) => g1.asQuoted.per[l.id]?.vendorId !== g0.asQuoted.per[l.id]?.vendorId);
+  const fmt = (n: number | null) => (n == null ? "—" : `₹${n.toFixed(2)}`);
+  return `Changes ${changed.map((l) => `${l.id} ${fmt(g0.cells[cellKey(rd.vendorId!, l.id)].perBox)} → ${fmt(g1.cells[cellKey(rd.vendorId!, l.id)].perBox)}`).join(", ")}. `
+    + (moves.length ? `Moves the winner on ${moves.map((l) => `${l.id} (${short(g0.asQuoted.per[l.id]?.vendorId)} → ${short(g1.asQuoted.per[l.id]?.vendorId)})`).join(", ")}.` : "It does not move any winner.");
+}
+
 export default function RepliesPage() {
   const { data, state, blocked, readOne, upload } = useReadings();
   if (!data) return <Shell><div className="text-n-700">Loading the event…</div></Shell>;
@@ -370,7 +405,7 @@ export default function RepliesPage() {
         <div className="text-[13px] text-n-700 mt-[var(--space-3)]">Reading: {done} of {data.replies.length} done</div>
       )}
       <div className="mt-[var(--space-6)]">
-        {main.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} />)}
+        {main.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} impact={revisionImpact(data, state, r.id)} />)}
       </div>
       {other.length > 0 && (
         <>
