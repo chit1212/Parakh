@@ -3,15 +3,17 @@
 // code from the readings. Click a price to see where it came from and how it was converted.
 import { useMemo, useState } from "react";
 import {
-  CaretDown, CaretRight, Camera, EnvelopeSimple, File, FileDoc, FileMagnifyingGlass, FilePdf, FileXls, X,
+  CaretDown, CaretRight, Camera, ChatsCircle, EnvelopeSimple, File, FileDoc, FileMagnifyingGlass, FilePdf, FileXls, X,
 } from "@phosphor-icons/react";
 import { Rail } from "@/components/Rail";
 import { SourceDoc } from "@/components/SourceDoc";
+import { Conversation, type ChatMsg } from "@/components/Conversation";
 import { DoubtsView } from "@/components/DoubtsView";
+import { runScenario, type ScenarioResult, type ScenarioRules } from "@/lib/scenario";
 import { useReadings } from "@/components/useReadings";
 import { findDoubts, type Doubt, type DoubtReport } from "@/lib/doubts";
 import { qualityOf, type Quality } from "@/lib/quality";
-import { buildGrid, cellKey, type Grid, type GridCell } from "@/lib/compare";
+import { buildGrid, cellKey, type Award, type Grid, type GridCell } from "@/lib/compare";
 import { crore, day, inr, lakh, num2, where } from "@/lib/format";
 import type { ReplyReading } from "@/lib/reader/pipeline";
 import { mainFile } from "@/lib/summary";
@@ -26,6 +28,96 @@ const tabS = (on: boolean): React.CSSProperties => ({
   color: on ? "var(--color-text)" : "var(--color-neutral-700)", fontWeight: on ? 600 : 400, boxShadow: on ? "inset 0 -2px 0 var(--color-text)" : "none",
 });
 
+const pill = (on: boolean): React.CSSProperties => ({
+  flex: "none", whiteSpace: "nowrap", background: on ? "var(--color-accent)" : "transparent", color: on ? "var(--color-bg)" : "var(--color-accent-800)",
+  border: 0, boxShadow: on ? "none" : "inset 0 0 0 1px var(--color-divider)", padding: "5px 10px", font: "inherit", fontSize: 13, borderRadius: "var(--radius-md)",
+});
+const segS = (on: boolean): React.CSSProperties => ({ border: 0, padding: "6px 12px", font: "inherit", fontSize: 13, background: on ? "var(--color-accent)" : "transparent", color: on ? "var(--color-bg)" : "inherit", whiteSpace: "nowrap" });
+const paneS = (on: boolean): React.CSSProperties => ({
+  display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap", background: "none", border: 0, padding: "4px 0", font: "inherit", fontSize: 14,
+  color: on ? "var(--color-text)" : "var(--color-neutral-700)", fontWeight: on ? 600 : 400, boxShadow: on ? "inset 0 -2px 0 var(--color-text)" : "none",
+});
+
+function ScenarioStrip({ r, n, grid, askedBy, onBack }: { r: ScenarioResult; n: number; grid: Grid; askedBy: string; onBack: () => void }) {
+  const d = r.award.total - r.base.total;
+  const lbl = { ...label11, color: "var(--color-accent-800)" };
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1.8fr) minmax(0,1fr) auto", gap: 24, padding: "10px 28px 12px 8px", fontSize: 12.5, background: "var(--color-accent-100)", marginBottom: 4 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <span style={lbl}>Scenario {n} · rules applied</span>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: "4px 18px" }}>
+          {r.rules.map((t, i) => (
+            <div key={i} style={{ display: "grid", gridTemplateColumns: "24px 1fr", gap: 4, lineHeight: 1.35 }}>
+              <span style={{ color: "var(--color-accent-800)", fontWeight: 600 }}>R{i + 1}</span><span>{t}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <span style={lbl}>Excluded, and why</span>
+        {r.excluded.length ? r.excluded.map((x) => <div key={x.vendorId}><span style={{ fontWeight: 600 }}>{x.name}</span>: {x.why}</div>) : <div>No vendor excluded.</div>}
+        {r.notes.map((t, i) => <div key={i} style={{ color: "var(--color-neutral-800)" }}>{t}</div>)}
+        <span style={{ fontSize: 12, color: "var(--color-neutral-700)", paddingTop: 4 }}>Asked by {askedBy}</span>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end", textAlign: "right" }}>
+        <span style={{ fontSize: 24, fontWeight: 600, lineHeight: 1.15 }}>{crore(r.award.total)}</span>
+        <span style={{ color: "var(--color-accent-800)" }}>{d >= 0 ? "+" : "−"}{lakh(Math.abs(d))} ({d >= 0 ? "+" : "−"}{Math.abs((d / r.base.total) * 100).toFixed(1)}%) vs as quoted</span>
+        <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{grid.vendors.filter((v) => r.award.byVendor[v.id].lines).map((v) => `${v.short} ${r.award.byVendor[v.id].lines}`).join(" · ")} lines</span>
+        <button className="btn btn-ghost" onClick={onBack}>Back to as quoted</button>
+      </div>
+    </div>
+  );
+}
+
+function ChartView({ grid, r }: { grid: Grid; r: ScenarioResult | null }) {
+  const base = grid.asQuoted;
+  const award = r?.award ?? base;
+  const mx = Math.max(1, ...grid.vendors.map((v) => Math.max(base.byVendor[v.id].value, award.byVendor[v.id].value)));
+  const bar = (x: number, c: string): React.CSSProperties => ({ display: "block", height: 12, width: `${Math.max(0.5, (x / mx) * 100)}%`, maxWidth: "calc(100% - 70px)", background: c });
+  return (
+    <div style={{ padding: "16px 8px 24px", display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 40 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <h3 style={{ fontSize: 20, margin: 0 }}>Award value by vendor</h3>
+        <div style={{ display: "flex", gap: 18, fontSize: 12, color: "var(--color-neutral-700)" }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 14, height: 8, background: "var(--color-neutral-400)" }} />As quoted (cheapest overall)</span>
+          {r && <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 14, height: 8, background: "var(--color-accent)" }} />This scenario</span>}
+        </div>
+        {grid.vendors.map((v) => (
+          <div key={v.id} style={{ display: "grid", gridTemplateColumns: "120px 1fr", gap: 12, alignItems: "center" }}>
+            <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
+              <span style={{ fontWeight: 600 }}>{v.short}</span>
+              <span style={{ fontSize: 11, color: "var(--color-neutral-700)" }}>{r?.excluded.some((e) => e.vendorId === v.id) ? "excluded" : `${award.byVendor[v.id].lines} lines`}</span>
+            </span>
+            <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={bar(base.byVendor[v.id].value, "var(--color-neutral-400)")} /><span style={{ fontSize: 11, color: "var(--color-neutral-700)" }}>{base.byVendor[v.id].value ? lakh(base.byVendor[v.id].value) : "—"}</span></div>
+              {r && <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={bar(award.byVendor[v.id].value, "var(--color-accent)")} /><span style={{ fontSize: 11 }}>{award.byVendor[v.id].value ? lakh(award.byVendor[v.id].value) : "—"}</span></div>}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <h3 style={{ fontSize: 20, margin: 0 }}>Lines that change hands</h3>
+        {r && r.changed.length ? (
+          <table className="table" style={{ fontSize: 13 }}>
+            <thead><tr><th>Line</th><th>From</th><th>To</th><th style={{ textAlign: "right" }}>+ ₹/box</th><th style={{ textAlign: "right" }}>+ value</th></tr></thead>
+            <tbody>
+              {r.changed.map((x) => (
+                <tr key={x.lineId}>
+                  <td>{x.lineId}</td><td>{grid.vendors.find((v) => v.id === x.from)?.short ?? "—"}</td><td>{grid.vendors.find((v) => v.id === x.to)?.short ?? "—"}</td>
+                  <td style={{ textAlign: "right" }}>{x.delta >= 0 ? "+" : "−"}{num2(Math.abs(x.delta))}</td>
+                  <td style={{ textAlign: "right" }}>{x.deltaValue >= 0 ? "+" : "−"}{lakh(Math.abs(x.deltaValue))}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <span style={{ color: "var(--color-neutral-700)" }}>No lines change hands: this is the as-quoted view.</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 const STATE_LABEL: Record<GridCell["kind"], string> = {
   checked: "checked", converted: "converted", last_year: "last year’s rate", not_quoted: "not quoted", unclear: "not on the basis",
 };
@@ -35,6 +127,14 @@ export default function ComparePage() {
   const [sel, setSel] = useState<{ v: string; l: string } | null>(null);
   const [legend, setLegend] = useState(true);
   const [tab, setTab] = useState<"compare" | "doubts">("compare");
+  const [pane, setPane] = useState<"conv" | "src">("conv");
+  const [view, setView] = useState<"table" | "chart">("table");
+  const [msgs, setMsgs] = useState<ChatMsg[]>([]);
+  const [asked, setAsked] = useState<{ title: string; rules: ScenarioRules; asker: "buyer" | "vp" }[]>([]);
+  const [active, setActive] = useState<number | null>(null);
+  const [asker, setAsker] = useState<"buyer" | "vp">("vp");
+  const [busy, setBusy] = useState(false);
+  const [q, setQ] = useState("");
 
   const readings = useMemo(
     () => (data ? data.replies.map((r) => state[r.id]?.reading).filter((r): r is ReplyReading => Boolean(r && r.status !== "error")) : []),
@@ -61,6 +161,39 @@ export default function ComparePage() {
     });
     return m;
   }, [report]);
+
+  // Every scenario asked so far, solved in code (the chat only chose the rules).
+  const results = useMemo<ScenarioResult[]>(
+    () => (data && grid ? asked.map((a) => runScenario(data.event, grid, quality, a.rules)) : []),
+    [data, grid, quality, asked],
+  );
+  const cur = active != null ? results[active] ?? null : null;
+
+  const ask = async (text: string) => {
+    const who = asker;
+    const next: ChatMsg[] = [...msgs, { role: "user", text, asker: who }];
+    setMsgs(next);
+    setQ("");
+    setBusy(true);
+    setPane("conv");
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        body: JSON.stringify({ messages: next.map((m) => ({ role: m.role, text: m.text, asker: m.asker === "vp" ? `${data!.event.vp} (VP)` : m.asker ? `${data!.event.buyer} (buyer)` : undefined })) }),
+      });
+      const j = await res.json();
+      if (j.error) { setMsgs((m) => [...m, { role: "assistant", text: j.error, error: true }]); return; }
+      const added = (j.scenarios as (ScenarioRules & { title: string })[]).map(({ title, ...rules }) => ({ title, rules, asker: who }));
+      const first = asked.length;
+      setAsked((a) => [...a, ...added]);
+      setMsgs((m) => [...m, { role: "assistant", text: j.answer, model: j.model, scenarios: added.map((_, i) => first + i) }]);
+      if (added.length) { setActive(first + added.length - 1); setView(j.view ?? "table"); setLegend(false); setTab("compare"); }
+    } catch {
+      setMsgs((m) => [...m, { role: "assistant", text: "Something went wrong while answering. Nothing was changed; try again in a minute.", error: true }]);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   // Where each file lives, to link "Open original".
   const paths: Record<string, string> = {};
@@ -102,13 +235,27 @@ export default function ComparePage() {
         <div style={{ display: "flex", alignItems: "center", gap: "10px 14px", padding: "2px 28px 8px 8px" }}>
           <span style={{ ...label11, flex: "none" }}>Table shows</span>
           <div style={{ flex: 1, minWidth: 0, display: "flex", gap: 8, overflowX: "auto", padding: 2 }}>
-            <span style={{ flex: "none", whiteSpace: "nowrap", background: "var(--color-accent)", color: "var(--color-bg)", padding: "5px 10px", fontSize: 13, borderRadius: "var(--radius-md)" }}>As quoted</span>
+            <button onClick={() => setActive(null)} style={pill(active == null)}>As quoted</button>
+            {asked.map((a, i) => <button key={i} onClick={() => setActive(i)} style={pill(active === i)}>Scenario {i + 1} · {a.title}</button>)}
+          </div>
+          <div style={{ flex: "none", display: "inline-flex", border: "1px solid var(--color-divider)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
+            <button onClick={() => setView("table")} style={segS(view === "table")}>Table</button>
+            <button onClick={() => setView("chart")} style={segS(view === "chart")}>Chart</button>
           </div>
         </div>
 
+        {cur && active != null && (
+          <ScenarioStrip r={cur} n={active + 1} grid={grid} askedBy={asked[active].asker === "vp" ? `${ev.vp}, ${ev.vpRole}` : `${ev.buyer}, buyer`} onBack={() => setActive(null)} />
+        )}
+
         <div style={{ flex: "1 0 460px", minHeight: 460, display: "flex" }}>
           <div style={{ flex: 1, minWidth: 0, overflow: "auto", padding: "0 20px 0 8px" }}>
-            <GridTable grid={grid} sel={sel} quality={quality} doubtAt={doubtAt} onSelect={(v, l) => setSel({ v, l })} />
+            {view === "chart" ? (
+              <ChartView grid={grid} r={cur} />
+            ) : (
+              <GridTable grid={grid} sel={sel} quality={quality} doubtAt={doubtAt} award={cur?.award ?? grid.asQuoted} base={cur ? grid.asQuoted : null}
+                excluded={new Set(cur?.excluded.map((e) => e.vendorId) ?? [])} scenarioNo={active != null ? active + 1 : null} onSelect={(v, l) => { setSel({ v, l }); setPane("src"); }} />
+            )}
           </div>
         </div>
         </>
@@ -117,11 +264,18 @@ export default function ComparePage() {
 
       <aside style={{ width: 440, flex: "none", background: "var(--color-surface)", display: "flex", flexDirection: "column", minHeight: 0 }}>
         <div style={{ display: "flex", gap: 22, padding: "22px 22px 0" }}>
-          <span style={{ display: "flex", alignItems: "center", gap: 6, padding: "4px 0", fontSize: 14, fontWeight: 600, boxShadow: "inset 0 -2px 0 var(--color-text)" }}>
+          <button onClick={() => setPane("conv")} style={paneS(pane === "conv")}><ChatsCircle size={16} weight="duotone" />Conversation</button>
+          <button onClick={() => setPane("src")} style={paneS(pane === "src")}>
             <FileMagnifyingGlass size={16} weight="duotone" />
             {sel ? `Source · ${sel.l} ${grid.vendors.find((v) => v.id === sel.v)?.short}` : "Source"}
-          </span>
+          </button>
         </div>
+        {pane === "conv" ? (
+          <Conversation msgs={msgs} results={results} titles={asked.map((a) => a.title)} people={{ buyer: ev.buyer, vp: ev.vp }} asker={asker} setAsker={setAsker}
+            busy={busy} q={q} setQ={setQ} onAsk={ask} onShow={(i, v) => { setActive(i); setView(v); setTab("compare"); }}
+            vendorNames={Object.fromEntries(grid.vendors.map((v) => [v.id, v.short]))}
+            opening={`Quotes from ${new Set(readings.filter((r) => r.status === "read" && r.vendorId).map((r) => r.vendorId)).size} of ${ev.vendors.length} vendors are read and on one basis. ${report.raised.length} doubts could change a winner (${lakh(report.raised.reduce((a, d) => a + d.stake, 0))} at stake); see the Doubts tab. Ask me anything about this table; every answer is solved in code and applied to it as a scenario you can keep, compare and switch between.`} />
+        ) : (
         <div style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "16px 22px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
           {sel ? (
             <SourcePanel grid={grid} sel={sel} readings={readings} paths={paths} doubt={doubtAt.get(cellKey(sel.v, sel.l))} report={report} onSelect={(v) => setSel({ v, l: sel.l })} onClose={() => setSel(null)} />
@@ -131,6 +285,7 @@ export default function ComparePage() {
             </p>
           )}
         </div>
+        )}
       </aside>
     </div>
   );
@@ -169,10 +324,10 @@ function Legend({ open, toggle }: { open: boolean; toggle: () => void }) {
   );
 }
 
-function GridTable({ grid, sel, quality, doubtAt, onSelect }: {
-  grid: Grid; sel: { v: string; l: string } | null; quality: Quality[]; doubtAt: Map<string, { d: Doubt; rank: number }>; onSelect: (v: string, l: string) => void;
+function GridTable({ grid, sel, quality, doubtAt, award, base, excluded, scenarioNo, onSelect }: {
+  grid: Grid; sel: { v: string; l: string } | null; quality: Quality[]; doubtAt: Map<string, { d: Doubt; rank: number }>;
+  award: Award; base: Award | null; excluded: Set<string>; scenarioNo: number | null; onSelect: (v: string, l: string) => void;
 }) {
-  const award = grid.asQuoted;
   const muted = { fontSize: 11, color: "var(--color-neutral-700)" };
   return (
     <>
@@ -184,14 +339,14 @@ function GridTable({ grid, sel, quality, doubtAt, onSelect }: {
         {grid.vendors.map((v) => {
           const Icon = FORMAT_ICON[v.format] ?? File;
           return (
-            <div key={v.id} style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", textAlign: "right", gap: 1, paddingRight: 10 }}>
+            <div key={v.id} style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", textAlign: "right", gap: 1, paddingRight: 10, opacity: excluded.has(v.id) ? 0.45 : 1 }}>
               <span style={{ fontWeight: 600, fontSize: 13, lineHeight: 1.15 }}>{v.short}</span>
               <span style={{ display: "flex", alignItems: "center", gap: 4, ...muted }}><Icon weight="duotone" />{v.format}</span>
               {(() => {
                 const q = quality.find((x) => x.vendorId === v.id);
                 return <span style={{ fontSize: 11 }} title={q?.why}>{!q?.returned ? "No questionnaire" : `Quality ${q.cleared ? "✓" : "✕"}`}</span>;
               })()}
-              <span style={{ fontSize: 10.5, color: "var(--color-neutral-700)", lineHeight: 1.25 }}>{v.note}</span>
+              <span style={{ fontSize: 10.5, color: "var(--color-neutral-700)", lineHeight: 1.25 }}>{excluded.has(v.id) ? `Excluded in scenario ${scenarioNo}` : v.note}</span>
             </div>
           );
         })}
@@ -210,10 +365,13 @@ function GridTable({ grid, sel, quality, doubtAt, onSelect }: {
             <span style={{ textAlign: "right", color: "var(--color-neutral-700)", alignSelf: "center" }}>{Math.round(l.qty / 1000)}k</span>
             <span style={{ textAlign: "right", color: "var(--color-neutral-700)", paddingRight: 6, alignSelf: "center" }}>{num2(l.shouldCost)}</span>
             {grid.vendors.map((v) => (
-              <Cell key={v.id} c={grid.cells[cellKey(v.id, l.id)]} doubt={doubtAt.has(cellKey(v.id, l.id))} win={w?.vendorId === v.id} selected={sel?.v === v.id && sel.l === l.id} onClick={() => onSelect(v.id, l.id)} tip={`${v.short} · ${l.id}: ${grid.cells[cellKey(v.id, l.id)].norm.asWritten}`} />
+              <Cell key={v.id} c={grid.cells[cellKey(v.id, l.id)]} out={excluded.has(v.id)} doubt={doubtAt.has(cellKey(v.id, l.id)) && !excluded.has(v.id)} win={w?.vendorId === v.id} selected={sel?.v === v.id && sel.l === l.id} onClick={() => onSelect(v.id, l.id)} tip={`${v.short} · ${l.id}: ${grid.cells[cellKey(v.id, l.id)].norm.asWritten}`} />
             ))}
             <span style={{ display: "flex", flexDirection: "column", justifyContent: "center", paddingLeft: 12, lineHeight: 1.2 }}>
               <span>{w ? grid.vendors.find((v) => v.id === w.vendorId)?.short : "—"}</span>
+              {base && base.per[l.id]?.vendorId !== w?.vendorId && (
+                <span style={{ fontSize: 11, color: "var(--color-accent-800)" }}>was {grid.vendors.find((v) => v.id === base.per[l.id]?.vendorId)?.short ?? "none"}</span>
+              )}
             </span>
           </div>
         );
@@ -236,7 +394,7 @@ function GridTable({ grid, sel, quality, doubtAt, onSelect }: {
   );
 }
 
-function Cell({ c, doubt, win, selected, onClick, tip }: { c: GridCell; doubt: boolean; win: boolean; selected: boolean; onClick: () => void; tip: string }) {
+function Cell({ c, out, doubt, win, selected, onClick, tip }: { c: GridCell; out: boolean; doubt: boolean; win: boolean; selected: boolean; onClick: () => void; tip: string }) {
   const k = c.kind;
   const ns = {
     color: doubt ? "var(--color-accent-2-800)" : k === "not_quoted" || k === "unclear" ? "var(--color-neutral-500)" : k === "last_year" ? "var(--color-neutral-800)" : "var(--color-text)",
@@ -250,7 +408,7 @@ function Cell({ c, doubt, win, selected, onClick, tip }: { c: GridCell; doubt: b
     <button
       onClick={onClick}
       title={tip}
-      style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", height: "100%", minHeight: 38, padding: "0 10px", border: 0, font: "inherit", fontSize: 13.5, background: doubt ? "var(--color-accent-2-100)" : "transparent", outline: selected ? "2px solid var(--color-accent)" : "none", outlineOffset: -2, color: "inherit" }}
+      style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", height: "100%", minHeight: 38, padding: "0 10px", border: 0, font: "inherit", fontSize: 13.5, background: doubt ? "var(--color-accent-2-100)" : "transparent", outline: selected ? "2px solid var(--color-accent)" : "none", outlineOffset: -2, color: "inherit", opacity: out ? 0.4 : 1 }}
     >
       <span style={ns}>
         {c.perBox == null ? (k === "unclear" ? "n/a" : "—") : num2(c.perBox)}

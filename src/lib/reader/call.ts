@@ -79,7 +79,9 @@ function classifyError(e: unknown): { retry: boolean; daily: boolean; waitMs: nu
   if (!(e instanceof ApiError)) return { retry: false, daily: false, waitMs: null };
   const busy = e.status === 429 || e.status === 503 || e.status === 500;
   const msg = e.message ?? "";
-  const daily = e.status === 429 && /PerDay|per day|daily/i.test(msg);
+  // Google names the limit hit; it is the daily one only if every named limit is per day.
+  const ids = [...msg.matchAll(/"quotaId"\s*:\s*"([^"]+)"/g)].map((m) => m[1]);
+  const daily = e.status === 429 && (ids.length ? ids.every((id) => /PerDay/i.test(id)) : /per day|daily/i.test(msg));
   const delay = msg.match(/"retryDelay"\s*:\s*"(\d+(?:\.\d+)?)s"/);
   return { retry: busy && !daily, daily, waitMs: delay ? Number(delay[1]) * 1000 : null };
 }
@@ -110,8 +112,9 @@ export async function callStructured<S extends z.ZodType>(opts: {
 
   opts.beforeCall?.();
   const models = [opts.model, ...(FALLBACKS[opts.model] ?? [])];
-  let lastDaily = false;
+  let busy = false; // any model was only busy, not out of quota for the day
   for (const model of models) {
+    if (isUsedUp(model)) continue;
     let delay: number = RETRY.firstDelayMs;
     for (let attempt = 1; attempt <= RETRY.attempts; attempt++) {
       try {
@@ -147,9 +150,10 @@ export async function callStructured<S extends z.ZodType>(opts: {
       } catch (e) {
         const c = classifyError(e);
         if (c.daily) {
-          lastDaily = true;
+          markUsedUp(model);
           break; // this model's day is used up; a fallback has its own quota
         }
+        busy = true;
         // Server log only (never shown to the buyer): which model refused, and how.
         console.warn(`[gemini] ${opts.step} ${model} attempt ${attempt}: ${e instanceof ApiError ? e.status : "error"} ${(e as Error).message.slice(0, 120)}`);
         if (!c.retry) throw e instanceof ReaderError ? e : new ReaderError(`Reading failed (${opts.step}): ${(e as Error).message.slice(0, 200)}`);
@@ -161,5 +165,45 @@ export async function callStructured<S extends z.ZodType>(opts: {
       }
     }
   }
-  throw new QuotaError(lastDaily);
+  throw new QuotaError(!busy);
+}
+
+/**
+ * Run any model call with the same free-tier handling as the reader: retry with backoff on busy or
+ * per-minute limits, fall back to the next model, then a calm QuotaError. Used by the analyst chat.
+ */
+/** Models whose free daily quota ran out, with the day it happened (UTC); skipped until the next day. */
+const usedUp = new Map<string, string>();
+const today = () => new Date().toISOString().slice(0, 10);
+export const isUsedUp = (m: string) => usedUp.get(m) === today();
+export const markUsedUp = (m: string) => {
+  console.warn(`[gemini] ${m}: free daily quota used up; skipped until tomorrow (UTC)`);
+  usedUp.set(m, today());
+};
+/** Tests only. */
+export const resetUsedUp = () => usedUp.clear();
+
+export async function withModels<T>(step: string, first: string, fn: (model: string) => Promise<T>, onWait?: (s: number) => void): Promise<{ value: T; model: string }> {
+  let busy = false; // any model was only busy, not out of quota for the day
+  for (const model of [first, ...(FALLBACKS[first] ?? [])]) {
+    if (isUsedUp(model)) continue;
+    let delay: number = RETRY.firstDelayMs;
+    for (let attempt = 1; attempt <= RETRY.attempts; attempt++) {
+      try {
+        return { value: await fn(model), model };
+      } catch (e) {
+        const c = classifyError(e);
+        if (c.daily) { markUsedUp(model); break; }
+        busy = true;
+        console.warn(`[gemini] ${step} ${model} attempt ${attempt}: ${e instanceof ApiError ? e.status : "error"} ${(e as Error).message.slice(0, 120)}`);
+        if (!c.retry) throw e;
+        if (attempt === RETRY.attempts) break;
+        const wait = Math.min(c.waitMs ?? delay, RETRY.maxDelayMs);
+        onWait?.(Math.round(wait / 1000));
+        await sleep(wait);
+        delay = Math.min(delay * 2, RETRY.maxDelayMs);
+      }
+    }
+  }
+  throw new QuotaError(!busy);
 }

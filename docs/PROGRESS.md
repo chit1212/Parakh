@@ -39,3 +39,9 @@ Built:
 - Quality (`src/lib/quality.ts`): cleared = questionnaire returned + valid ISO 9001 + test report within 12 months of the RFQ, all checked in code. The 0-100 score needs a marking scheme the RFQ does not give: milestone 5 (L26).
 - Doubts (`src/lib/doubts.ts`): every candidate (conditional discount, unknown freight, substitute spec, far below should-cost, hard-to-read number) is re-solved in the cheapest-overall and quality-cleared views; raised only if a winner changes, ranked by rupees, routed to vendor or buyer. Doubts tab and magenta doubt cells on Compare. Vendor emails drafted by Gemini on request (`/api/draft`), only that vendor's own figures; approve is stubbed.
 - Scorecard grades doubts and totals against the answer key: 9 of 9 pass.
+
+## Milestone 5 (analyst chat) done; quality score still open
+- Scenario solver (`src/lib/scenario.ts`): eligibility (all / quality-cleared / exclusions), discount and freight assumptions, held cells, worst case, share cap, line overrides. Matches all four answer-key scenario totals (`test/compare.test.ts`).
+- Chat (`/api/chat`): Gemini function calling with read_comparison, run_scenario, get_cell_source, show_view; the model never does sums. The client re-solves each returned rule set in code and applies it to the table: scenario pills, rules/excluded strip, "was X", faded excluded vendors, chart view.
+- Free tier: on 9 Oct the three Flash models hit their daily limit; Flash-Lite models are now the last fallback for reading and chat, and daily-limited models are skipped until the next day. A busy model (503) is no longer reported as "used up for today".
+- Not done: a 0-100 quality score (no marking scheme in the RFQ); the header shows pass/fail with reasons.
