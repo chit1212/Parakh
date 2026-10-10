@@ -1,7 +1,7 @@
 "use client";
 // L25 conversation panel (design: right panel, "Conversation"). Shared by the buyer and the VP;
 // every question is labelled with who asked it. Answers that produced a scenario carry a result card.
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChartBarHorizontal, PaperPlaneRight, Table } from "@phosphor-icons/react";
 import { crore, lakh } from "@/lib/format";
 import type { ScenarioResult } from "@/lib/scenario";
@@ -20,7 +20,8 @@ export interface ChatMsg {
 
 export interface People { buyer: string; vp: string }
 
-const label = { fontSize: 16 };
+const label = { fontSize: 14 };
+const KEEP = 3;
 const SUGGESTIONS = [
   "What if we split it, cheapest per line, but only among vendors who cleared the quality questionnaire?",
   "Same split, but assume every open doubt goes against us.",
@@ -38,12 +39,19 @@ export function Conversation({ msgs, results, titles, people, asker, busy, q, se
     if (el) el.scrollTop = el.scrollHeight;
   }, [msgs.length, busy]);
   const asked = new Set(msgs.filter((m) => m.role === "user").map((m) => m.text));
+  // v2: the last three messages, with the earlier ones one click away.
+  const [all, setAll] = useState(false);
+  const hidden = all ? 0 : Math.max(0, msgs.length - KEEP);
 
   return (
     <>
       <div ref={thread} style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "16px 22px", display: "flex", flexDirection: "column", gap: 18 }}>
-        <Bot text={opening} />
-        {msgs.map((m, i) =>
+        {hidden > 0 ? (
+          <button className="btn btn-ghost" style={{ alignSelf: "flex-start", fontSize: 15, color: "var(--color-accent-700)", padding: "2px 0" }} onClick={() => setAll(true)}>
+            Show {hidden + 1} earlier message{hidden ? "s" : ""}
+          </button>
+        ) : <Bot text={opening} />}
+        {msgs.map((m, i) => i < hidden ? null :
           m.role === "user" ? (
             <div key={i} style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-end", paddingLeft: 44 }}>
               <span style={{ ...label, display: "flex", gap: 6, alignItems: "center", color: "var(--color-neutral-700)" }}>
@@ -82,8 +90,8 @@ export function Conversation({ msgs, results, titles, people, asker, busy, q, se
       </div>
       <div style={{ padding: "10px 22px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          {SUGGESTIONS.filter((s) => !asked.has(s)).map((s) => (
-            <button key={s} disabled={busy} onClick={() => onAsk(s)} style={{ background: "var(--color-bg)", border: 0, padding: "4px 10px", font: "inherit", fontSize: 14, color: "var(--color-accent-800)", borderRadius: "var(--radius-md)", textAlign: "left" }}>{s}</button>
+          {SUGGESTIONS.filter((s) => !asked.has(s)).slice(0, 3).map((s) => (
+            <button key={s} disabled={busy} onClick={() => onAsk(s)} style={{ background: "var(--color-neutral-100)", boxShadow: "var(--shadow-sm)", border: 0, padding: "5px 10px", font: "inherit", fontSize: 14, color: "var(--color-accent-800)", borderRadius: "var(--radius-lg)", textAlign: "left", cursor: "pointer" }}>{s}</button>
           ))}
         </div>
         <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>

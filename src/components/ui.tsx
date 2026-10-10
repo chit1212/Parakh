@@ -16,13 +16,14 @@ export function PageHead({ meta, title, children, beside }: { meta: React.ReactN
   );
 }
 
-export interface Kpi { label: string; value: React.ReactNode; sub?: React.ReactNode; doubt?: boolean }
+export interface Kpi { label: string; value: React.ReactNode; sub?: React.ReactNode; doubt?: boolean; onClick?: () => void; title?: string }
 
 export function Kpis({ items }: { items: Kpi[] }) {
   return (
     <div className="kpis" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0,1fr))` }}>
       {items.map((k) => (
-        <div key={k.label} className={`kpi${k.doubt ? " kpi-doubt" : ""}`}>
+        <div key={k.label} className={`kpi${k.doubt ? " kpi-doubt" : ""}`} title={k.title} onClick={k.onClick} role={k.onClick ? "button" : undefined}
+          style={k.onClick ? { cursor: "pointer" } : undefined}>
           <span className="k-label">{k.label}</span>
           <span className="k-value">{k.value}</span>
           {k.sub && <span className="k-sub">{k.sub}</span>}
