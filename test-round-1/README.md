@@ -8,20 +8,16 @@ Allow about 45 minutes. Each reply takes 30 to 90 seconds to read.
 
 ## Before you start (once)
 
-### 1. Raise the demo's AI limit
-The demo allows only 12 AI calls per visitor per hour, so a public link can't use up the free quota. One reply takes about 3 to 6 calls, so you would be blocked after two uploads. Raise the limit for the test:
-
-1. Open vercel.com, then your **parakh** project, then **Settings**, then **Environment Variables**.
-2. Add `PARAKH_CALLS_PER_HOUR` with value `200`. Click **Save**.
-3. Add `PARAKH_CALLS_PER_DAY` with value `600`. Click **Save**.
-4. Go to **Deployments**, click **⋯** on the top one, then **Redeploy**. Wait until it says Ready (about 2 minutes).
-
-Put them back to 12 and 150 (or delete them) after testing.
+### 1. The AI limit
+Already raised for this test, to 200 AI calls per visitor per hour and 600 a day; nothing to do. Ask Claude to put it back to 12 and 150 after testing.
 
 ### 2. Start clean
-1. Open https://parakh-ten.vercel.app/events/SE-2026-041/replies in a **private/incognito window**. This means no old ticks, uploads or settings.
-2. Next to "Demo event starts with", click **No replies: I'll upload them**. The page reloads with an empty event.
-3. Open **Compare**. Every cell shows "—", and the chat says nothing is read yet.
+1. Open https://parakh-ten.vercel.app/events/SE-2026-041/compare.
+2. Click **P** (top of the left rail). At the bottom of the menu, under **Reset demo**, click **Start empty: RFQ, upload, compare**, then **Reset**. This wipes your earlier ticks, uploads and changes in this browser.
+3. You land on the **RFQ** screen with no replies in. Look over the RFQ (and, if you like, the **Send** tab, where sending is stubbed). Then go to **Replies** to upload.
+4. **Compare** now shows "—" in every cell, and the chat says nothing is read yet.
+
+To go back to the normal demo afterwards: **P** → **Back to the full demo (five replies read)**.
 
 ### How to upload
 - On **Replies**, in the upload box, click **Choose files** and select **every file in one folder** at once (Ctrl/Cmd+A inside the folder).
