@@ -64,10 +64,6 @@ const EMPTY = "parakh-empty-event";
 export const isEmptyEvent = () => {
   try { return localStorage.getItem(EMPTY) === "1"; } catch { return false; }
 };
-export const setEmptyEvent = (on: boolean) => {
-  try { if (on) localStorage.setItem(EMPTY, "1"); else localStorage.removeItem(EMPTY); } catch { /* blocked */ }
-  window.location.reload();
-};
 
 /**
  * Reset the demo in this browser: every Parakh setting, upload, tick, override, decision, frozen
