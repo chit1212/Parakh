@@ -22,9 +22,9 @@ type Draft = Omit<DraftRfq, "lines"> & {
   refId?: string; title?: string; due?: string; vendors?: RfqVendor[]; sent?: Record<string, Sent>;
 };
 const KEY = "parakh.rfq.v1";
-const label11 = { fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--color-neutral-700)" };
+const label11 = { fontSize: 16, color: "var(--color-neutral-700)" };
 const COLS = "44px minmax(200px,1.4fr) minmax(160px,1fr) minmax(220px,1.6fr) 80px 30px";
-const inp: React.CSSProperties = { minHeight: 30, padding: "3px 8px", fontSize: 13 };
+const inp: React.CSSProperties = { minHeight: 30, padding: "3px 8px", fontSize: 15 };
 
 export default function RfqPage() {
   const { data, state } = useReadings();
@@ -113,7 +113,7 @@ export default function RfqPage() {
     }
   };
 
-  const tabS = (on: boolean): React.CSSProperties => ({ whiteSpace: "nowrap", background: "none", border: 0, padding: "4px 0", font: "inherit", fontSize: 14, color: on ? "var(--color-text)" : "var(--color-neutral-700)", fontWeight: on ? 600 : 400, boxShadow: on ? "inset 0 -2px 0 var(--color-text)" : "none" });
+  const tabS = (on: boolean): React.CSSProperties => ({ whiteSpace: "nowrap", background: "none", border: 0, padding: "4px 0", font: "inherit", fontSize: 16, color: on ? "var(--color-text)" : "var(--color-neutral-700)", fontWeight: on ? 600 : 400, boxShadow: on ? "inset 0 -2px 0 var(--color-text)" : "none" });
   const ev = data?.event;
   const refId = draft?.refId ?? ev?.id ?? "";
   const title = draft?.title ?? ev?.title ?? "";
@@ -131,21 +131,21 @@ export default function RfqPage() {
     URL.revokeObjectURL(a.href);
   };
   return (
-    <div style={{ display: "flex", height: "100vh", minWidth: 1360, fontSize: 13, lineHeight: 1.45 }}>
+    <div style={{ display: "flex", height: "100vh", minWidth: 1360, fontSize: 15, lineHeight: 1.45 }}>
       <Rail />
       <section style={{ width: 430, flex: "none", background: "var(--color-surface)", display: "flex", flexDirection: "column" }}>
         <div style={{ flex: 1, overflow: "auto", padding: "22px 24px", display: "flex", flexDirection: "column", gap: 18 }}>
           <span style={label11}>RFQ co-pilot</span>
           <div><span style={{ ...label11, color: "var(--color-accent-700)" }}>Parakh</span>
-            <p style={{ margin: "4px 0 0", fontSize: 14 }}>This draft starts from {draft?.from ?? "the RFQ"}. Tell me what to add or change, e.g. “make L14 5-ply BC”, “add an air fryer master carton, 400 x 300 x 350 mm, 5-ply BC, 8,000 boxes”, or “ask for FSC certification”. You can also edit any field directly.</p>
+            <p style={{ margin: "4px 0 0", fontSize: 16 }}>This draft starts from {draft?.from ?? "the RFQ"}. Tell me what to add or change, e.g. “make L14 5-ply BC”, “add an air fryer master carton, 400 x 300 x 350 mm, 5-ply BC, 8,000 boxes”, or “ask for FSC certification”. You can also edit any field directly.</p>
           </div>
           {msgs.map((m, i) => m.role === "user" ? (
             <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
               <span style={label11}>{ev?.buyer ?? "Buyer"}</span>
-              <p style={{ margin: 0, fontSize: 14, fontStyle: "italic", textAlign: "right" }}>{m.text}</p>
+              <p style={{ margin: 0, fontSize: 16, fontStyle: "italic", textAlign: "right" }}>{m.text}</p>
             </div>
           ) : (
-            <div key={i}><span style={{ ...label11, color: "var(--color-accent-700)" }}>Parakh{m.model ? <span style={{ color: "var(--color-neutral-500)", textTransform: "none", letterSpacing: 0 }}> · {m.model}</span> : null}</span><p style={{ margin: "4px 0 0", fontSize: 14 }}>{m.text}</p></div>
+            <div key={i}><span style={{ ...label11, color: "var(--color-accent-700)" }}>Parakh{m.model ? <span style={{ color: "var(--color-neutral-500)", textTransform: "none", letterSpacing: 0 }}> · {m.model}</span> : null}</span><p style={{ margin: "4px 0 0", fontSize: 16 }}>{m.text}</p></div>
           ))}
           {busy && <p style={{ margin: 0, color: "var(--color-neutral-700)" }}>Working on the draft…</p>}
         </div>
@@ -172,9 +172,9 @@ export default function RfqPage() {
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14 }}>
               {[["Deliver to", ev.plant], ["Price basis asked", draft.terms["Price basis"] ?? ev.basis], ["Contract period", "Oct 2026 – Mar 2027"]].map(([k, v]) => (
-                <label key={k} style={{ display: "flex", flexDirection: "column", gap: 4 }}><span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{k}</span><input className="input" defaultValue={v} /></label>
+                <label key={k} style={{ display: "flex", flexDirection: "column", gap: 4 }}><span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>{k}</span><input className="input" defaultValue={v} /></label>
               ))}
-              <label style={{ display: "flex", flexDirection: "column", gap: 4 }}><span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>Replies due</span>
+              <label style={{ display: "flex", flexDirection: "column", gap: 4 }}><span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>Replies due</span>
                 <input className="input" value={due} placeholder="e.g. 20 Oct 2026" onChange={(e) => save({ ...draft, due: e.target.value })} /></label>
             </div>
             <div style={{ display: "flex", gap: 22 }}>
@@ -191,7 +191,7 @@ export default function RfqPage() {
                 </div>
                 {draft.lines.map((l, i) => (
                   <div key={l.id} style={{ display: "grid", gridTemplateColumns: COLS, gap: "0 8px", alignItems: "center", padding: "5px 0", borderBottom: "1px solid color-mix(in srgb, var(--color-text) 8%, transparent)", background: l.tag === "changed by chat" || l.tag === "new SKU" ? "var(--color-accent-100)" : undefined }}>
-                    <span style={{ color: "var(--color-neutral-700)", display: "flex", flexDirection: "column", lineHeight: 1.15 }}>{l.id}{l.tag && <span style={{ fontSize: 10, color: "var(--color-accent-800)" }}>{l.tag}</span>}</span>
+                    <span style={{ color: "var(--color-neutral-700)", display: "flex", flexDirection: "column", lineHeight: 1.15 }}>{l.id}{l.tag && <span style={{ fontSize: 13, color: "var(--color-accent-800)" }}>{l.tag}</span>}</span>
                     {(["name", "size", "spec"] as const).map((f) => (
                       <input key={f} className="input" style={inp} value={l[f]} onChange={(e) => save({ ...draft, lines: draft.lines.map((x, j) => (j === i ? { ...x, [f]: e.target.value } : x)) })} />
                     ))}
@@ -223,7 +223,7 @@ export default function RfqPage() {
                   <select className="input" value={newQ.type} onChange={(e) => setNewQ({ ...newQ, type: e.target.value })} style={{ minHeight: 34 }}><option>Scored</option><option>Mandatory</option></select>
                   <button className="btn btn-secondary" type="submit" disabled={!newQ.text.trim()}><Plus size={14} weight="duotone" />Add question</button>
                 </form>
-                {refId === ev.id && <p style={{ fontSize: 12.5, color: "var(--color-neutral-700)" }}>The quality score for this event is marked on the Evaluation rules tab. Questions you add here go out with your RFQ; marking them is not part of this demo yet.</p>}
+                {refId === ev.id && <p style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>The quality score for this event is marked on the Evaluation rules tab. Questions you add here go out with your RFQ; marking them is not part of this demo yet.</p>}
               </div>
             )}
             {tab === "s" && (
@@ -234,7 +234,7 @@ export default function RfqPage() {
             {tab === "t" && (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 14, maxWidth: 900 }}>
                 {Object.entries(draft.terms).map(([k, v]) => (
-                  <label key={k} style={{ display: "flex", flexDirection: "column", gap: 4 }}><span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{k}</span>
+                  <label key={k} style={{ display: "flex", flexDirection: "column", gap: 4 }}><span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>{k}</span>
                     <input className="input" value={v} onChange={(e) => save({ ...draft, terms: { ...draft.terms, [k]: e.target.value } })} /></label>
                 ))}
               </div>

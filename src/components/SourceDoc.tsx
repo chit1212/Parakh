@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import type { SourceView } from "@/lib/sourceview";
 import type { SourceRef } from "@/lib/types";
 
-const label11 = { fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--color-neutral-700)" };
+const label11 = { fontSize: 16, color: "var(--color-neutral-700)" };
 const HIT = { background: "var(--color-accent-200)", boxShadow: "inset 0 0 0 2px var(--color-accent)" };
 
 export function SourceDoc({ replyId, source, raw, lineId, filePath }: {
@@ -62,7 +62,7 @@ export function SourceDoc({ replyId, source, raw, lineId, filePath }: {
   const head = (
     <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
       <span style={{ ...label11, marginRight: "auto" }}>The original, as it arrived</span>
-      {filePath && <a href={`/api/file?path=${encodeURIComponent(filePath)}`} target="_blank" rel="noreferrer" style={{ fontSize: 12 }}>Open original</a>}
+      {filePath && <a href={`/api/file?path=${encodeURIComponent(filePath)}`} target="_blank" rel="noreferrer" style={{ fontSize: 14 }}>Open original</a>}
     </div>
   );
   const frame = { background: "var(--color-bg)", boxShadow: "var(--shadow-sm)", maxHeight: 360, overflow: "auto" as const, position: "relative" as const };
@@ -72,8 +72,8 @@ export function SourceDoc({ replyId, source, raw, lineId, filePath }: {
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         <span style={label11}>The original, as it arrived</span>
         <div style={{ background: "var(--color-bg)", boxShadow: "var(--shadow-sm)", padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6 }}>
-          <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{source.file} was uploaded in this session; Parakh keeps no copy on the server to draw. The words it was read from, checked by code against the file:</span>
-          <q style={{ fontSize: 14, background: "var(--color-accent-200)", padding: "2px 4px", alignSelf: "flex-start", quotes: "none" }}>{source.snippet}</q>
+          <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>{source.file} was uploaded in this session; Parakh keeps no copy on the server to draw. The words it was read from, checked by code against the file:</span>
+          <q style={{ fontSize: 16, background: "var(--color-accent-200)", padding: "2px 4px", alignSelf: "flex-start", quotes: "none" }}>{source.snippet}</q>
         </div>
       </div>
     );
@@ -92,7 +92,7 @@ export function SourceDoc({ replyId, source, raw, lineId, filePath }: {
         {view.kind === "image" && <Photo v={view} />}
         {view.kind === "none" && <p style={{ margin: 12, color: "var(--color-neutral-700)" }}>{view.why}</p>}
       </div>
-      <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{caption(view)}</span>
+      <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>{caption(view)}</span>
     </div>
   );
 }
@@ -110,7 +110,7 @@ function caption(v: SourceView): string {
 
 function Sheet({ v }: { v: Extract<SourceView, { kind: "sheet" }> }) {
   const cell = { padding: "3px 6px", borderRight: "1px solid var(--color-neutral-300)", borderBottom: "1px solid var(--color-neutral-300)", whiteSpace: "nowrap" as const, maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis" };
-  const rail = { ...cell, background: "var(--color-neutral-200)", color: "var(--color-neutral-700)", textAlign: "center" as const, fontSize: 11 };
+  const rail = { ...cell, background: "var(--color-neutral-200)", color: "var(--color-neutral-700)", textAlign: "center" as const, fontSize: 13 };
   const RAIL_W = 34;
   // Keep the item's name in view while the sheet scrolls to the cell: pin the wordiest
   // column left of the hit on its row (the line's label, not a code), next to the row numbers.
@@ -121,7 +121,7 @@ function Sheet({ v }: { v: Extract<SourceView, { kind: "sheet" }> }) {
   const railPin = { ...rail, minWidth: RAIL_W, maxWidth: RAIL_W, ...pin(0, 2, "var(--color-neutral-200)") };
   const labelPin = (bg: string, z: number) => ({ maxWidth: 160, boxShadow: "inset -1px 0 0 var(--color-neutral-400)", ...pin(RAIL_W, z, bg) });
   return (
-    <table style={{ borderCollapse: "separate", borderSpacing: 0, fontSize: 12, fontFamily: "var(--font-body)" }}>
+    <table style={{ borderCollapse: "separate", borderSpacing: 0, fontSize: 14, fontFamily: "var(--font-body)" }}>
       <thead style={{ position: "sticky", top: 0, zIndex: 3 }}>
         <tr>
           <th data-pin style={{ ...railPin, zIndex: 4 }} />
@@ -142,7 +142,7 @@ function Sheet({ v }: { v: Extract<SourceView, { kind: "sheet" }> }) {
           </tr>
         ))}
       </tbody>
-      <caption style={{ captionSide: "bottom", textAlign: "left", padding: "4px 6px", fontSize: 11, color: "var(--color-neutral-700)" }}>
+      <caption style={{ captionSide: "bottom", textAlign: "left", padding: "4px 6px", fontSize: 13, color: "var(--color-neutral-700)" }}>
         Sheets: {v.sheets.map((s) => (s === v.sheet ? `[${s}]` : s)).join(" · ")}
       </caption>
     </table>
@@ -151,12 +151,12 @@ function Sheet({ v }: { v: Extract<SourceView, { kind: "sheet" }> }) {
 
 function Doc({ v }: { v: Extract<SourceView, { kind: "doc" }> }) {
   return (
-    <div style={{ padding: "14px 16px", fontSize: 12.5, display: "flex", flexDirection: "column", gap: 8 }}>
+    <div style={{ padding: "14px 16px", fontSize: 14, display: "flex", flexDirection: "column", gap: 8 }}>
       {v.blocks.map((b, i) =>
         b.type === "p" ? (
           <p key={i} data-hit={b.hit || undefined} style={{ margin: 0, ...(b.hit ? { ...HIT, padding: "2px 4px" } : {}) }}>{b.text}</p>
         ) : (
-          <table key={i} style={{ borderCollapse: "collapse", fontSize: 11.5 }}>
+          <table key={i} style={{ borderCollapse: "collapse", fontSize: 13 }}>
             <tbody>
               {b.rows.map((r, ri) => (
                 <tr key={ri} data-hit={r.hit || undefined} style={r.hit ? HIT : undefined}>
@@ -173,7 +173,7 @@ function Doc({ v }: { v: Extract<SourceView, { kind: "doc" }> }) {
 
 function Email({ v }: { v: Extract<SourceView, { kind: "email" }> }) {
   return (
-    <div style={{ padding: "12px 16px", fontSize: 12.5 }}>
+    <div style={{ padding: "12px 16px", fontSize: 14 }}>
       {v.headers.map(([k, val]) => (
         <div key={k} style={{ display: "grid", gridTemplateColumns: "56px 1fr", gap: 6 }}>
           <span style={{ color: "var(--color-neutral-700)" }}>{k}</span><span>{val}</span>
@@ -210,7 +210,7 @@ function RowStrip({ v }: { v: SourceView }) {
   }
   if (!parts.length) return null;
   return (
-    <div style={{ fontSize: 12, padding: "4px 8px", background: "var(--color-accent-200)", boxShadow: "inset 2px 0 0 var(--color-accent)", display: "flex", flexWrap: "wrap", columnGap: 12 }}>
+    <div style={{ fontSize: 14, padding: "4px 8px", background: "var(--color-accent-200)", boxShadow: "inset 2px 0 0 var(--color-accent)", display: "flex", flexWrap: "wrap", columnGap: 12 }}>
       {parts.map((p, i) => <span key={i} style={{ fontWeight: p.value ? 600 : 400 }}>{p.text}</span>)}
     </div>
   );

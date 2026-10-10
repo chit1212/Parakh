@@ -30,7 +30,7 @@ import { USD_REFERENCE } from "@/lib/config";
 
 const FORMAT_ICON: Record<string, typeof File> = { Excel: FileXls, PDF: FilePdf, Word: FileDoc, Photo: Camera, Email: EnvelopeSimple };
 const COLS = "40px minmax(170px,1fr) 44px 64px repeat(5, minmax(76px,96px)) 104px";
-const label11 = { fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--color-neutral-700)" };
+const label11 = { fontSize: 16, color: "var(--color-neutral-700)" };
 
 const tabS = (on: boolean): React.CSSProperties => ({
   whiteSpace: "nowrap", background: "none", border: 0, padding: "6px 0", font: "inherit", fontSize: 15,
@@ -39,11 +39,11 @@ const tabS = (on: boolean): React.CSSProperties => ({
 
 const pill = (on: boolean): React.CSSProperties => ({
   flex: "none", whiteSpace: "nowrap", background: on ? "var(--color-accent)" : "transparent", color: on ? "var(--color-bg)" : "var(--color-accent-800)",
-  border: 0, boxShadow: on ? "none" : "inset 0 0 0 1px var(--color-divider)", padding: "5px 10px", font: "inherit", fontSize: 13, borderRadius: "var(--radius-md)",
+  border: 0, boxShadow: on ? "none" : "inset 0 0 0 1px var(--color-divider)", padding: "5px 10px", font: "inherit", fontSize: 15, borderRadius: "var(--radius-md)",
 });
-const segS = (on: boolean): React.CSSProperties => ({ border: 0, padding: "6px 12px", font: "inherit", fontSize: 13, background: on ? "var(--color-accent)" : "transparent", color: on ? "var(--color-bg)" : "inherit", whiteSpace: "nowrap" });
+const segS = (on: boolean): React.CSSProperties => ({ border: 0, padding: "6px 12px", font: "inherit", fontSize: 15, background: on ? "var(--color-accent)" : "transparent", color: on ? "var(--color-bg)" : "inherit", whiteSpace: "nowrap" });
 const paneS = (on: boolean): React.CSSProperties => ({
-  display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap", background: "none", border: 0, padding: "4px 0", font: "inherit", fontSize: 14,
+  display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap", background: "none", border: 0, padding: "4px 0", font: "inherit", fontSize: 16,
   color: on ? "var(--color-text)" : "var(--color-neutral-700)", fontWeight: on ? 600 : 400, boxShadow: on ? "inset 0 -2px 0 var(--color-text)" : "none",
 });
 
@@ -51,7 +51,7 @@ function ScenarioStrip({ r, title, grid, askedBy, onBack, backLabel }: { r: Scen
   const d = r.award.total - r.base.total;
   const lbl = { ...label11, color: "var(--color-accent-800)" };
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1.8fr) minmax(0,1fr) auto", gap: 24, padding: "10px 28px 12px 8px", fontSize: 12.5, background: "var(--color-accent-100)", marginBottom: 4 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1.8fr) minmax(0,1fr) auto", gap: 24, padding: "10px 28px 12px 8px", fontSize: 14, background: "var(--color-accent-100)", marginBottom: 4 }}>
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <span style={lbl}>{title} · rules applied</span>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: "4px 18px" }}>
@@ -66,12 +66,12 @@ function ScenarioStrip({ r, title, grid, askedBy, onBack, backLabel }: { r: Scen
         <span style={lbl}>Excluded, and why</span>
         {r.excluded.length ? r.excluded.map((x) => <div key={x.vendorId}><span style={{ fontWeight: 600 }}>{x.name}</span>: {x.why}</div>) : <div>No vendor excluded.</div>}
         {r.notes.map((t, i) => <div key={i} style={{ color: "var(--color-neutral-800)" }}>{t}</div>)}
-        {askedBy && <span style={{ fontSize: 12, color: "var(--color-neutral-700)", paddingTop: 4 }}>{askedBy}</span>}
+        {askedBy && <span style={{ fontSize: 14, color: "var(--color-neutral-700)", paddingTop: 4 }}>{askedBy}</span>}
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6, alignItems: "flex-end", textAlign: "right" }}>
         <span style={{ fontSize: 24, fontWeight: 600, lineHeight: 1.15 }}>{crore(r.award.total)}</span>
         <span style={{ color: "var(--color-accent-800)" }}>{d >= 0 ? "+" : "−"}{lakh(Math.abs(d))} ({d >= 0 ? "+" : "−"}{Math.abs((d / r.base.total) * 100).toFixed(1)}%) vs cheapest overall</span>
-        <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{grid.vendors.filter((v) => r.award.byVendor[v.id].lines).map((v) => `${v.short} ${r.award.byVendor[v.id].lines}`).join(" · ")} lines</span>
+        <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>{grid.vendors.filter((v) => r.award.byVendor[v.id].lines).map((v) => `${v.short} ${r.award.byVendor[v.id].lines}`).join(" · ")} lines</span>
         <button className="btn btn-ghost" onClick={onBack}>{backLabel}</button>
       </div>
     </div>
@@ -87,7 +87,7 @@ function ChartView({ grid, r }: { grid: Grid; r: ScenarioResult | null }) {
     <div style={{ padding: "16px 8px 24px", display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr)", gap: 40 }}>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <h3 style={{ fontSize: 20, margin: 0 }}>Award value by vendor</h3>
-        <div style={{ display: "flex", gap: 18, fontSize: 12, color: "var(--color-neutral-700)" }}>
+        <div style={{ display: "flex", gap: 18, fontSize: 14, color: "var(--color-neutral-700)" }}>
           <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 14, height: 8, background: "var(--color-neutral-400)" }} />As quoted (cheapest overall)</span>
           {r && <span style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ width: 14, height: 8, background: "var(--color-accent)" }} />This scenario</span>}
         </div>
@@ -95,11 +95,11 @@ function ChartView({ grid, r }: { grid: Grid; r: ScenarioResult | null }) {
           <div key={v.id} style={{ display: "grid", gridTemplateColumns: "120px 1fr", gap: 12, alignItems: "center" }}>
             <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
               <span style={{ fontWeight: 600 }}>{v.short}</span>
-              <span style={{ fontSize: 11, color: "var(--color-neutral-700)" }}>{r?.excluded.some((e) => e.vendorId === v.id) ? "excluded" : `${award.byVendor[v.id].lines} lines`}</span>
+              <span style={{ fontSize: 13, color: "var(--color-neutral-700)" }}>{r?.excluded.some((e) => e.vendorId === v.id) ? "excluded" : `${award.byVendor[v.id].lines} lines`}</span>
             </span>
             <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={bar(base.byVendor[v.id].value, "var(--color-neutral-400)")} /><span style={{ fontSize: 11, color: "var(--color-neutral-700)" }}>{base.byVendor[v.id].value ? lakh(base.byVendor[v.id].value) : "—"}</span></div>
-              {r && <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={bar(award.byVendor[v.id].value, "var(--color-accent)")} /><span style={{ fontSize: 11 }}>{award.byVendor[v.id].value ? lakh(award.byVendor[v.id].value) : "—"}</span></div>}
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={bar(base.byVendor[v.id].value, "var(--color-neutral-400)")} /><span style={{ fontSize: 13, color: "var(--color-neutral-700)" }}>{base.byVendor[v.id].value ? lakh(base.byVendor[v.id].value) : "—"}</span></div>
+              {r && <div style={{ display: "flex", alignItems: "center", gap: 8 }}><span style={bar(award.byVendor[v.id].value, "var(--color-accent)")} /><span style={{ fontSize: 13 }}>{award.byVendor[v.id].value ? lakh(award.byVendor[v.id].value) : "—"}</span></div>}
             </div>
           </div>
         ))}
@@ -107,7 +107,7 @@ function ChartView({ grid, r }: { grid: Grid; r: ScenarioResult | null }) {
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <h3 style={{ fontSize: 20, margin: 0 }}>Lines that change hands</h3>
         {r && r.changed.length ? (
-          <table className="table" style={{ fontSize: 13 }}>
+          <table className="table" style={{ fontSize: 15 }}>
             <thead><tr><th>Line</th><th>From</th><th>To</th><th style={{ textAlign: "right" }}>+ ₹/box</th><th style={{ textAlign: "right" }}>+ value</th></tr></thead>
             <tbody>
               {r.changed.map((x) => (
@@ -156,14 +156,14 @@ function CounterOffer({ vendorId, line, cell, target }: { vendorId: string; line
     <details>
       <summary style={{ cursor: "pointer", color: "var(--color-accent-800)" }}>Counter-offer: ask this vendor to sharpen {line.id} toward {inr(target)}</summary>
       <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingTop: 6 }}>
-        <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>The target is set in code from the line’s lowest price; the email does not say whose it is.</span>
+        <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>The target is set in code from the line’s lowest price; the email does not say whose it is.</span>
         {sent ? <span style={{ color: "var(--color-accent-800)" }}>Approved by you and marked as sent. (Demo: no email server; nothing left this app.)</span>
           : !d ? <button className="btn btn-primary" style={{ alignSelf: "flex-start" }} onClick={draft}>Draft the counter-offer</button>
           : d === "loading" ? <span style={{ color: "var(--color-neutral-700)" }}>Drafting with AI…</span>
           : "error" in d ? <span>{d.error} <button className="btn btn-ghost" onClick={draft}>Try again</button></span>
           : (
             <>
-              <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>To {d.to} · {d.subject} · drafted by {d.model ?? "AI"}, for you to check</span>
+              <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>To {d.to} · {d.subject} · drafted by {d.model ?? "AI"}, for you to check</span>
               <textarea className="input" style={{ minHeight: 170, whiteSpace: "pre-wrap", background: "var(--color-bg)" }} value={d.body} onChange={(e) => setD({ ...d, body: e.target.value })} />
               <button className="btn btn-primary" style={{ alignSelf: "flex-start" }} onClick={() => setSent(true)}>Approve &amp; send</button>
             </>
@@ -421,10 +421,10 @@ export default function ComparePage() {
   const shownValue = shown.reduce((a, l) => a + (award.per[l.id] ? award.per[l.id]!.perBox * l.qty : 0), 0);
   const askedLabel = (a: Asked) => (a.asker === "vp" ? `Asked by ${ev.vp}, ${ev.vpRole}` : `Asked by ${ev.buyer}, buyer`);
   const sel11 = { ...label11, display: "flex", flexDirection: "column" as const, gap: 4 };
-  const selS: React.CSSProperties = { minHeight: 34, height: 34, padding: "4px 8px", fontSize: 13, background: "var(--color-bg)" };
+  const selS: React.CSSProperties = { minHeight: 34, height: 34, padding: "4px 8px", fontSize: 15, background: "var(--color-bg)" };
 
   return (
-    <div style={{ display: "flex", height: "100vh", minWidth: 1360, fontSize: 13, lineHeight: 1.4, fontVariantNumeric: "tabular-nums", overflow: "hidden" }}>
+    <div style={{ display: "flex", height: "100vh", minWidth: 1360, fontSize: 15, lineHeight: 1.4, fontVariantNumeric: "tabular-nums", overflow: "hidden" }}>
       <Rail />
       <main style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", overflowY: "auto" }}>
         <header style={{ display: "flex", alignItems: "flex-end", gap: 24, padding: "18px 28px 10px 8px" }}>
@@ -450,11 +450,11 @@ export default function ComparePage() {
           </button>
           {pending > 0 && <span style={{ color: "var(--color-neutral-700)" }}>Reading {pending} more repl{pending === 1 ? "y" : "ies"}…</span>}
           {!readings.length && <span style={{ color: "var(--color-neutral-700)" }}>{empty ? "No replies yet. " : "Nothing read yet. "}<Link href={`/events/${ev.id}/replies`}>Upload a reply on Replies</Link> and it joins this table when it is read.</span>}
-          <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12, fontSize: 12.5 }}>
+          <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12, fontSize: 14 }}>
             <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", lineHeight: 1.25 }}>
               <span><b>{winChecked} of {winners.length}</b> winning prices approved by you</span>
             </span>
-            <button className="btn btn-secondary" style={{ padding: "4px 10px", fontSize: 12.5 }} disabled={winChecked === winners.length} onClick={() => nextWinner(sel?.l)}>
+            <button className="btn btn-secondary" style={{ padding: "4px 10px", fontSize: 14 }} disabled={winChecked === winners.length} onClick={() => nextWinner(sel?.l)}>
               <SealCheck size={14} weight="duotone" />Next winner to approve
             </button>
           </span>
@@ -500,11 +500,11 @@ export default function ComparePage() {
                   </select>
                 </label>
               </div>
-              <span style={{ fontSize: 13, color: "var(--color-neutral-800)", maxWidth: 900 }}>{active.desc}</span>
+              <span style={{ fontSize: 15, color: "var(--color-neutral-800)", maxWidth: 900 }}>{active.desc}</span>
               <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
                 <span style={{ ...label11, marginRight: 4 }}>Show</span>
                 {SHOW.filter(([k]) => k !== "changed" || isScenario || overrides.length > 0).map(([k, t]) => (
-                  <button key={k} onClick={() => setF({ ...f, show: k })} style={{ ...pill(f.show === k), fontSize: 12.5, padding: "4px 9px" }}>
+                  <button key={k} onClick={() => setF({ ...f, show: k })} style={{ ...pill(f.show === k), fontSize: 14, padding: "4px 9px" }}>
                     {t} <span style={{ opacity: 0.75 }}>{counts[k]}</span>
                   </button>
                 ))}
@@ -587,12 +587,12 @@ function Legend({ open, toggle }: { open: boolean; toggle: () => void }) {
     </span>
   );
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px 26px", padding: "14px 28px 10px 8px", fontSize: 12, lineHeight: 1.25 }}>
+    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px 26px", padding: "14px 28px 10px 8px", fontSize: 14, lineHeight: 1.25 }}>
       <button onClick={toggle} style={btn}><CaretDown weight="duotone" />How to read a price</button>
       {item(<span style={chip}>24.60</span>, "Checked", "as written, passed the code checks")}
       {item(<span style={chip}><span style={{ textDecoration: "underline dotted var(--color-neutral-600)", textUnderlineOffset: 3 }}>24.60</span></span>, "Converted", "dotted line = a sum, click it")}
       {item(<span style={{ ...chip, fontStyle: "italic", color: "var(--color-neutral-800)" }}>24.60<sup style={{ fontSize: 8, fontStyle: "normal", letterSpacing: "0.04em", marginLeft: 1 }}>LY</sup></span>, "Last year’s price", "italic, from SE-2025-037")}
-      {item(<span style={chip}>24.60<sup style={{ fontSize: 10, fontWeight: 600, marginLeft: 1 }}>↑</sup></span>, "Unusual price", "↑ or ↓ over 12% from should-cost")}
+      {item(<span style={chip}>24.60<sup style={{ fontSize: 13, fontWeight: 600, marginLeft: 1 }}>↑</sup></span>, "Unusual price", "↑ or ↓ over 12% from should-cost")}
       {item(<span style={{ ...chip, color: "var(--color-neutral-500)" }}>—</span>, "Not quoted", "vendor skipped this line")}
       {item(<span style={{ ...chip, boxShadow: "none", background: "var(--color-accent-2-100)", color: "var(--color-accent-2-800)", fontWeight: 600 }}>24.60?</span>, "Doubt", "could change who wins", "var(--color-accent-2-800)")}
       {item(<span style={{ ...chip, fontWeight: 600 }}>24.60</span>, "Lowest", "bold = cheapest on the line")}
@@ -605,7 +605,7 @@ function GridTable({ grid, lines, filtered, sel, quality, doubtAt, award, base, 
   grid: Grid; lines: Grid["lines"]; filtered: boolean; sel: { v: string; l: string } | null; quality: Quality[]; doubtAt: Map<string, { d: Doubt; rank: number }>;
   award: Award; base: Award | null; excluded: Set<string>; excludedWhy: Map<string, string>; checks: Checks; onSelect: (v: string, l: string) => void;
 }) {
-  const muted = { fontSize: 11, color: "var(--color-neutral-700)" };
+  const muted = { fontSize: 13, color: "var(--color-neutral-700)" };
   // The footer totals the lines shown.
   const foot = { byVendor: Object.fromEntries(grid.vendors.map((v) => [v.id, { lines: 0, value: 0 }])) as Award["byVendor"], total: 0 };
   for (const l of lines) {
@@ -624,13 +624,13 @@ function GridTable({ grid, lines, filtered, sel, quality, doubtAt, award, base, 
           const Icon = FORMAT_ICON[v.format] ?? File;
           return (
             <div key={v.id} style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", textAlign: "right", gap: 1, paddingRight: 10, opacity: excluded.has(v.id) ? 0.45 : 1 }}>
-              <span style={{ fontWeight: 600, fontSize: 13, lineHeight: 1.15 }}>{v.short}</span>
+              <span style={{ fontWeight: 600, fontSize: 15, lineHeight: 1.15 }}>{v.short}</span>
               <span style={{ display: "flex", alignItems: "center", gap: 4, ...muted }}><Icon weight="duotone" />{v.format}</span>
               {(() => {
                 const q = quality.find((x) => x.vendorId === v.id);
-                return <span style={{ fontSize: 11 }} title={q?.why}>{!q?.returned ? "No questionnaire" : `Quality ${q.score} ${q.cleared ? "✓" : "✕"}`}</span>;
+                return <span style={{ fontSize: 13 }} title={q?.why}>{!q?.returned ? "No questionnaire" : `Quality ${q.score} ${q.cleared ? "✓" : "✕"}`}</span>;
               })()}
-              <span style={{ fontSize: 10.5, color: "var(--color-neutral-700)", lineHeight: 1.25 }}>{excluded.has(v.id) ? excludedWhy.get(v.id) ?? "Excluded in this view" : v.note}</span>
+              <span style={{ fontSize: 13, color: "var(--color-neutral-700)", lineHeight: 1.25 }}>{excluded.has(v.id) ? excludedWhy.get(v.id) ?? "Excluded in this view" : v.note}</span>
             </div>
           );
         })}
@@ -645,7 +645,7 @@ function GridTable({ grid, lines, filtered, sel, quality, doubtAt, award, base, 
             <span style={{ color: "var(--color-neutral-700)", alignSelf: "center" }}>{l.id}</span>
             <span style={{ display: "flex", flexDirection: "column", minWidth: 0, paddingRight: 8, alignSelf: "center" }}>
               <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{l.name}</span>
-              <span style={{ fontSize: 11, color: "var(--color-neutral-700)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{l.spec}</span>
+              <span style={{ fontSize: 13, color: "var(--color-neutral-700)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{l.spec}</span>
             </span>
             <span style={{ textAlign: "right", color: "var(--color-neutral-700)", alignSelf: "center" }}>{Math.round(l.qty / 1000)}k</span>
             <span style={{ textAlign: "right", color: "var(--color-neutral-700)", paddingRight: 6, alignSelf: "center" }}>{num2(l.shouldCost)}</span>
@@ -655,7 +655,7 @@ function GridTable({ grid, lines, filtered, sel, quality, doubtAt, award, base, 
             <span style={{ display: "flex", flexDirection: "column", justifyContent: "center", paddingLeft: 12, lineHeight: 1.2 }}>
               <span>{w ? grid.vendors.find((v) => v.id === w.vendorId)?.short : "—"}</span>
               {base && base.per[l.id]?.vendorId !== w?.vendorId && (
-                <span style={{ fontSize: 11, color: "var(--color-accent-800)" }}>was {grid.vendors.find((v) => v.id === base.per[l.id]?.vendorId)?.short ?? "none"}</span>
+                <span style={{ fontSize: 13, color: "var(--color-accent-800)" }}>was {grid.vendors.find((v) => v.id === base.per[l.id]?.vendorId)?.short ?? "none"}</span>
               )}
             </span>
           </div>
@@ -669,7 +669,7 @@ function GridTable({ grid, lines, filtered, sel, quality, doubtAt, award, base, 
           return (
             <span key={v.id} style={{ textAlign: "right", paddingRight: 10, display: "flex", flexDirection: "column" }}>
               <span style={{ fontWeight: 600 }}>{b.lines || "—"}</span>
-              <span style={{ fontSize: 11, color: "var(--color-neutral-700)" }}>{b.lines ? lakh(b.value) : ""}</span>
+              <span style={{ fontSize: 13, color: "var(--color-neutral-700)" }}>{b.lines ? lakh(b.value) : ""}</span>
             </span>
           );
         })}
@@ -693,7 +693,7 @@ function Cell({ c, checked, out, doubt, win, selected, onClick, tip }: { c: Grid
     <button
       onClick={onClick}
       title={checked ? `${tip} · approved by you` : tip}
-      style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", height: "100%", minHeight: 38, padding: "0 10px", border: 0, font: "inherit", fontSize: 13.5, background: doubt ? "var(--color-accent-2-100)" : "transparent", outline: selected ? "2px solid var(--color-accent)" : "none", outlineOffset: -2, color: "inherit", opacity: out ? 0.4 : 1 }}
+      style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", height: "100%", minHeight: 38, padding: "0 10px", border: 0, font: "inherit", fontSize: 15, background: doubt ? "var(--color-accent-2-100)" : "transparent", outline: selected ? "2px solid var(--color-accent)" : "none", outlineOffset: -2, color: "inherit", opacity: out ? 0.4 : 1 }}
     >
       {checked && c.perBox != null && <SealCheck size={12} weight="duotone" color="var(--color-accent-700)" style={{ marginRight: 3, flex: "none" }} aria-label="Approved by you" />}
       <span style={ns}>
@@ -790,7 +790,7 @@ function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, overrid
         <div style={{ display: "flex", flexDirection: "column", gap: 2, marginRight: "auto" }}>
           <span style={label11}>Source · {line.id}</span>
           <span style={{ fontSize: 18, fontWeight: 600, lineHeight: 1.2 }}>{line.name}</span>
-          <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{line.spec} · {Math.round(line.qty / 1000)}k boxes</span>
+          <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>{line.spec} · {Math.round(line.qty / 1000)}k boxes</span>
         </div>
         <button className="btn btn-ghost btn-icon" onClick={onClose} title="Close"><X size={18} weight="duotone" /></button>
       </div>
@@ -814,7 +814,7 @@ function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, overrid
           <SealCheck size={22} weight="duotone" color="var(--color-accent-700)" />
           <span style={{ display: "flex", flexDirection: "column", marginRight: "auto", lineHeight: 1.3 }}>
             <span style={{ fontWeight: 600 }}>Approved by you</span>
-            <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{check.who} · {stamp(check.at)} · recorded on the award</span>
+            <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>{check.who} · {stamp(check.at)} · recorded on the award</span>
           </span>
           <button className="btn btn-ghost" onClick={() => onCheck(null, false)}>Undo</button>
         </div>
@@ -824,7 +824,7 @@ function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, overrid
             <button className="btn btn-primary" onClick={() => onCheck({ at: new Date().toISOString(), who: me }, false)}><SealCheck size={16} weight="duotone" />Approve this price</button>
             <button className="btn btn-secondary" onClick={() => onCheck({ at: new Date().toISOString(), who: me }, true)}>Approve &amp; open next winner</button>
           </div>
-          <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>
+          <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>
             {doubt ? `Confirms the price matches the document. Doubt ${doubt.rank} stays open until you decide it on the Doubts tab.` : "Confirms the price matches the document. Recorded with your name and the time, and listed on the award when you freeze it."}
           </span>
         </div>
@@ -834,7 +834,7 @@ function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, overrid
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <span style={label11}>As written</span>
           <span style={{ fontSize: 20, fontWeight: 600, lineHeight: 1.2 }}>{n.asWritten}</span>
-          {n.alternatives.length > 0 && <span style={{ fontSize: 12.5, color: "var(--color-neutral-800)" }}>or {n.alternatives.map((a) => a.value.toFixed(2)).join(" / ")}: {n.legibility === "corrected_by_hand" ? "corrected by hand" : "hard to read"}</span>}
+          {n.alternatives.length > 0 && <span style={{ fontSize: 14, color: "var(--color-neutral-800)" }}>or {n.alternatives.map((a) => a.value.toFixed(2)).join(" / ")}: {n.legibility === "corrected_by_hand" ? "corrected by hand" : "hard to read"}</span>}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <span style={label11}>On our basis</span>
@@ -847,7 +847,7 @@ function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, overrid
           <div key={s.stage} style={{ display: "grid", gridTemplateColumns: "92px 1fr", gap: 10 }}>
             <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.25 }}>
               <span style={{ fontWeight: 600 }}>{s.stage}</span>
-              <span style={{ fontSize: 11, color: "var(--color-neutral-700)" }}>{s.who}</span>
+              <span style={{ fontSize: 13, color: "var(--color-neutral-700)" }}>{s.who}</span>
             </span>
             <span style={{ textWrap: "pretty" }}>{s.text}</span>
           </div>
@@ -865,7 +865,7 @@ function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, overrid
           return (
             <button key={v.id} onClick={() => onSelect(v.id)} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 80px", gap: 8, padding: "5px 6px", background: v.id === sel.v ? "var(--color-accent-100)" : "transparent", border: 0, font: "inherit", color: "inherit", textAlign: "left" }}>
               <span>{v.short}</span>
-              <span style={{ color: "var(--color-neutral-700)", fontSize: 12 }}>{STATE_LABEL[pc.kind]}{pc.band ? `, ${pc.band === "high" ? "↑" : "↓"} unusual` : ""}</span>
+              <span style={{ color: "var(--color-neutral-700)", fontSize: 14 }}>{STATE_LABEL[pc.kind]}{pc.band ? `, ${pc.band === "high" ? "↑" : "↓"} unusual` : ""}</span>
               <span style={{ textAlign: "right", fontWeight: 600 }}>{pc.perBox != null ? inr(pc.perBox) : "—"}</span>
             </button>
           );

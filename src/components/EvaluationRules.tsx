@@ -13,7 +13,7 @@ import type { ReplyReading } from "@/lib/reader/pipeline";
 import type { SourcingEvent } from "@/lib/types";
 import { useScheme } from "./useScheme";
 
-const label11 = { fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--color-neutral-700)" };
+const label11 = { fontSize: 16, color: "var(--color-neutral-700)" };
 const QCOLS = "30px minmax(0,1.3fr) 100px minmax(0,1.6fr) 70px";
 const RCOLS = "minmax(0,1.2fr) minmax(0,1.5fr) 160px";
 const rowRule = "1px solid color-mix(in srgb, var(--color-text) 8%, transparent)";
@@ -31,7 +31,7 @@ function Section({ title, tag, tagCls, note, children }: { title: string; tag: s
       <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
         <h3 style={{ fontSize: 20, margin: 0 }}>{title}</h3>
         <span className={tagCls}>{tag}</span>
-        <span style={{ color: "var(--color-neutral-700)", fontSize: 12.5 }}>{note}</span>
+        <span style={{ color: "var(--color-neutral-700)", fontSize: 14 }}>{note}</span>
       </div>
       {children}
     </section>
@@ -41,9 +41,9 @@ function Section({ title, tag, tagCls, note, children }: { title: string; tag: s
 function Rule({ name, how, val, used, locked }: { name: string; how: string; val: string; used: string; locked?: boolean }) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: RCOLS, gap: "0 16px", alignItems: "center", padding: "8px 0", borderBottom: rowRule }}>
-      <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}><span style={{ fontWeight: 600 }}>{name}</span><span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{how}</span></span>
+      <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}><span style={{ fontWeight: 600 }}>{name}</span><span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>{how}</span></span>
       <span style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--color-neutral-800)" }}>{locked && <LockSimple weight="duotone" color="var(--color-neutral-600)" />}{val}</span>
-      <span style={{ fontSize: 12, color: "var(--color-neutral-700)", textAlign: "right" }}>{used}</span>
+      <span style={{ fontSize: 14, color: "var(--color-neutral-700)", textAlign: "right" }}>{used}</span>
     </div>
   );
 }
@@ -108,7 +108,7 @@ export function EvaluationRules({ ev, grid, readings, report }: { ev: SourcingEv
             placeholder="e.g. Score rejection rate out of 25, full marks at 0.5% or less" />
           <button className="btn btn-primary" type="submit" disabled={busy || !text.trim()} style={{ whiteSpace: "nowrap" }}><Sparkle size={16} weight="duotone" />{busy ? "Drafting…" : "Draft rule"}</button>
         </form>
-        <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>Parakh drafts the rule; code checks it and runs it. You see the rule and its effect before it applies.</span>
+        <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>Parakh drafts the rule; code checks it and runs it. You see the rule and its effect before it applies.</span>
         {ai && ("error" in ai ? <span>{ai.error}</span> : (
           <div style={{ display: "flex", flexDirection: "column", gap: 8, background: "var(--color-bg)", padding: "10px 12px", boxShadow: "var(--shadow-sm)" }}>
             <span><span style={{ ...label11, color: "var(--color-accent-700)" }}>Parakh{ai.model ? <span style={{ color: "var(--color-neutral-500)", textTransform: "none", letterSpacing: 0 }}> · {ai.model}</span> : null}</span><br />{ai.reply}</span>
@@ -117,14 +117,14 @@ export function EvaluationRules({ ev, grid, readings, report }: { ev: SourcingEv
                 {ai.proposal.rules.filter((r) => ai.changed?.includes(r.id)).map((r) => {
                   const was = scheme.rules.find((x) => x.id === r.id)!;
                   return (
-                    <div key={r.id} style={{ display: "grid", gridTemplateColumns: "34px 1fr", gap: 8, fontSize: 12.5 }}>
+                    <div key={r.id} style={{ display: "grid", gridTemplateColumns: "34px 1fr", gap: 8, fontSize: 14 }}>
                       <b>{r.id}</b>
                       <span><span style={{ color: "var(--color-neutral-700)", textDecoration: "line-through" }}>{markingText(was)} ({was.points} pts)</span><br />{markingText(r)} ({r.points} pts)</span>
                     </div>
                   );
                 })}
-                {ai.proposal.passMark !== scheme.passMark && <span style={{ fontSize: 12.5 }}>Pass mark {scheme.passMark} → {ai.proposal.passMark}</span>}
-                <span style={{ fontSize: 12.5, display: "flex", flexWrap: "wrap", gap: "2px 14px" }}><span style={{ color: "var(--color-neutral-700)" }}>Effect, marked by code:</span>{scoreLine(effect(ai.proposal))}</span>
+                {ai.proposal.passMark !== scheme.passMark && <span style={{ fontSize: 14 }}>Pass mark {scheme.passMark} → {ai.proposal.passMark}</span>}
+                <span style={{ fontSize: 14, display: "flex", flexWrap: "wrap", gap: "2px 14px" }}><span style={{ color: "var(--color-neutral-700)" }}>Effect, marked by code:</span>{scoreLine(effect(ai.proposal))}</span>
                 <div style={{ display: "flex", gap: 8 }}>
                   <button className="btn btn-primary" onClick={() => { saveScheme({ ...ai.proposal!, rules: ai.proposal!.rules.map((r) => (ai.changed?.includes(r.id) ? { ...r, changedByChat: true } : { ...r, changedByChat: scheme.rules.find((x) => x.id === r.id)?.changedByChat })) }); setAi(null); setText(""); setEdit(null); }}>Apply this rule</button>
                   <button className="btn btn-secondary" onClick={() => setAi(null)}>Discard</button>
@@ -144,10 +144,10 @@ export function EvaluationRules({ ev, grid, readings, report }: { ev: SourcingEv
           return (
             <div key={r.id} style={{ display: "grid", gridTemplateColumns: QCOLS, gap: "0 12px", alignItems: "center", padding: "5px 0", borderBottom: rowRule, background: r.changedByChat ? "var(--color-accent-100)" : "transparent" }}>
               <span style={{ color: "var(--color-neutral-700)" }}>{r.id}</span>
-              <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>{q?.text ?? r.id}{r.changedByChat && <span style={{ fontSize: 10.5, color: "var(--color-accent-800)" }}>changed by chat</span>}</span>
+              <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.3 }}>{q?.text ?? r.id}{r.changedByChat && <span style={{ fontSize: 13, color: "var(--color-accent-800)" }}>changed by chat</span>}</span>
               <span style={{ color: r.mandatory ? "var(--color-accent-2-800)" : "var(--color-text)", fontWeight: r.mandatory ? 600 : 400 }}>{r.mandatory ? "Mandatory" : "Scored"}</span>
-              <span style={{ fontSize: 12.5, color: "var(--color-neutral-800)" }}>{markingText(r)}</span>
-              <input className="input" aria-label={`Points for ${r.id}`} inputMode="numeric" style={{ minHeight: 30, padding: "3px 8px", fontSize: 13, textAlign: "right" }} value={r.points}
+              <span style={{ fontSize: 14, color: "var(--color-neutral-800)" }}>{markingText(r)}</span>
+              <input className="input" aria-label={`Points for ${r.id}`} inputMode="numeric" style={{ minHeight: 30, padding: "3px 8px", fontSize: 15, textAlign: "right" }} value={r.points}
                 onChange={(e) => change({ ...shown, rules: shown.rules.map((x, j) => (j === i ? withPoints(scheme.rules.find((y) => y.id === x.id) ?? x, Number(e.target.value.replace(/[^\d]/g, "")) || 0) : x)) })} />
             </div>
           );
@@ -162,7 +162,7 @@ export function EvaluationRules({ ev, grid, readings, report }: { ev: SourcingEv
           {(scheme !== DEFAULT_SCHEME || edit) && <button className="btn btn-ghost" onClick={() => { saveScheme(null); setEdit(null); }}>Reset to Parakh’s draft</button>}
         </div>
         {problems.length > 0 && <span style={{ color: "var(--color-accent-2-800)" }}>Not applied yet: {problems.join(" ")}</span>}
-        <span style={{ fontSize: 12.5, display: "flex", flexWrap: "wrap", gap: "2px 14px", paddingTop: 2 }}><span style={{ color: "var(--color-neutral-700)" }}>Today’s replies, marked by code:</span>{scoreLine(effect(scheme))}</span>
+        <span style={{ fontSize: 14, display: "flex", flexWrap: "wrap", gap: "2px 14px", paddingTop: 2 }}><span style={{ color: "var(--color-neutral-700)" }}>Today’s replies, marked by code:</span>{scoreLine(effect(scheme))}</span>
       </Section>
 
       <Section title="Price basis" tag="Shared with vendors" tagCls="tag tag-accent" note="Every reply is brought onto this basis before comparing.">

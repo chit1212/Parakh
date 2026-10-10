@@ -14,7 +14,7 @@ import { HOME } from "@/lib/routes";
 import { useRole } from "@/components/useRole";
 import { stamp } from "@/components/useVerified";
 
-const label11 = { fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--color-neutral-700)" };
+const label11 = { fontSize: 16, color: "var(--color-neutral-700)" };
 
 export default function AwardPage() {
   const { data } = useReadings();
@@ -27,7 +27,7 @@ export default function AwardPage() {
   const save = (n: Snapshot) => { setS(n); try { localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(n)); } catch { /* blocked */ } };
 
   const frame = (body: React.ReactNode, aside?: React.ReactNode) => (
-    <div style={{ display: "flex", minHeight: "100vh", minWidth: 1360, fontSize: 13, lineHeight: 1.45, fontVariantNumeric: "tabular-nums" }}>
+    <div style={{ display: "flex", minHeight: "100vh", minWidth: 1360, fontSize: 15, lineHeight: 1.45, fontVariantNumeric: "tabular-nums" }}>
       <Rail />
       <div style={{ flex: 1, minWidth: 0, padding: "18px 32px 40px 8px", display: "flex", flexDirection: "column", gap: 22 }}>{body}</div>
       {aside}
@@ -113,7 +113,7 @@ export default function AwardPage() {
       <div style={{ display: "flex", flexDirection: "column", gap: 6, maxWidth: 1000 }}>
         <h3 style={{ fontSize: 20, margin: 0 }}>Approvals, decisions and overrides on record</h3>
         {(s.audit ?? []).length ? (
-          <table className="table" style={{ fontSize: 13 }}>
+          <table className="table" style={{ fontSize: 15 }}>
             <thead><tr><th style={{ whiteSpace: "nowrap" }}>When</th><th>Who</th><th>What</th><th>Why</th></tr></thead>
             <tbody>
               {(s.audit ?? []).map((a, i) => (
@@ -130,7 +130,7 @@ export default function AwardPage() {
             <LockSimple weight="duotone" />Frozen {new Date(s.frozenAt).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Kolkata" })} · snapshot {s.id} · later revisions will not change these numbers
           </span>
         </div>
-        <table className="table" style={{ fontSize: 13 }}>
+        <table className="table" style={{ fontSize: 15 }}>
           <thead><tr><th>Line</th><th>Box</th><th>Awarded to</th><th style={{ textAlign: "right" }}>₹/box</th><th style={{ textAlign: "right" }}>Qty</th><th style={{ textAlign: "right" }}>Value</th><th>Source</th><th>Approved by you</th></tr></thead>
           <tbody>
             {s.rows.map((r, i) => (
@@ -139,8 +139,8 @@ export default function AwardPage() {
                 <td style={{ textAlign: "right" }}>{r.perBox != null ? inr(r.perBox) : "—"}</td>
                 <td style={{ textAlign: "right" }}>{r.qty.toLocaleString("en-IN")}</td>
                 <td style={{ textAlign: "right" }}>{lakh(r.value)}</td>
-                <td style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{r.where?.replace(/^[^,]+, /, "") ?? "—"}</td>
-                <td style={{ whiteSpace: "nowrap", fontSize: 12, color: r.checked ? "var(--color-accent-800)" : "var(--color-neutral-600)" }} title={r.checked ? `${r.checked.who}` : undefined}>{r.perBox == null ? "" : r.checked ? `✓ ${stamp(r.checked.at)}` : "not yet"}</td>
+                <td style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>{r.where?.replace(/^[^,]+, /, "") ?? "—"}</td>
+                <td style={{ whiteSpace: "nowrap", fontSize: 14, color: r.checked ? "var(--color-accent-800)" : "var(--color-neutral-600)" }} title={r.checked ? `${r.checked.who}` : undefined}>{r.perBox == null ? "" : r.checked ? `✓ ${stamp(r.checked.at)}` : "not yet"}</td>
               </tr>
             ))}
           </tbody>
@@ -155,7 +155,7 @@ export default function AwardPage() {
             <div><span style={label11}>As written</span><div style={{ fontSize: 18, fontWeight: 600 }}>{row.asWritten}</div></div>
             <div><span style={label11}>On our basis</span><div style={{ fontSize: 18, fontWeight: 600 }}>{row.perBox != null ? inr(row.perBox) : "—"}</div></div>
           </div>
-          <span style={{ fontSize: 12.5 }}>{row.vendor} · {row.calc === "as written" ? "no conversion" : row.calc}</span>
+          <span style={{ fontSize: 14 }}>{row.vendor} · {row.calc === "as written" ? "no conversion" : row.calc}</span>
           <SourceDoc replyId={row.replyId} source={row.source} raw={row.raw} lineId={row.lineId}
             filePath={paths[`${row.replyId}|${row.source.file.toLowerCase()}`] ?? (/award_summary/i.test(row.source.file) ? "dataset/04_history/SE-2025-037_Award_Summary.xlsx" : null)} />
         </>

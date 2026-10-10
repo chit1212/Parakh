@@ -10,8 +10,8 @@ import { stamp } from "./useVerified";
 export interface RfqVendor { name: string; contact: string; email: string }
 export interface Sent { at: string; by: string; subject: string; body: string }
 
-const label11 = { fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--color-neutral-700)" };
-const inp: React.CSSProperties = { minHeight: 30, padding: "3px 8px", fontSize: 13 };
+const label11 = { fontSize: 16, color: "var(--color-neutral-700)" };
+const inp: React.CSSProperties = { minHeight: 30, padding: "3px 8px", fontSize: 15 };
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const fileName = (ref: string) => `RFQ_${ref.replace(/[^\w-]+/g, "_")}.xlsx`;
@@ -73,7 +73,7 @@ export function RfqSend({ draft, vendors, setVendors, sent, setSent, refId, titl
               <input key={k} className="input" style={{ ...inp, ...(k === "email" && !EMAIL.test(v.email) ? { boxShadow: "inset 0 0 0 1px var(--color-accent-2)" } : {}) }} value={v[k]} disabled={!!sent[v.email]}
                 onChange={(e) => setVendors(vendors.map((x, j) => (j === i ? { ...x, [k]: e.target.value } : x)))} />
             ))}
-            <span style={{ fontSize: 12, color: sent[v.email] ? "var(--color-accent-800)" : "var(--color-neutral-700)" }}>{sent[v.email] ? `Sent ${stamp(sent[v.email].at)}` : "Not sent"}</span>
+            <span style={{ fontSize: 14, color: sent[v.email] ? "var(--color-accent-800)" : "var(--color-neutral-700)" }}>{sent[v.email] ? `Sent ${stamp(sent[v.email].at)}` : "Not sent"}</span>
             <button className="btn btn-ghost btn-icon" title="Remove vendor" disabled={!!sent[v.email]} onClick={() => setVendors(vendors.filter((_, j) => j !== i))}><X size={16} weight="duotone" /></button>
           </div>
         ))}
@@ -90,7 +90,7 @@ export function RfqSend({ draft, vendors, setVendors, sent, setSent, refId, titl
         <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
           <h3 style={{ fontSize: 20, margin: 0 }}>Outbox</h3>
           <span className="tag tag-neutral">Demo: sending is stubbed</span>
-          <span style={{ color: "var(--color-neutral-700)", fontSize: 12.5 }}>One email per vendor, drafted from this RFQ; edit any of them. Each vendor sees only its own email. Nothing leaves this app.</span>
+          <span style={{ color: "var(--color-neutral-700)", fontSize: 14 }}>One email per vendor, drafted from this RFQ; edit any of them. Each vendor sees only its own email. Nothing leaves this app.</span>
         </div>
         {missing.length > 0 ? (
           <span style={{ color: "var(--color-accent-2-800)" }}>Before sending, the RFQ needs {missing.join(", ")}.</span>
@@ -107,10 +107,10 @@ export function RfqSend({ draft, vendors, setVendors, sent, setSent, refId, titl
             <div key={v.email} style={{ background: "var(--color-surface)", padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6 }}>
               <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
                 <b>{v.name}</b><span style={{ color: "var(--color-neutral-700)" }}>To {v.contact ? `${v.contact} ` : ""}&lt;{v.email}&gt;</span>
-                <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "var(--color-neutral-700)" }}><FileXls size={14} weight="duotone" />{fileName(refId)}</span>
+                <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4, fontSize: 14, color: "var(--color-neutral-700)" }}><FileXls size={14} weight="duotone" />{fileName(refId)}</span>
               </div>
               <input className="input" style={{ ...inp, background: "var(--color-bg)" }} value={m.subject} disabled={done} onChange={(e) => setEdits({ ...edits, [v.email]: { ...m, subject: e.target.value } })} />
-              <textarea className="input" style={{ minHeight: 190, background: "var(--color-bg)", whiteSpace: "pre-wrap", fontSize: 13 }} value={m.body} disabled={done}
+              <textarea className="input" style={{ minHeight: 190, background: "var(--color-bg)", whiteSpace: "pre-wrap", fontSize: 15 }} value={m.body} disabled={done}
                 onChange={(e) => setEdits({ ...edits, [v.email]: { ...m, body: e.target.value } })} />
               {done ? (
                 <span style={{ color: "var(--color-accent-800)" }}>Approved by {sent[v.email].by} and marked sent {stamp(sent[v.email].at)}. (Demo: no email server; nothing left this app.)</span>

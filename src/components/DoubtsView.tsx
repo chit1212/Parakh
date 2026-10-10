@@ -10,7 +10,7 @@ import type { Doubt, DoubtReport } from "@/lib/doubts";
 import { lakh } from "@/lib/format";
 import { stamp } from "./useVerified";
 
-const label11 = { fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--color-neutral-700)" };
+const label11 = { fontSize: 16, color: "var(--color-neutral-700)" };
 const COLS = "40px minmax(0,1fr) 120px 110px 120px";
 
 type Draft = { to: string; subject: string; body: string; model?: string } | { error: string } | "loading";
@@ -83,7 +83,7 @@ export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord
                 <span />
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 820 }}>
                   <span style={{ fontWeight: 600 }}>{d.ask}</span>
-                  <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>
+                  <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>
                     Checked by code: {d.tested}. Changes: {d.changes.map((c) => `${c.lineId} ${c.from ? name(c.from.vendorId) : "—"} → ${c.to ? name(c.to.vendorId) : "—"} (${c.view === "cleared" ? "quality-cleared" : "all vendors"})`).join("; ")}.
                   </span>
                   {decisionOf(d) ? (
@@ -105,12 +105,12 @@ export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord
                         <button className="btn btn-ghost" onClick={() => onSee(d.vendorId, d.lineIds[0])}>See source</button>
                         {d.route === "vendor" && !dr && <button className="btn btn-ghost" onClick={() => draft(d)}>Or ask the vendor by email</button>}
                       </div>
-                      <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>
+                      <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>
                         {choicesFor(d)[0].label.split(":")[0]} lets this price compete in the comparison, every scenario and the chat. You can undo it until the award is frozen.
                       </span>
                       {dr && dr !== "loading" && !("error" in dr) && (
                         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                          <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>To {dr.to} · {dr.subject} · drafted by {dr.model ?? "AI"}, for you to check</span>
+                          <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>To {dr.to} · {dr.subject} · drafted by {dr.model ?? "AI"}, for you to check</span>
                           <textarea className="input" style={{ minHeight: 190, whiteSpace: "pre-wrap" }} value={dr.body} onChange={(e) => setDrafts((s) => ({ ...s, [d.id]: { ...dr, body: e.target.value } }))} />
                           <button className="btn btn-primary" style={{ alignSelf: "flex-start" }} onClick={() => record(d, `Asked ${name(d.vendorId)} by email (${dr.to}); held until they reply`, "asked", `To settle: ${d.ask}`)}>Approve &amp; send</button>
                         </div>
@@ -129,7 +129,7 @@ export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord
                       <span style={{ color: "var(--color-neutral-800)" }}>{dr.error} <button className="btn btn-ghost" onClick={() => draft(d)}>Try again</button></span>
                     ) : (
                       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                        <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>To {dr.to} · {dr.subject} · drafted by {dr.model ?? "AI"}, for you to check</span>
+                        <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>To {dr.to} · {dr.subject} · drafted by {dr.model ?? "AI"}, for you to check</span>
                         <textarea className="input" style={{ minHeight: 190, whiteSpace: "pre-wrap" }} value={dr.body} onChange={(e) => setDrafts((s) => ({ ...s, [d.id]: { ...dr, body: e.target.value } }))} />
                         <div style={{ display: "flex", gap: 8 }}>
                           <button className="btn btn-primary" onClick={() => record(d, `Asked ${name(d.vendorId)} by email (${dr.to}); open until they reply. (Demo: nothing left this app.)`, "asked", `To settle: ${d.ask}`)}>Approve &amp; send</button>
