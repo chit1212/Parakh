@@ -66,8 +66,8 @@ export default function AwardPage() {
 
   return frame(
     <>
-      <div style={{ display: "flex", alignItems: "flex-end", gap: 14 }}>
-        <div style={{ marginRight: "auto", display: "flex", flexDirection: "column", gap: 2 }}>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 14, flexWrap: "wrap" }}>
+        <div style={{ marginRight: "auto", display: "flex", flexDirection: "column", gap: 2, flex: "1 0 100%", minWidth: 0 }}>
           <span style={label11}>Award record · {s.eventId} · for approval by {ev?.vp ?? "the VP"}, {ev?.vpRole ?? ""}</span>
           <h1 style={{ fontSize: 26, margin: 0 }}>{s.title}</h1>
         </div>

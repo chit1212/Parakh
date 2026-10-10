@@ -174,8 +174,8 @@ function Row({ r, st, ev, onRead, impact, quality }: { r: ReplySummary; st: Repl
         {rd && (rd.status === "read" || rd.status === "incomplete") && (
           <>
             <div className="font-semibold">
-              Questionnaire · {quality?.returned && rd.questionnaire.length
-                ? `${quality.score} / 100 · ${quality.cleared ? "cleared" : quality.mandatoryFailed ? `${quality.mandatoryFailed} mandatory item${quality.mandatoryFailed > 1 ? "s" : ""} failed` : "below the pass mark"}`
+              Questionnaire · {quality?.returned
+                ? `${quality.score} / 100 · ${quality.cleared ? "cleared" : quality.mandatoryFailed ? `${quality.mandatoryFailed} mandatory item${quality.mandatoryFailed > 1 ? "s" : ""} failed` : "below the pass mark"}${rd.questionnaire.length ? "" : " (answers in another reply from this vendor)"}`
                 : rd.questionnaire.length ? `${rd.questionnaire.length} of ${ev.questions.length} answers read` : "not returned"}
             </div>
             {quality?.returned && rd.questionnaire.length > 0 && (
