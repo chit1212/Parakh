@@ -1,13 +1,16 @@
 "use client";
 import { useRef, useState } from "react";
 import { Camera, CaretDown, CaretRight, Envelope, File, FileDoc, FilePdf, FileXls, UploadSimple, Warning } from "@phosphor-icons/react";
-import { Kpis } from "@/components/ui";
+import { Kpis, QualityLabel } from "@/components/ui";
 import Link from "next/link";
 import { ScreenHead } from "@/components/Rail";
 import { Shell } from "@/components/Shell";
 import { useReadings, type EventData, type ReplyState } from "@/components/useReadings";
 import { buildGrid, cellKey, type Grid } from "@/lib/compare";
 import { qualityOf, type Quality } from "@/lib/quality";
+import { findDoubts } from "@/lib/doubts";
+import { assuranceOf } from "@/components/Assurance";
+import { checkKey, useVerified, type Checks } from "@/components/useVerified";
 import { useScheme } from "@/components/useScheme";
 import type { ReplyReading } from "@/lib/reader/pipeline";
 import { mainFile, type ReplySummary } from "@/lib/summary";
@@ -52,7 +55,7 @@ function termLine(rd: ReplyReading): string[] {
 const includedInPrice = (t: string) => /includ/i.test(t) && !/not includ|exclud|extra|separately/i.test(t);
 
 /** What needs the buyer on this reply, worked out in code from the reading: lines to look at, and messages to answer. */
-function needsYou(rd: ReplyReading | null, grid?: Grid): { kind: "Line" | "Message"; text: string }[] {
+function needsYou(rd: ReplyReading | null, grid?: Grid, raised?: Set<string>): { kind: "Line" | "Message"; text: string }[] {
   if (!rd) return [];
   if (rd.status === "unreadable" || rd.status === "pending" || rd.status === "incomplete" || rd.status === "error")
     return rd.nextStep.text ? [{ kind: "Message", text: rd.nextStep.text }] : [];
@@ -66,7 +69,8 @@ function needsYou(rd: ReplyReading | null, grid?: Grid): { kind: "Line" | "Messa
     const alts = cell?.norm.replyId === rd.replyId ? cell.norm.alternatives.map((x) => x.value) : p.alternative_readings.map((x) => x.value);
     const diff = (p.difference ?? "a different spec").replace(/\.$/, "");
     const t = p.differs_from_rfq ? `${p.line_id} ${/^offered/i.test(diff) ? diff[0].toLowerCase() + diff.slice(1) : `offered ${diff}`}`
-      : p.legibility !== "clear" ? `${p.line_id} price unclear: ${[Number(p.raw_value), ...alts].sort((x, y) => x - y).map((v) => `₹${v.toFixed(2)}`).join(" or ")}`
+      // A hard-to-read price needs the buyer only if code raised it (one of its readings changes a winner); otherwise it is logged.
+      : p.legibility !== "clear" && rd.vendorId && raised?.has(cellKey(rd.vendorId, p.line_id)) ? `${p.line_id} price unclear: ${[Number(p.raw_value), ...alts].sort((x, y) => x - y).map((v) => `₹${v.toFixed(2)}`).join(" or ")}`
       : p.verification.status === "failed" ? `${p.line_id} not found where the reader said` : null;
     if (t) { seen.add(p.line_id); out.push({ kind: "Line", text: t }); }
   }
@@ -84,7 +88,7 @@ function needsYou(rd: ReplyReading | null, grid?: Grid): { kind: "Line" | "Messa
 
 const ROW_COLS = "28px minmax(0,1.6fr) minmax(0,0.75fr) minmax(0,0.9fr) minmax(0,0.9fr) minmax(0,1.9fr) 56px";
 
-function Row({ r, st, ev, onRead, impact, quality, grid }: { r: ReplySummary; st: ReplyState | undefined; ev: SourcingEvent; onRead: (fresh: boolean) => void; impact?: string | null; quality?: Quality; grid?: Grid }) {
+function Row({ r, st, ev, onRead, impact, quality, grid, raised, checks }: { r: ReplySummary; st: ReplyState | undefined; ev: SourcingEvent; onRead: (fresh: boolean) => void; impact?: string | null; quality?: Quality; grid?: Grid; raised?: Set<string>; checks?: Checks }) {
   const [expanded, setExpanded] = useState(false);
   const [open, setOpen] = useState(false);
   const rd = st?.reading ?? null;
@@ -94,7 +98,7 @@ function Row({ r, st, ev, onRead, impact, quality, grid }: { r: ReplySummary; st
   const reading = st && st.stage !== "done";
   const docs = rd?.qualityDocs ?? [];
   const isQuote = rd && (rd.status === "read" || rd.status === "incomplete");
-  const needs = needsYou(rd, grid);
+  const needs = needsYou(rd, grid, raised);
   const sub = "text-[14px] text-n-700";
   const fileHref = f ? `/api/file?path=${encodeURIComponent(f.path)}` : null;
   const blank = rd ? rd.coverage.missing.length : 0;
@@ -123,15 +127,26 @@ function Row({ r, st, ev, onRead, impact, quality, grid }: { r: ReplySummary; st
               </div>
             </>
           ) : isQuote ? (
-            <span><span className={blank ? "font-semibold" : undefined}>{rd.coverage.quoted.length} of {rd.coverage.total}</span>{blank ? <span className="text-n-700 text-[15px]"> · {blank} blank</span> : null}</span>
+            <span style={{ display: "flex", flexDirection: "column" }}>
+              <span><span className={blank ? "font-semibold" : undefined}>{rd.coverage.quoted.length} of {rd.coverage.total}</span>{blank ? <span className="text-n-700 text-[15px]"> · {blank} blank</span> : null}</span>
+              {(() => {
+                // Three assurance levels, counted over this reply's prices in the comparison.
+                if (!grid || !rd.vendorId) return null;
+                const cells = ev.lines.map((l) => grid.cells[cellKey(rd.vendorId!, l.id)]).filter((c) => c.perBox != null && c.norm.replyId === rd.replyId);
+                if (!cells.length) return null;
+                const n = { ai: 0, matched: 0, verified: 0 };
+                for (const c of cells) n[assuranceOf(c, !!checks?.[checkKey(c.vendorId, c.lineId)])]++;
+                return <span className="text-[13px] text-n-700" title="Read by AI · matched to the source by code · approved by you">{n.ai} AI only · {n.matched} matched · {n.verified} approved</span>;
+              })()}
+            </span>
           ) : st?.error ? <span className="text-d-700">Not read</span>
             : rd ? <span>{{ unreadable: "Unreadable", pending: "Pending", ignored: "Ignored", error: "Not read" }[rd.status as "unreadable"] ?? "—"}</span> : "—"}
         </div>
         <div>
           {!isQuote ? "—"
-            : quality?.returned ? (quality.cleared ? <span className="tag tag-accent">{quality.score} · cleared</span> : <span style={{ fontSize: 15 }}>{quality.score} · not cleared</span>)
-            : rd.questionnaire.length ? <span className="tag tag-neutral">{rd.questionnaire.length} of {ev.questions.length} answers</span>
-            : <span className="tag tag-outline">Not returned</span>}
+            : quality ? <QualityLabel returned={quality.returned} score={quality.score} cleared={quality.cleared} />
+            : rd.questionnaire.length ? <span>{rd.questionnaire.length} of {ev.questions.length} answers</span>
+            : <QualityLabel returned={false} score={null} cleared={false} />}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 2, color: "var(--color-accent-2-800)", fontSize: 15 }}>
           {st?.error ? <span>{st.error}</span> : needs.length ? needs.map((n, i) => (
@@ -402,6 +417,7 @@ export default function RepliesPage() {
   const { data, state, blocked, readOne, upload, empty } = useReadings();
   const [scheme] = useScheme();
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [checks] = useVerified();
   if (!data) return <Shell><div className="text-n-700">Loading the event…</div></Shell>;
   const ev = data.event;
   const readings = data.replies.map((x) => state[x.id]?.reading).filter((x): x is ReplyReading => Boolean(x && x.status !== "error"));
@@ -423,7 +439,9 @@ export default function RepliesPage() {
   const priced = ev.vendors.reduce((a, v) => a + new Set(quotes.filter((x) => x.vendorId === v.id).flatMap((x) => x.coverage.quoted)).size, 0);
   const files = Object.fromEntries(data.replies.map((x) => [x.id, mainFile(x, state[x.id]?.reading ?? null) ?? undefined]));
   const grid = buildGrid(ev, readings, { sheets: data.historySheets }, files, data.lastYear);
-  const needs = data.replies.flatMap((r) => (state[r.id]?.reading?.status === "ignored" ? [] : needsYou(state[r.id]?.reading ?? null, grid)));
+  const cleared = ev.vendors.map((v) => qualityOf(ev, v.id, readings, scheme)).filter((q) => q.cleared).map((q) => q.vendorId);
+  const raised = new Set(findDoubts(ev, grid, cleared).raised.filter((d) => d.kind === "hard_to_read").flatMap((d) => d.lineIds.map((l) => cellKey(d.vendorId, l))));
+  const needs = data.replies.flatMap((r) => (state[r.id]?.reading?.status === "ignored" ? [] : needsYou(state[r.id]?.reading ?? null, grid, raised)));
   const nLines = needs.filter((n) => n.kind === "Line").length;
   const nMsgs = needs.length - nLines;
   const head = (
@@ -435,7 +453,7 @@ export default function RepliesPage() {
   return (
     <Shell>
       <div className="flex flex-col gap-[16px]" style={{ maxWidth: 1300 }}>
-      <ScreenHead meta={`${ev.id} · ${ev.title}`} title="Replies">
+      <ScreenHead meta={<>{ev.id} · {ev.title} · Typed files are matched to the source by code. Photo readings need your check.</>} title="Replies">
         <Link href="/scorecard" style={{ fontSize: 16, marginRight: 8 }}>Reading scorecard</Link>
         <button className="btn btn-secondary" style={{ whiteSpace: "nowrap" }} aria-expanded={uploadOpen} onClick={() => setUploadOpen(!uploadOpen)}><UploadSimple size={18} weight="duotone" />Upload a reply</button>
         <Link className="btn btn-primary" href={`/events/${ev.id}/compare`} style={{ whiteSpace: "nowrap", color: "var(--color-bg)" }}>Open comparison</Link>
@@ -464,7 +482,7 @@ export default function RepliesPage() {
       <div className="sheet" style={{ padding: "6px 24px 10px" }}>
         {head}
         {!main.length && <div style={{ padding: "20px 0" }} className="text-n-700">No quotes in yet.</div>}
-        {main.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} impact={revisionImpact(data, state, r.id)} quality={qualityFor(r.id)} grid={grid} />)}
+        {main.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} impact={revisionImpact(data, state, r.id)} quality={qualityFor(r.id)} grid={grid} raised={raised} checks={checks} />)}
       </div>
       {other.length > 0 && (
         <>
@@ -474,7 +492,7 @@ export default function RepliesPage() {
           </div>
           <div className="sheet" style={{ padding: "6px 24px 10px" }}>
             {head}
-            {other.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} grid={grid} />)}
+            {other.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} grid={grid} raised={raised} checks={checks} />)}
           </div>
         </>
       )}

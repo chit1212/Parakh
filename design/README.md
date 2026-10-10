@@ -1,5 +1,13 @@
 # Handoff: Parakh — Sourcing co-pilot (Direction A, "Ledger")
 
+> **Start here, Claude Code.** Work in this order:
+> 1. **`CHANGES - Review fixes.md`** + **`Review Fixes.dc.html`**: the latest priority fixes from the submission review: analytical correctness, visible trust, a simpler hierarchy, and charts. **Do these first.**
+> 2. **`CHANGES - Reviewer polish.md`**: the start-here strip, the default scenario, the chat answer format, Vardhman's ‡, quality labels, and Anand L19.
+> 3. **`Target Screens v2.dc.html`** + the "Readability pass v2" section below: the approved visual redesign for every screen.
+> 4. The rest of this README: base behaviour, data and rules.
+>
+> Where documents conflict, the higher item in this list wins. The VP is **Meera** (replace "Anita" everywhere). Numbers in the design files come from the prototype's `data.js`; compute everything from your own data, and never hard-code a figure.
+
 ## Overview
 Parakh is an AI co-pilot workspace for a procurement buyer running one sourcing event. The demo event is 30 lines of corrugated boxes with five vendors, each replying in a different format (Excel, PDF, Word, a phone photo, a one-line email). Parakh reads every reply into one side-by-side comparison on a single basis (₹ per box, delivered, GST extra). It shows how each number was converted and where it came from, and raises only the doubts that could change who wins a line. The buyer (Vikram, category buyer) and his VP (Anita, VP Supply Chain) then ask what-if questions until they reach an award they can defend.
 
@@ -50,12 +58,31 @@ Sign in → Events → RFQ → Replies → Compare → Award. "P" opens the work
 - **Evaluation rules:** collapse to one pill at the right of the tabs: lock icon + "Rules · 14 · lock when sent" + "Edit". The full Evaluation rules tab remains behind it.
 - **Co-pilot (380 px):** shows the last 3 messages, with "Show 6 earlier messages" above them. Messages are 16 px.
 
-### 03 · Replies
-- **One-line intro:** "Read by AI, every number checked by code against the original file." The "How well did Parakh read? Scorecard" link stays.
-- **Upload bar (keep, for the live demo):** a single raised strip containing an upload icon, "Upload a reply", "Choose files", the file name, a "From" dropdown ("Work it out from the file"), primary "Read it", and a right-aligned "Up to 4 MB · joins this session's comparison".
-- **Key numbers (3 cards):** Replied · Prices read · Need you.
-- **Table:** one row per vendor (72 px): Vendor (name + city · contact) · Sent as (format icon) · Received · Lines priced ("27 of 30" + a 6 px progress bar, replacing the 30-segment strip) · Quality (tag) · Reply.
-- **Reply column:** "Open original" and "See what was read" links, plus "Saved reading, <date> · Read again live".
+### 03 · Replies (simplified for daily use)
+- **Rule:** each row answers four questions: did they reply, is it complete, did they pass quality, what needs me? Everything else moves into the row's detail view.
+- **Removed** (always true, learned once):
+  - the intro "Read by AI, every number checked by code…"
+  - "All lines quoted"
+  - "Every price checked against the original"
+  - the card sub-lines "every one traced to its source" and "10 messages in the inbox…"
+- **Header:** meta line + H1 "Replies". On the right: a "Reading scorecard" text link (accent-700, 15 px), secondary **"Upload a reply"** (`ph-upload-simple`), and primary "Open comparison".
+- **Upload (kept for the live demo):** "Upload a reply" toggles a raised strip under the header containing "Choose file", "No file chosen · up to 4 MB", a "From" dropdown ("Work it out from the file") and primary "Read it" (disabled until a file is chosen). It is closed by default.
+- **Cards (3, no sub-lines):** Replied 5 of 5 · Prices read 147 of 150 · Need you **4** · 2 lines · 2 messages (accent-2-100 card).
+- **Table** (`28 | 1.5fr | 120 | 140 | 150 | 1.6fr | 80`), rows 62 px, whole row clickable:
+  - **Caret:** caret-right when closed, caret-down when open.
+  - **Vendor:** name 17/600, plus "1 Oct, 16:05 · Sanjay Agarwal" (14 px neutral-700).
+  - **Sent as:** format icon + one word (Excel / PDF / Word / Photo / Email).
+  - **Lines priced:** "30 of 30" plain; when incomplete, bold "27 of 30 · 3 blank".
+  - **Quality:** tag "90 · cleared" (tag-accent) / "20 · not cleared" (tag-neutral) / "Not returned" (tag-outline).
+  - **Needs you:** exceptions only, 15 px accent-2-800, each prefixed **Message** (ask the vendor) or **Line** (your call), e.g. "Message 2.5% discount only above ₹25 L per PO". "—" when nothing is needed.
+  - **"Open":** link at the end of the row.
+- **Open row (one at a time):** three columns:
+  - **File:** name + attachments.
+  - **Price basis, as read:** e.g. "Per box in USD, delivered Chakan" and "2.5% trade discount if one PO exceeds ₹25 L".
+  - **Quality documents:** certificates with dates, plus "How code marked it".
+  
+  Then the buttons "Open original" and "See what was read", plus "Read 9 Oct by <models>" and "Read again live".
+- **Data:** live-site values (scores 90 / 80 / 70 for Shree Balaji, Vardhman, Kaveri). Production computes "Needs you" from open doubts: route `vendor` = Message, route `buyer` = Line.
 
 ### 04 · Compare (each change approved one by one)
 1. **Header:** title 30 px; "SE-2026-041 · award by 15 Oct" above it; tabs **Compare** | **Doubts 5** (count in accent-2-700) beside the title; primary "Freeze for award" on the right.

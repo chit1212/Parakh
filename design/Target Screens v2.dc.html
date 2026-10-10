@@ -179,11 +179,16 @@
     <div style="display:flex;align-items:baseline;gap:20px;">
       <span style="font-size:20px;color:var(--color-neutral-700);">03</span>
       <h2 style="margin:0;font-size:36px;font-weight:600;">Replies</h2>
-      <span style="font-size:18px;color:var(--color-neutral-800);">Upload from device stays, as one clear bar · 4-line intro becomes 1 line · one row per vendor · coverage as one bar · Open original, See what was read and Read again live kept on each row</span>
+      <span style="font-size:18px;color:var(--color-neutral-800);">Built for daily use: each row answers “did they reply, is it complete, did they pass, what needs me?” Everything else opens on click.</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,560px));gap:40px;font-size:16px;line-height:1.5;">
+      <div style="display:flex;flex-direction:column;gap:6px;"><b>Always visible</b><span>Vendor and when · format icon · lines priced · quality pass/fail · what needs you · Open</span></div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><b>Moved into the row (click to open)</b><span>File name, attachments, price basis as read, certificates, how code marked it, which model read it, Read again live</span></div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><b>Removed (always true, learned once)</b><span>“Read by AI, every number checked…”, “All lines quoted”, “Every price checked against the original”, “every one traced to its source”</span></div>
     </div>
     <div style="display:flex;gap:48px;align-items:flex-start;">
       <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;"><span style="font-size:18px;font-weight:600;color:var(--color-neutral-700);">Before · live site</span><div style="width:1440px;height:900px;overflow:hidden;box-shadow:var(--shadow-md);background:var(--color-bg);"><img src="assets/live-replies.png" style="width:1440px;display:block;"></div></div>
-      <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;"><span style="font-size:18px;font-weight:600;color:var(--color-accent-700);">After</span>
+      <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;"><span style="font-size:18px;font-weight:600;color:var(--color-accent-700);">After · click a row or “Upload a reply”</span>
         <div style="width:1440px;height:900px;overflow:hidden;background:var(--color-bg);box-shadow:var(--shadow-md);display:flex;font-size:16px;line-height:1.45;font-variant-numeric:tabular-nums;">
           <nav style="width:84px;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 0;">
             <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--color-text);color:var(--color-bg);font-size:22px;font-weight:700;border-radius:var(--radius-lg);margin-bottom:18px;">P</div>
@@ -192,45 +197,61 @@
               <sc-if value="{{ r.off }}"><div style="width:68px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;color:var(--color-neutral-800);"><i class="ph-duotone {{ r.icon }}" style="font-size:24px;"></i><span style="font-size:13px;">{{ r.label }}</span></div></sc-if>
             </sc-for>
           </nav>
-          <main style="flex:1;min-width:0;padding:28px 40px 32px 16px;display:flex;flex-direction:column;gap:18px;overflow:hidden;">
-            <div style="display:flex;align-items:flex-end;gap:18px;">
-              <div style="margin-right:auto;display:flex;flex-direction:column;gap:2px;"><span style="font-size:15px;color:var(--color-neutral-700);">SE-2026-041 · Corrugated boxes, FY27 H2</span><h1 style="margin:0;font-size:32px;line-height:1.15;font-weight:600;">Replies</h1><span style="font-size:16px;color:var(--color-neutral-800);">Read by AI, every number checked by code against the original file.</span></div>
-              <span style="font-size:16px;color:var(--color-accent-700);white-space:nowrap;">How well did Parakh read? Scorecard</span>
+          <main style="flex:1;min-width:0;padding:28px 40px 32px 16px;display:flex;flex-direction:column;gap:20px;overflow:hidden;">
+            <div style="display:flex;align-items:flex-end;gap:12px;">
+              <div style="margin-right:auto;display:flex;flex-direction:column;gap:2px;"><span style="font-size:15px;color:var(--color-neutral-700);">SE-2026-041 · Corrugated boxes, FY27 H2</span><h1 style="margin:0;font-size:32px;line-height:1.15;font-weight:600;">Replies</h1></div>
+              <span style="font-size:15px;color:var(--color-accent-700);white-space:nowrap;padding:0 8px 10px 0;">Reading scorecard</span>
+              <button onClick="{{ toggleUpload }}" class="btn btn-secondary" style="font-size:16px;white-space:nowrap;"><i class="ph-duotone ph-upload-simple" style="font-size:18px;"></i>Upload a reply</button>
               <button class="btn btn-primary" style="font-size:16px;white-space:nowrap;">Open comparison</button>
             </div>
-            <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-              <i class="ph-duotone ph-upload-simple" style="font-size:24px;color:var(--color-accent-700);"></i>
-              <span style="font-size:17px;font-weight:600;">Upload a reply</span>
-              <button class="btn btn-secondary" style="font-size:15px;white-space:nowrap;">Choose files</button>
-              <span style="font-size:15px;color:var(--color-neutral-700);">No file chosen</span>
-              <span style="font-size:15px;color:var(--color-neutral-800);margin-left:12px;">From</span>
-              <span style="font-size:15px;padding:7px 12px;background:var(--color-bg);border-radius:var(--radius-md);box-shadow:inset 0 0 0 1px var(--color-neutral-400);display:flex;align-items:center;gap:8px;">Work it out from the file <i class="ph-duotone ph-caret-down"></i></span>
-              <button class="btn btn-primary" style="font-size:15px;white-space:nowrap;" disabled>Read it</button>
-              <span style="font-size:14px;color:var(--color-neutral-700);margin-left:auto;">Up to 4 MB · joins this session’s comparison</span>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;">
-              <sc-for list="{{ repCards }}" as="k" hint-placeholder-count="3">
-                <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:12px 18px;display:flex;flex-direction:column;gap:0;"><span style="font-size:15px;color:var(--color-neutral-700);">{{ k.t }}</span><span style="font-size:26px;font-weight:600;line-height:1.25;">{{ k.v }}</span><span style="font-size:14px;color:var(--color-neutral-800);">{{ k.s }}</span></div>
-              </sc-for>
-            </div>
-            <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:16px 22px;display:flex;flex-direction:column;">
-              <div style="display:grid;grid-template-columns:minmax(0,1.5fr) 110px 130px minmax(0,1fr) 150px 250px;gap:16px;padding:0 0 10px;font-size:15px;font-weight:600;color:var(--color-neutral-800);box-shadow:inset 0 -2px 0 var(--color-text);">
-                <span>Vendor</span><span>Sent as</span><span>Received</span><span>Lines priced</span><span>Quality</span><span style="text-align:right;">Reply</span>
+            <sc-if value="{{ uploadOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:12px 18px;display:flex;align-items:center;gap:12px;">
+                <button class="btn btn-secondary" style="font-size:15px;white-space:nowrap;">Choose file</button>
+                <span style="font-size:15px;color:var(--color-neutral-700);margin-right:auto;">No file chosen · up to 4 MB</span>
+                <span style="font-size:15px;color:var(--color-neutral-800);">From</span>
+                <span style="font-size:15px;padding:7px 12px;background:var(--color-bg);border-radius:var(--radius-md);box-shadow:inset 0 0 0 1px var(--color-neutral-400);display:flex;align-items:center;gap:8px;white-space:nowrap;">Work it out from the file <i class="ph-duotone ph-caret-down"></i></span>
+                <button class="btn btn-primary" style="font-size:15px;white-space:nowrap;" disabled>Read it</button>
               </div>
-              <sc-for list="{{ replies }}" as="v" hint-placeholder-count="5">
-                <div style="display:grid;grid-template-columns:minmax(0,1.5fr) 110px 130px minmax(0,1fr) 150px 250px;gap:16px;align-items:center;min-height:72px;box-shadow:inset 0 -1px 0 var(--color-neutral-300);" style-hover="background:var(--color-bg);">
-                  <div style="display:flex;flex-direction:column;line-height:1.3;"><span style="font-size:17px;font-weight:600;">{{ v.name }}</span><span style="font-size:14px;color:var(--color-neutral-700);">{{ v.city }} · {{ v.contact }}</span></div>
-                  <span style="display:flex;align-items:center;gap:8px;font-size:16px;"><i class="ph-duotone {{ v.icon }}" style="font-size:22px;color:var(--color-neutral-800);"></i>{{ v.fmt }}</span>
-                  <span style="font-size:16px;">{{ v.received }}</span>
-                  <div style="display:flex;flex-direction:column;gap:6px;">
-                    <span style="font-size:16px;"><b>{{ v.coverage }}</b> of 30</span>
-                    <div style="height:6px;background:var(--color-neutral-300);border-radius:3px;overflow:hidden;max-width:200px;"><div style="height:100%;background:var(--color-text);width:{{ v.pct }};"></div></div>
+            </sc-if>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;">
+              <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:12px 18px;display:flex;flex-direction:column;"><span style="font-size:15px;color:var(--color-neutral-700);">Replied</span><span style="font-size:28px;font-weight:600;line-height:1.25;">5 of 5</span></div>
+              <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:12px 18px;display:flex;flex-direction:column;"><span style="font-size:15px;color:var(--color-neutral-700);">Prices read</span><span style="font-size:28px;font-weight:600;line-height:1.25;">147 of 150</span></div>
+              <div style="background:var(--color-accent-2-100);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:12px 18px;display:flex;flex-direction:column;"><span style="font-size:15px;color:var(--color-accent-2-800);">Need you</span><span style="font-size:28px;font-weight:600;line-height:1.25;color:var(--color-accent-2-800);">4 <span style="font-size:16px;font-weight:400;">· 2 lines · 2 messages</span></span></div>
+            </div>
+            <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:14px 22px;display:flex;flex-direction:column;">
+              <div style="display:grid;grid-template-columns:28px minmax(0,1.5fr) 120px 140px 150px minmax(0,1.6fr) 80px;gap:14px;padding:0 0 10px;font-size:15px;font-weight:600;color:var(--color-neutral-800);box-shadow:inset 0 -2px 0 var(--color-text);">
+                <span></span><span>Vendor</span><span>Sent as</span><span>Lines priced</span><span>Quality</span><span>Needs you</span><span></span>
+              </div>
+              <sc-for list="{{ rep3 }}" as="v" hint-placeholder-count="5">
+                <div style="display:flex;flex-direction:column;box-shadow:inset 0 -1px 0 var(--color-neutral-300);">
+                  <div onClick="{{ v.toggle }}" style="display:grid;grid-template-columns:28px minmax(0,1.5fr) 120px 140px 150px minmax(0,1.6fr) 80px;gap:14px;align-items:center;min-height:62px;cursor:pointer;" style-hover="background:var(--color-bg);">
+                    <i class="ph-duotone {{ v.caret }}" style="font-size:18px;color:var(--color-neutral-700);"></i>
+                    <div style="display:flex;flex-direction:column;line-height:1.3;"><span style="font-size:17px;font-weight:600;">{{ v.name }}</span><span style="font-size:14px;color:var(--color-neutral-700);">{{ v.when }}</span></div>
+                    <span style="display:flex;align-items:center;gap:8px;font-size:16px;"><i class="ph-duotone {{ v.icon }}" style="font-size:22px;color:var(--color-neutral-800);"></i>{{ v.fmt }}</span>
+                    <sc-if value="{{ v.full }}"><span style="font-size:16px;">30 of 30</span></sc-if>
+                    <sc-if value="{{ v.part }}"><span style="font-size:16px;"><b>{{ v.cov }} of 30</b> <span style="font-size:14px;color:var(--color-neutral-700);">· {{ v.miss }} blank</span></span></sc-if>
+                    <div><span class="{{ v.qCls }}" style="font-size:14px;white-space:nowrap;">{{ v.q }}</span></div>
+                    <div style="display:flex;flex-direction:column;gap:2px;">
+                      <sc-for list="{{ v.needs }}" as="n" hint-placeholder-count="1"><span style="font-size:15px;color:var(--color-accent-2-800);display:flex;gap:6px;align-items:baseline;"><span style="font-weight:600;">{{ n.k }}</span>{{ n.t }}</span></sc-for>
+                      <sc-if value="{{ v.clear }}"><span style="font-size:15px;color:var(--color-neutral-700);">—</span></sc-if>
+                    </div>
+                    <span style="font-size:16px;color:var(--color-accent-700);text-align:right;">Open</span>
                   </div>
-                  <div><span class="{{ v.qCls }}" style="font-size:14px;">{{ v.qLabel }}</span></div>
-                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;line-height:1.3;">
-                    <div style="display:flex;gap:14px;"><span style="font-size:15px;color:var(--color-accent-700);">Open original</span><span style="font-size:15px;color:var(--color-accent-700);">See what was read</span></div>
-                    <span style="font-size:14px;color:var(--color-neutral-700);">Saved reading, 9 Oct · <span style="color:var(--color-accent-700);">Read again live</span></span>
-                  </div>
+                  <sc-if value="{{ v.open }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:grid;grid-template-columns:28px minmax(0,1.3fr) minmax(0,1.2fr) minmax(0,1fr);gap:14px 24px;padding:4px 0 18px;font-size:15px;line-height:1.45;">
+                      <span></span>
+                      <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:14px;font-weight:600;color:var(--color-neutral-800);">File</span><span>{{ v.file }}</span><span style="color:var(--color-neutral-700);">{{ v.att }}</span></div>
+                      <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:14px;font-weight:600;color:var(--color-neutral-800);">Price basis, as read</span><sc-for list="{{ v.basis }}" as="b" hint-placeholder-count="2"><span>{{ b }}</span></sc-for></div>
+                      <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:14px;font-weight:600;color:var(--color-neutral-800);">Quality documents</span><sc-for list="{{ v.docs }}" as="d" hint-placeholder-count="2"><span>{{ d }}</span></sc-for><span style="color:var(--color-accent-700);">How code marked it</span></div>
+                      <span></span>
+                      <div style="grid-column:2 / span 3;display:flex;align-items:center;gap:16px;padding-top:4px;">
+                        <button class="btn btn-secondary" style="font-size:15px;">Open original</button>
+                        <button class="btn btn-secondary" style="font-size:15px;">See what was read</button>
+                        <span style="font-size:14px;color:var(--color-neutral-700);">Read 9 Oct by gemini-3.5-flash-lite + gemini-3.5-flash</span>
+                        <span style="font-size:14px;color:var(--color-accent-700);">Read again live</span>
+                      </div>
+                    </div>
+                  </sc-if>
                 </div>
               </sc-for>
             </div>
@@ -483,7 +504,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
-  state = { legendOpen: true, pane: 'conv', sel: null };
+  state = { legendOpen: true, pane: 'conv', sel: null, repOpen: 'VP', uploadOpen: false };
   componentDidMount() {
     if (!window.KD) { this._f = () => this.forceUpdate(); window.addEventListener('kd-ready', this._f); this._t = setInterval(() => { if (window.KD) { clearInterval(this._t); this.forceUpdate(); } }, 150); }
   }
@@ -494,7 +515,25 @@ class Component extends DCLogic {
   }
   renderVals() {
     const K = window.KD, S = this.state;
+    
+    const rv = [
+      { id: 'SB', name: 'Shree Balaji Corrugators', when: '1 Oct, 16:05 · Sanjay Agarwal', fmt: 'Excel', icon: 'ph-microsoft-excel-logo', cov: 30, q: '90 · cleared', ok: true, needs: [],
+        file: 'SBC_Offer_0418_SE-2026-041.xlsx', att: '+ 3 attachments, cover email', basis: ['Per piece in INR, ex-works', 'Freight ₹0.35 per box to Chakan'], docs: ['ISO 9001 · valid to 14 Mar 2028', 'Test report · 12 Jun 2026'] },
+      { id: 'VP', name: 'Vardhman Packwell Exports', when: '2 Oct, 11:22 · Ritu Jain', fmt: 'PDF', icon: 'ph-file-pdf', cov: 30, q: '80 · cleared', ok: true, needs: [{ k: 'Message', t: '2.5% discount only above ₹25 L per PO' }],
+        file: 'Vardhman_Quotation_VPE-Q-2611.pdf', att: '+ 2 attachments, cover email', basis: ['Per box in USD, delivered Chakan', '2.5% trade discount if one PO exceeds ₹25 L'], docs: ['ISO 9001 · valid to 30 Nov 2027', 'Test report · 28 Apr 2026'] },
+      { id: 'KP', name: 'Kaveri Paper Products', when: '3 Oct, 12:40 · Prakash Kulkarni', fmt: 'Word', icon: 'ph-file-doc', cov: 30, q: '70 · cleared', ok: true, needs: [],
+        file: 'Kaveri_Quotation_SE-2026-041.docx', att: '+ 2 attachments, cover email', basis: ['Per 100 in INR, ex-works', 'Freight ₹38 per 100'], docs: ['ISO 9001 · valid to 09 Jan 2027', 'Test report · 05 Feb 2026'] },
+      { id: 'AC', name: 'Anand Cartons', when: '7 Oct, 09:31 · Dilip Shah', fmt: 'Photo', icon: 'ph-camera', cov: 27, q: '20 · not cleared', ok: false, needs: [{ k: 'Line', t: 'L14 offered 3-ply, not 5-ply' }, { k: 'Line', t: 'L19 price unclear: ₹31.20 or ₹37.20' }],
+        file: 'IMG_20261007_093114.jpg', att: 'Phone photo of a printed rate card', basis: ['Per box in INR, delivered Pune region'], docs: ['Burst test report · expired Jan 2025', 'ISO 9001 · not attached'] },
+      { id: 'RB', name: 'Rohit Box Industries', when: '7 Oct, 20:12 · Rohit Jadhav', fmt: 'Email', icon: 'ph-envelope-simple', cov: 30, q: 'Not returned', ok: null, needs: [{ k: 'Message', t: '“Freight extra”, no amount given' }],
+        file: 'Email from Rohit Jadhav, 7 Oct, 20:12', att: 'One-line email, no attachment', basis: ['Per kg: ₹42 5-ply, ₹38 3-ply', '“Rest same as last year”', 'Freight extra'], docs: ['Questionnaire not returned'] }
+    ];
+    const rep3 = rv.map(v => ({ ...v, full: v.cov === 30, part: v.cov < 30, miss: 30 - v.cov, clear: !v.needs.length,
+      qCls: v.ok === true ? 'tag tag-accent' : v.ok === false ? 'tag tag-neutral' : 'tag tag-outline',
+      open: this.state.repOpen === v.id, caret: this.state.repOpen === v.id ? 'ph-caret-down' : 'ph-caret-right',
+      toggle: () => this.setState({ repOpen: this.state.repOpen === v.id ? null : v.id }) }));
     const base = {
+      rep3, uploadOpen: this.state.uploadOpen, toggleUpload: () => this.setState({ uploadOpen: !this.state.uploadOpen }),
       railEvents: this.rail('Events'), railRfq: this.rail('RFQ'), railReplies: this.rail('Replies'), railCompare: this.rail('Compare'), railAward: this.rail('Award'),
       legendOpen: S.legendOpen, legendCaret: S.legendOpen ? 'ph-caret-up' : 'ph-caret-down',
       toggleLegend: () => this.setState({ legendOpen: !S.legendOpen }),

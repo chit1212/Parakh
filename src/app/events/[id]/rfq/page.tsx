@@ -135,7 +135,7 @@ export default function RfqPage() {
     URL.revokeObjectURL(a.href);
   };
   return (
-    <div style={{ display: "flex", height: "100vh", minWidth: 1360, fontSize: 16, lineHeight: 1.45 }}>
+    <div style={{ display: "flex", height: "100vh", fontSize: 16, lineHeight: 1.45 }}>
       <Rail />
       <section style={{ width: 380, flex: "none", background: "var(--color-surface)", display: "flex", flexDirection: "column" }}>
         <div style={{ flex: 1, overflow: "auto", padding: "22px 24px", display: "flex", flexDirection: "column", gap: 18 }}>

@@ -38,3 +38,6 @@ export function hashOfText(s: string): string {
   for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619);
   return (h >>> 0).toString(16).padStart(8, "0");
 }
+
+/** Exact rupees, Indian grouping: ₹4,07,28,770. */
+export const rupees = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;

@@ -74,7 +74,7 @@ export function WorkspaceMenu() {
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <span style={{ fontSize: 15 }}>
-                    This wipes everything in this browser: your approvals, uploads, overrides, decisions, frozen award, marking changes, RFQ draft and chat.
+                    This wipes everything in this browser: your approvals, uploads, overrides, decisions, draft award, marking changes, RFQ draft and chat.
                     {confirm === "empty" ? " The event then starts with no replies, on the RFQ screen." : " The five vendors’ replies come back as read."}
                   </span>
                   <span style={{ display: "flex", gap: 8 }}>

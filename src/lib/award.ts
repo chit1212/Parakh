@@ -25,6 +25,10 @@ export interface SnapshotRow {
   raw: { text: string; value: number } | null;
   /** "Approved by you": who approved this price against the document, and when, as at freezing. */
   checked: { who: string; at: string } | null;
+  /** An open doubt that can change the winner of this line in the saved scenario (absent on older snapshots). */
+  doubt?: string | null;
+  /** The winning vendor has not stated freight: this price excludes it. */
+  freightPending?: boolean;
 }
 
 export interface AuditEntry { at: string; who: string; what: string; why: string }
@@ -43,8 +47,8 @@ export interface Snapshot {
   cheapestOverall: number;
   /** Like-for-like against last year, on the lines that have a price from last year. */
   lastYear: { lines: number; thisYear: number; lastYear: number } | null;
-  /** quality: the questionnaire result at freeze time, e.g. "90 · cleared" (absent on older snapshots). */
-  byVendor: { vendor: string; lines: number; value: number; quality?: string; cleared?: boolean }[];
+  /** The questionnaire result at freeze time (absent on older snapshots). */
+  byVendor: { vendor: string; lines: number; value: number; returned?: boolean; score?: number | null; cleared?: boolean }[];
   /** Set when only some lines were exported (a filtered view). */
   partial?: string;
   decisions: { title: string; status: string }[];
@@ -56,6 +60,33 @@ export interface Snapshot {
   /** When the buyer sent it to the VP for approval (stubbed: nothing leaves the app). */
   sentAt?: string | null;
 }
+
+export type AwardState = "draft" | "in_review" | "submitted" | "approved";
+export interface Blocker { kind: "doubt" | "unapproved" | "freight"; text: string; action: string; lineId?: string }
+
+/**
+ * What stops an award going to the VP (review fix 2.5), read from the snapshot alone so the screen
+ * and the server agree: open doubts that change a winner in the saved scenario, winning prices on
+ * those lines not approved by the buyer, and winning prices that exclude freight.
+ */
+export function blockersOf(s: Snapshot): Blocker[] {
+  const out: Blocker[] = [];
+  const doubts = [...new Set(s.rows.map((r) => r.doubt).filter((d): d is string => !!d))];
+  for (const d of doubts) out.push({ kind: "doubt", text: `Open doubt: ${d}`, action: "Decide it on the Doubts tab" });
+  const unapproved = s.rows.filter((r) => r.doubt && r.perBox != null && !r.checked);
+  if (unapproved.length)
+    out.push({ kind: "unapproved", text: `${unapproved.length} winning price${unapproved.length === 1 ? "" : "s"} on doubt lines not approved by you: ${unapproved.map((r) => r.lineId).join(", ")}`, action: "Check them against the source", lineId: unapproved[0].lineId });
+  const pending = s.rows.filter((r) => r.freightPending && r.perBox != null);
+  for (const v of [...new Set(pending.map((r) => r.vendor))]) {
+    const n = pending.filter((r) => r.vendor === v).length;
+    out.push({ kind: "freight", text: `Freight pending: ${n} line${n === 1 ? "" : "s"} won by ${v} exclude freight`, action: `Ask ${v} for freight (Doubts tab)` });
+  }
+  return out;
+}
+
+/** Four named states; never "frozen". */
+export const awardState = (s: Snapshot): AwardState =>
+  s.approvedBy ? "approved" : s.sentAt ? "submitted" : blockersOf(s).length ? "draft" : "in_review";
 
 const NUMBER = ["", "one", "two", "three", "four", "five"];
 
@@ -69,6 +100,10 @@ export function freeze(o: {
   checks?: Record<string, { who: string; at: string }>;
   /** Only these lines (an exported view); all lines when absent. */
   only?: string[];
+  /** Open doubts that can change a winner in this scenario, with the lines they flip. */
+  affecting?: { title: string; lineIds: string[] }[];
+  /** Vendors whose prices exclude freight they have not stated. */
+  pendingVendors?: string[];
 }): Snapshot {
   const { ev, grid } = o;
   const award: Award = o.scenario?.result.award ?? grid.asQuoted;
@@ -82,6 +117,8 @@ export function freeze(o: {
       asWritten: c?.norm.asWritten ?? null, calc: c?.norm.calc ?? null, where: c?.norm.source ? where(c.norm.source) : null,
       replyId: c?.norm.replyId ?? null, source: c?.norm.source ?? null, raw: c?.norm.raw ?? null,
       checked: w ? o.checks?.[`${w.vendorId}:${l.id}`] ?? null : null,
+      doubt: o.affecting?.find((d) => d.lineIds.includes(l.id))?.title ?? null,
+      freightPending: !!w && !!o.pendingVendors?.includes(w.vendorId),
     };
   });
   const byVendor = grid.vendors
@@ -89,7 +126,7 @@ export function freeze(o: {
       const q = o.quality.find((x) => x.vendorId === v.id);
       return {
         vendor: v.short, lines: rows.filter((r) => r.vendorId === v.id).length, value: rows.filter((r) => r.vendorId === v.id).reduce((a, r) => a + r.value, 0),
-        quality: !q?.returned ? "quality not returned" : `${q.score} · ${q.cleared ? "cleared" : "not cleared"}`, cleared: !!q?.cleared,
+        returned: !!q?.returned, score: q?.score ?? null, cleared: !!q?.cleared,
       };
     })
     .filter((v) => v.lines);
