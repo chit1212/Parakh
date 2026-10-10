@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/broadsheet-b2904ec4-9842-45c9-b4be-2ac94f55f925/styles.css">
+<script src="_ds/broadsheet-b2904ec4-9842-45c9-b4be-2ac94f55f925/_ds_bundle.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<script src="data.js"></script>
+<style>body{margin:0;background:var(--color-neutral-200);color:var(--color-text);font-family:var(--font-body)} a{color:var(--color-accent-700)} a:hover{color:var(--color-accent-800)}</style>
+</helmet>
+
+<div style="padding:56px 64px 96px;display:flex;flex-direction:column;gap:88px;width:max-content;">
+
+  <div style="display:flex;flex-direction:column;gap:20px;max-width:1440px;">
+    <div style="font-size:16px;color:var(--color-neutral-700);">Parakh · readability pass, round 2 · all six screens built from your calls</div>
+    <h1 style="margin:0;font-size:56px;line-height:1.05;font-weight:600;">Before → After</h1>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px;font-size:18px;line-height:1.5;">
+      <div style="display:flex;flex-direction:column;gap:6px;"><b>Read in 2 minutes</b><span>Each screen opens with up to 4 key numbers, then one table. Details open on click.</span></div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><b>Bigger, darker type</b><span>Body text 16px, prices 17–18px, small labels 14px. No grey lighter than neutral-700.</span></div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><b>Depth only where you work</b><span>Tables sit on a raised sheet. Cyan marks actions and winners; magenta only marks doubts.</span></div>
+    </div>
+  </div>
+
+  <section id="flow" data-screen-label="00 Flow" style="display:flex;flex-direction:column;gap:22px;">
+    <div style="display:flex;align-items:baseline;gap:20px;"><span style="font-size:20px;color:var(--color-neutral-700);">00</span><h2 style="margin:0;font-size:36px;font-weight:600;">The whole flow</h2><span style="font-size:18px;color:var(--color-neutral-800);">What the buyer does on each screen. P opens the workspace menu from every screen.</span></div>
+    <div style="display:flex;align-items:stretch;gap:0;">
+      <sc-for list="{{ flow }}" as="f" hint-placeholder-count="7">
+        <div style="display:flex;align-items:center;">
+          <a href="{{ f.href }}" style="width:250px;min-height:150px;text-decoration:none;color:var(--color-text);background:var(--color-neutral-100);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:18px 20px;display:flex;flex-direction:column;gap:6px;" style-hover="box-shadow:var(--shadow-md);">
+            <span style="font-size:15px;color:var(--color-neutral-700);">{{ f.n }}</span>
+            <span style="font-size:22px;font-weight:600;">{{ f.t }}</span>
+            <span style="font-size:16px;line-height:1.4;color:var(--color-neutral-800);text-wrap:pretty;">{{ f.d }}</span>
+            <sc-if value="{{ f.hold }}"><span class="tag tag-accent-2" style="font-size:13px;align-self:flex-start;margin-top:4px;">On hold · to debate</span></sc-if>
+          </a>
+          <sc-if value="{{ f.arrow }}"><i class="ph-duotone ph-arrow-right" style="font-size:26px;color:var(--color-neutral-600);padding:0 10px;"></i></sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section id="s-events" data-screen-label="01 Events" style="display:flex;flex-direction:column;gap:24px;">
+    <div style="display:flex;align-items:baseline;gap:20px;">
+      <span style="font-size:20px;color:var(--color-neutral-700);">01</span>
+      <h2 style="margin:0;font-size:36px;font-weight:600;">Events</h2>
+      <span style="font-size:18px;color:var(--color-neutral-800);">Columns cut from 7 to 5 · three key numbers on top · one clear next step per event · clone and more stay on every row</span>
+    </div>
+    <div style="display:flex;gap:48px;align-items:flex-start;">
+      <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;"><span style="font-size:18px;font-weight:600;color:var(--color-neutral-700);">Before</span><iframe src="Shared Screens.dc.html#events" style="width:1440px;height:900px;border:0;display:block;box-shadow:var(--shadow-md);background:var(--color-bg);"></iframe></div>
+      <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;"><span style="font-size:18px;font-weight:600;color:var(--color-accent-700);">After</span>
+        <div style="width:1440px;height:900px;overflow:hidden;background:var(--color-bg);box-shadow:var(--shadow-md);display:flex;font-size:16px;line-height:1.45;font-variant-numeric:tabular-nums;">
+          <nav style="width:84px;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 0;">
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--color-text);color:var(--color-bg);font-size:22px;font-weight:700;border-radius:var(--radius-lg);margin-bottom:18px;">P</div>
+            <sc-for list="{{ railEvents }}" as="r" hint-placeholder-count="5">
+              <sc-if value="{{ r.on }}"><div style="width:68px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;background:var(--color-accent-200);color:var(--color-accent-800);border-radius:var(--radius-lg);font-weight:600;"><i class="ph-duotone {{ r.icon }}" style="font-size:24px;"></i><span style="font-size:13px;">{{ r.label }}</span></div></sc-if>
+              <sc-if value="{{ r.off }}"><div style="width:68px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;color:var(--color-neutral-800);"><i class="ph-duotone {{ r.icon }}" style="font-size:24px;"></i><span style="font-size:13px;">{{ r.label }}</span></div></sc-if>
+            </sc-for>
+          </nav>
+          <main style="flex:1;min-width:0;padding:28px 40px 32px 16px;display:flex;flex-direction:column;gap:22px;">
+            <div style="display:flex;align-items:flex-end;gap:14px;">
+              <div style="margin-right:auto;display:flex;flex-direction:column;gap:2px;"><span style="font-size:15px;color:var(--color-neutral-700);">Sahyadri Appliances · Packaging &amp; print</span><h1 style="margin:0;font-size:32px;line-height:1.15;font-weight:600;">Sourcing events</h1></div>
+              <input class="input" style="width:300px;font-size:16px;" placeholder="Search events, vendors, SKUs">
+              <button class="btn btn-primary" style="font-size:16px;white-space:nowrap;"><i class="ph-duotone ph-plus" style="font-size:18px;"></i>New event</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;">
+              <sc-for list="{{ evCards }}" as="k" hint-placeholder-count="3">
+                <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:16px 20px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:15px;color:var(--color-neutral-700);">{{ k.t }}</span><span style="font-size:30px;font-weight:600;line-height:1.2;">{{ k.v }}</span><span style="font-size:14px;color:var(--color-neutral-800);">{{ k.s }}</span></div>
+              </sc-for>
+            </div>
+            <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:20px 24px;display:flex;flex-direction:column;gap:14px;flex:1;min-height:0;">
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <sc-for list="{{ evChips }}" as="c" hint-placeholder-count="6">
+                  <sc-if value="{{ c.on }}"><span style="font-size:15px;padding:6px 14px;border-radius:999px;background:var(--color-text);color:var(--color-bg);">{{ c.t }} {{ c.n }}</span></sc-if>
+                  <sc-if value="{{ c.off }}"><span style="font-size:15px;padding:6px 14px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--color-neutral-400);">{{ c.t }} {{ c.n }}</span></sc-if>
+                </sc-for>
+                <span style="font-size:15px;padding:6px 10px;color:var(--color-accent-700);display:flex;align-items:center;gap:4px;"><i class="ph-duotone ph-plus"></i>Filter</span>
+              </div>
+              <div style="display:flex;flex-direction:column;">
+                <div style="display:grid;grid-template-columns:minmax(0,2.2fr) 180px 180px 120px 290px;gap:16px;padding:0 0 10px;font-size:15px;font-weight:600;color:var(--color-neutral-800);box-shadow:inset 0 -2px 0 var(--color-text);">
+                  <span>Event</span><span>Stage</span><span>Due</span><span style="text-align:right;">Value</span><span style="text-align:right;">Next step</span>
+                </div>
+                <sc-for list="{{ events }}" as="e" hint-placeholder-count="7">
+                  <div style="display:grid;grid-template-columns:minmax(0,2.2fr) 180px 180px 120px 290px;gap:16px;align-items:center;min-height:64px;box-shadow:inset 0 -1px 0 var(--color-neutral-300);" style-hover="background:var(--color-bg);">
+                    <div style="display:flex;flex-direction:column;line-height:1.3;"><span style="font-size:17px;font-weight:600;">{{ e.name }}</span><span style="font-size:14px;color:var(--color-neutral-700);">{{ e.id }}</span></div>
+                    <div><span class="{{ e.tagCls }}" style="font-size:14px;">{{ e.status }}</span></div>
+                    <span style="font-size:16px;">{{ e.due }}</span>
+                    <span style="font-size:17px;text-align:right;">{{ e.valueTxt }}</span>
+                    <div style="display:flex;justify-content:flex-end;align-items:center;gap:6px;"><sc-if value="{{ e.primary }}"><span class="btn btn-primary" style="font-size:15px;white-space:nowrap;">{{ e.action }}</span></sc-if><sc-if value="{{ e.secondary }}"><span style="font-size:16px;color:var(--color-accent-700);white-space:nowrap;">{{ e.action }} →</span></sc-if><button class="btn btn-ghost btn-icon" title="Clone event"><i class="ph-duotone ph-copy" style="font-size:20px;"></i></button><button class="btn btn-ghost btn-icon" title="More"><i class="ph-duotone ph-dots-three" style="font-size:22px;"></i></button></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-rfq" data-screen-label="02 RFQ" style="display:flex;flex-direction:column;gap:24px;">
+    <div style="display:flex;align-items:baseline;gap:20px;">
+      <span style="font-size:20px;color:var(--color-neutral-700);">02</span>
+      <h2 style="margin:0;font-size:36px;font-weight:600;">RFQ</h2>
+      <span style="font-size:18px;color:var(--color-neutral-800);">Input boxes stay, so it reads as editable · larger boxes and type · co-pilot shows the last 3 messages · rules shrink to one locked row</span>
+    </div>
+    <div style="display:flex;gap:48px;align-items:flex-start;">
+      <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;"><span style="font-size:18px;font-weight:600;color:var(--color-neutral-700);">Before</span><iframe src="Shared Screens.dc.html#rfq" style="width:1440px;height:900px;border:0;display:block;box-shadow:var(--shadow-md);background:var(--color-bg);"></iframe></div>
+      <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;"><span style="font-size:18px;font-weight:600;color:var(--color-accent-700);">After</span>
+        <div style="width:1440px;height:900px;overflow:hidden;background:var(--color-bg);box-shadow:var(--shadow-md);display:flex;font-size:16px;line-height:1.45;font-variant-numeric:tabular-nums;">
+          <nav style="width:84px;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 0;">
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--color-text);color:var(--color-bg);font-size:22px;font-weight:700;border-radius:var(--radius-lg);margin-bottom:18px;">P</div>
+            <sc-for list="{{ railRfq }}" as="r" hint-placeholder-count="5">
+              <sc-if value="{{ r.on }}"><div style="width:68px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;background:var(--color-accent-200);color:var(--color-accent-800);border-radius:var(--radius-lg);font-weight:600;"><i class="ph-duotone {{ r.icon }}" style="font-size:24px;"></i><span style="font-size:13px;">{{ r.label }}</span></div></sc-if>
+              <sc-if value="{{ r.off }}"><div style="width:68px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;color:var(--color-neutral-800);"><i class="ph-duotone {{ r.icon }}" style="font-size:24px;"></i><span style="font-size:13px;">{{ r.label }}</span></div></sc-if>
+            </sc-for>
+          </nav>
+          <div style="width:380px;flex:none;background:var(--color-surface);display:flex;flex-direction:column;">
+            <div style="flex:1;padding:28px 24px;display:flex;flex-direction:column;gap:22px;">
+              <span style="font-size:18px;font-weight:600;">RFQ co-pilot</span>
+              <span style="font-size:15px;color:var(--color-accent-700);">Show 6 earlier messages</span>
+              <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:14px;color:var(--color-neutral-700);">Parakh</span><p style="margin:0;font-size:16px;text-wrap:pretty;">I started from last year’s RFQ. 25 lines carried over; 5 new boxes added from the BOM.</p></div>
+              <div style="align-self:flex-end;max-width:86%;background:var(--color-accent-100);border-radius:var(--radius-lg);padding:12px 14px;display:flex;flex-direction:column;gap:4px;"><span style="font-size:14px;color:var(--color-accent-800);">You</span><p style="margin:0;font-size:16px;">Raise BF to 22 on all 5-ply boxes.</p></div>
+              <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:14px;color:var(--color-neutral-700);">Parakh</span><p style="margin:0;font-size:16px;text-wrap:pretty;">Done. 14 lines changed; they’re marked in the draft.</p></div>
+            </div>
+            <div style="padding:14px 24px 24px;display:flex;gap:8px;align-items:flex-end;">
+              <textarea class="input" style="min-height:60px;font-size:16px;background:var(--color-bg);" placeholder="Tell Parakh what to change"></textarea>
+              <button class="btn btn-primary btn-icon"><i class="ph-duotone ph-paper-plane-right" style="font-size:20px;"></i></button>
+            </div>
+          </div>
+          <main style="flex:1;min-width:0;padding:28px 32px 32px;display:flex;flex-direction:column;gap:18px;overflow:hidden;">
+            <div style="display:flex;align-items:flex-end;gap:12px;">
+              <div style="margin-right:auto;display:flex;flex-direction:column;gap:2px;"><span style="font-size:15px;color:var(--color-neutral-700);">Draft RFQ · saved 2 min ago</span><h1 style="margin:0;font-size:30px;line-height:1.15;font-weight:600;">Corrugated boxes, FY27 H2</h1></div>
+              <button class="btn btn-secondary" style="font-size:16px;white-space:nowrap;">Preview as vendor</button>
+              <button class="btn btn-primary" style="font-size:16px;white-space:nowrap;">Send to 5 vendors</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;">
+              <sc-for list="{{ rfqFacts }}" as="f" hint-placeholder-count="4">
+                <div class="field" style="gap:4px;"><label style="font-size:14px;color:var(--color-neutral-800);">{{ f.t }}</label><input class="input" style="font-size:15px;min-height:42px;" value="{{ f.v }}" onChange="{{ noop }}"></div>
+              </sc-for>
+            </div>
+            <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:16px 20px 18px;display:flex;flex-direction:column;gap:12px;flex:1;min-height:0;overflow:hidden;">
+              <div style="display:flex;gap:24px;align-items:center;">
+                <span style="font-size:17px;font-weight:600;padding:4px 0;box-shadow:inset 0 -3px 0 var(--color-accent);white-space:nowrap;flex:none;">Lines <span style="font-weight:400;color:var(--color-neutral-700);">30</span></span>
+                <span style="font-size:17px;color:var(--color-neutral-800);white-space:nowrap;flex:none;">Quality questions <span style="color:var(--color-neutral-700);">10</span></span>
+                <span style="font-size:17px;color:var(--color-neutral-800);white-space:nowrap;flex:none;">Terms</span>
+                <span style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:15px;color:var(--color-neutral-800);background:var(--color-bg);padding:6px 12px;border-radius:var(--radius-md);white-space:nowrap;flex:none;"><i class="ph-duotone ph-lock-simple-open" style="font-size:18px;"></i>Rules · 14 · lock when sent <span style="color:var(--color-accent-700);">Edit</span></span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="display:grid;grid-template-columns:40px minmax(0,1.5fr) 44px 52px 112px 128px 44px 76px 56px;gap:8px;padding:0 0 8px;font-size:14px;font-weight:600;color:var(--color-neutral-800);box-shadow:inset 0 -2px 0 var(--color-text);">
+                  <span>Line</span><span>Box</span><span>Ply</span><span>Flute</span><span>L×W×H mm</span><span>GSM</span><span>BF</span><span>Print</span><span style="text-align:right;">Qty k</span>
+                </div>
+                <sc-for list="{{ rfqRows }}" as="r" hint-placeholder-count="12">
+                  <div style="display:grid;grid-template-columns:40px minmax(0,1.5fr) 44px 52px 112px 128px 44px 76px 56px;gap:8px;align-items:center;">
+                    <span style="font-size:15px;color:var(--color-neutral-700);">{{ r.id }}</span>
+                    <input class="input" style="min-height:38px;padding:4px 10px;font-size:15px;" value="{{ r.name }}" onChange="{{ noop }}">
+                    <input class="input" style="min-height:38px;padding:4px 8px;font-size:15px;" value="{{ r.ply }}" onChange="{{ noop }}">
+                    <input class="input" style="min-height:38px;padding:4px 8px;font-size:15px;" value="{{ r.flute }}" onChange="{{ noop }}">
+                    <input class="input" style="min-height:38px;padding:4px 8px;font-size:15px;" value="{{ r.dims }}" onChange="{{ noop }}">
+                    <input class="input" style="min-height:38px;padding:4px 8px;font-size:15px;" value="{{ r.gsm }}" onChange="{{ noop }}">
+                    <input class="input" style="min-height:38px;padding:4px 8px;font-size:15px;" value="{{ r.bf }}" onChange="{{ noop }}">
+                    <input class="input" style="min-height:38px;padding:4px 8px;font-size:15px;" value="{{ r.print }}" onChange="{{ noop }}">
+                    <input class="input" style="min-height:38px;padding:4px 8px;font-size:15px;text-align:right;" value="{{ r.qtyK }}" onChange="{{ noop }}">
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-replies" data-screen-label="03 Replies" style="display:flex;flex-direction:column;gap:24px;">
+    <div style="display:flex;align-items:baseline;gap:20px;">
+      <span style="font-size:20px;color:var(--color-neutral-700);">03</span>
+      <h2 style="margin:0;font-size:36px;font-weight:600;">Replies</h2>
+      <span style="font-size:18px;color:var(--color-neutral-800);">Upload from device stays, as one clear bar · 4-line intro becomes 1 line · one row per vendor · coverage as one bar · Open original, See what was read and Read again live kept on each row</span>
+    </div>
+    <div style="display:flex;gap:48px;align-items:flex-start;">
+      <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;"><span style="font-size:18px;font-weight:600;color:var(--color-neutral-700);">Before · live site</span><div style="width:1440px;height:900px;overflow:hidden;box-shadow:var(--shadow-md);background:var(--color-bg);"><img src="assets/live-replies.png" style="width:1440px;display:block;"></div></div>
+      <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;"><span style="font-size:18px;font-weight:600;color:var(--color-accent-700);">After</span>
+        <div style="width:1440px;height:900px;overflow:hidden;background:var(--color-bg);box-shadow:var(--shadow-md);display:flex;font-size:16px;line-height:1.45;font-variant-numeric:tabular-nums;">
+          <nav style="width:84px;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 0;">
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--color-text);color:var(--color-bg);font-size:22px;font-weight:700;border-radius:var(--radius-lg);margin-bottom:18px;">P</div>
+            <sc-for list="{{ railReplies }}" as="r" hint-placeholder-count="5">
+              <sc-if value="{{ r.on }}"><div style="width:68px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;background:var(--color-accent-200);color:var(--color-accent-800);border-radius:var(--radius-lg);font-weight:600;"><i class="ph-duotone {{ r.icon }}" style="font-size:24px;"></i><span style="font-size:13px;">{{ r.label }}</span></div></sc-if>
+              <sc-if value="{{ r.off }}"><div style="width:68px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;color:var(--color-neutral-800);"><i class="ph-duotone {{ r.icon }}" style="font-size:24px;"></i><span style="font-size:13px;">{{ r.label }}</span></div></sc-if>
+            </sc-for>
+          </nav>
+          <main style="flex:1;min-width:0;padding:28px 40px 32px 16px;display:flex;flex-direction:column;gap:18px;overflow:hidden;">
+            <div style="display:flex;align-items:flex-end;gap:18px;">
+              <div style="margin-right:auto;display:flex;flex-direction:column;gap:2px;"><span style="font-size:15px;color:var(--color-neutral-700);">SE-2026-041 · Corrugated boxes, FY27 H2</span><h1 style="margin:0;font-size:32px;line-height:1.15;font-weight:600;">Replies</h1><span style="font-size:16px;color:var(--color-neutral-800);">Read by AI, every number checked by code against the original file.</span></div>
+              <span style="font-size:16px;color:var(--color-accent-700);white-space:nowrap;">How well did Parakh read? Scorecard</span>
+              <button class="btn btn-primary" style="font-size:16px;white-space:nowrap;">Open comparison</button>
+            </div>
+            <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+              <i class="ph-duotone ph-upload-simple" style="font-size:24px;color:var(--color-accent-700);"></i>
+              <span style="font-size:17px;font-weight:600;">Upload a reply</span>
+              <button class="btn btn-secondary" style="font-size:15px;white-space:nowrap;">Choose files</button>
+              <span style="font-size:15px;color:var(--color-neutral-700);">No file chosen</span>
+              <span style="font-size:15px;color:var(--color-neutral-800);margin-left:12px;">From</span>
+              <span style="font-size:15px;padding:7px 12px;background:var(--color-bg);border-radius:var(--radius-md);box-shadow:inset 0 0 0 1px var(--color-neutral-400);display:flex;align-items:center;gap:8px;">Work it out from the file <i class="ph-duotone ph-caret-down"></i></span>
+              <button class="btn btn-primary" style="font-size:15px;white-space:nowrap;" disabled>Read it</button>
+              <span style="font-size:14px;color:var(--color-neutral-700);margin-left:auto;">Up to 4 MB · joins this session’s comparison</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;">
+              <sc-for list="{{ repCards }}" as="k" hint-placeholder-count="3">
+                <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:12px 18px;display:flex;flex-direction:column;gap:0;"><span style="font-size:15px;color:var(--color-neutral-700);">{{ k.t }}</span><span style="font-size:26px;font-weight:600;line-height:1.25;">{{ k.v }}</span><span style="font-size:14px;color:var(--color-neutral-800);">{{ k.s }}</span></div>
+              </sc-for>
+            </div>
+            <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:16px 22px;display:flex;flex-direction:column;">
+              <div style="display:grid;grid-template-columns:minmax(0,1.5fr) 110px 130px minmax(0,1fr) 150px 250px;gap:16px;padding:0 0 10px;font-size:15px;font-weight:600;color:var(--color-neutral-800);box-shadow:inset 0 -2px 0 var(--color-text);">
+                <span>Vendor</span><span>Sent as</span><span>Received</span><span>Lines priced</span><span>Quality</span><span style="text-align:right;">Reply</span>
+              </div>
+              <sc-for list="{{ replies }}" as="v" hint-placeholder-count="5">
+                <div style="display:grid;grid-template-columns:minmax(0,1.5fr) 110px 130px minmax(0,1fr) 150px 250px;gap:16px;align-items:center;min-height:72px;box-shadow:inset 0 -1px 0 var(--color-neutral-300);" style-hover="background:var(--color-bg);">
+                  <div style="display:flex;flex-direction:column;line-height:1.3;"><span style="font-size:17px;font-weight:600;">{{ v.name }}</span><span style="font-size:14px;color:var(--color-neutral-700);">{{ v.city }} · {{ v.contact }}</span></div>
+                  <span style="display:flex;align-items:center;gap:8px;font-size:16px;"><i class="ph-duotone {{ v.icon }}" style="font-size:22px;color:var(--color-neutral-800);"></i>{{ v.fmt }}</span>
+                  <span style="font-size:16px;">{{ v.received }}</span>
+                  <div style="display:flex;flex-direction:column;gap:6px;">
+                    <span style="font-size:16px;"><b>{{ v.coverage }}</b> of 30</span>
+                    <div style="height:6px;background:var(--color-neutral-300);border-radius:3px;overflow:hidden;max-width:200px;"><div style="height:100%;background:var(--color-text);width:{{ v.pct }};"></div></div>
+                  </div>
+                  <div><span class="{{ v.qCls }}" style="font-size:14px;">{{ v.qLabel }}</span></div>
+                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;line-height:1.3;">
+                    <div style="display:flex;gap:14px;"><span style="font-size:15px;color:var(--color-accent-700);">Open original</span><span style="font-size:15px;color:var(--color-accent-700);">See what was read</span></div>
+                    <span style="font-size:14px;color:var(--color-neutral-700);">Saved reading, 9 Oct · <span style="color:var(--color-accent-700);">Read again live</span></span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-compare" data-screen-label="04 Compare" style="display:flex;flex-direction:column;gap:24px;">
+    <div style="display:flex;align-items:baseline;gap:20px;">
+      <span style="font-size:20px;color:var(--color-neutral-700);">04</span>
+      <h2 style="margin:0;font-size:36px;font-weight:600;">Compare</h2>
+      <span style="font-size:18px;color:var(--color-neutral-800);">Built from your calls. Click any price to open its source on the right.</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px 28px;max-width:2928px;">
+      <sc-for list="{{ decided }}" as="d" hint-placeholder-count="12">
+        <span style="display:flex;align-items:center;gap:8px;font-size:16px;"><span class="{{ d.cls }}" style="font-size:13px;">{{ d.call }}</span>{{ d.c }}</span>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:48px;align-items:flex-start;">
+      <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;"><span style="font-size:18px;font-weight:600;color:var(--color-neutral-700);">Before</span><iframe src="Comparison - Ledger.dc.html" style="width:1440px;height:900px;border:0;display:block;box-shadow:var(--shadow-md);background:var(--color-bg);"></iframe></div>
+      <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;"><span style="font-size:18px;font-weight:600;color:var(--color-accent-700);">After</span>
+        <div style="width:1440px;height:900px;overflow:hidden;background:var(--color-bg);box-shadow:var(--shadow-md);display:flex;font-size:15px;line-height:1.45;font-variant-numeric:tabular-nums;">
+          <nav style="width:84px;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 0;">
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--color-text);color:var(--color-bg);font-size:22px;font-weight:700;border-radius:var(--radius-lg);margin-bottom:18px;">P</div>
+            <sc-for list="{{ railCompare }}" as="r" hint-placeholder-count="5">
+              <sc-if value="{{ r.on }}"><div style="width:68px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;background:var(--color-accent-200);color:var(--color-accent-800);border-radius:var(--radius-lg);font-weight:600;"><i class="ph-duotone {{ r.icon }}" style="font-size:24px;"></i><span style="font-size:13px;">{{ r.label }}</span></div></sc-if>
+              <sc-if value="{{ r.off }}"><div style="width:68px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;color:var(--color-neutral-800);"><i class="ph-duotone {{ r.icon }}" style="font-size:24px;"></i><span style="font-size:13px;">{{ r.label }}</span></div></sc-if>
+            </sc-for>
+          </nav>
+          <main style="flex:1;min-width:0;padding:22px 24px 22px 12px;display:flex;flex-direction:column;gap:14px;overflow:hidden;">
+            <div style="display:flex;align-items:flex-end;gap:14px;">
+              <div style="display:flex;flex-direction:column;gap:2px;min-width:0;"><span style="font-size:15px;color:var(--color-neutral-700);">SE-2026-041 · award by 15 Oct</span><h1 style="margin:0;font-size:30px;line-height:1.15;font-weight:600;white-space:nowrap;">Corrugated boxes, FY27 H2</h1></div>
+              <div style="display:flex;gap:22px;align-items:center;padding:0 0 4px 20px;margin-right:auto;">
+                <span style="font-size:17px;font-weight:600;padding:4px 0;box-shadow:inset 0 -3px 0 var(--color-accent);">Compare</span>
+                <span style="font-size:17px;color:var(--color-neutral-800);white-space:nowrap;">Doubts <span style="color:var(--color-accent-2-700);font-weight:600;">{{ dCount }}</span></span>
+              </div>
+              <button class="btn btn-primary" style="font-size:16px;white-space:nowrap;">Freeze for award</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
+              <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:10px 16px;display:flex;flex-direction:column;"><span style="font-size:14px;color:var(--color-neutral-700);">Award total</span><span style="font-size:26px;font-weight:600;line-height:1.2;">{{ cmpTotal }}</span></div>
+              <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:10px 16px;display:flex;flex-direction:column;"><span style="font-size:14px;color:var(--color-neutral-700);">vs last year, same 25 boxes</span><span style="font-size:26px;font-weight:600;line-height:1.2;color:var(--color-accent-800);">{{ cmpLy }}</span></div>
+              <div style="background:var(--color-accent-2-100);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:10px 16px;display:flex;flex-direction:column;"><span style="font-size:14px;color:var(--color-accent-2-800);">Doubts that could change a winner</span><span style="font-size:26px;font-weight:600;line-height:1.2;color:var(--color-accent-2-800);">{{ dCount }} · {{ dStake }}</span></div>
+            </div>
+            <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:14px 18px;display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;overflow:hidden;">
+              <div style="display:flex;gap:8px;align-items:center;">
+                <span style="font-size:15px;padding:6px 12px;background:var(--color-bg);border-radius:var(--radius-md);box-shadow:inset 0 0 0 1px var(--color-neutral-400);display:flex;align-items:center;gap:8px;white-space:nowrap;">Cheapest per line <i class="ph-duotone ph-caret-down"></i></span>
+                <span style="font-size:14px;padding:5px 12px;border-radius:999px;background:var(--color-text);color:var(--color-bg);white-space:nowrap;">All 30</span>
+                <span style="font-size:14px;padding:5px 12px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--color-neutral-400);white-space:nowrap;">Doubts {{ dLines }}</span>
+                <span style="font-size:14px;padding:5px 12px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--color-neutral-400);white-space:nowrap;">Not checked</span>
+                <span style="font-size:14px;padding:5px 8px;color:var(--color-accent-700);display:flex;align-items:center;gap:4px;white-space:nowrap;"><i class="ph-duotone ph-plus"></i>Filter</span>
+                <span style="font-size:14px;padding:5px 10px;display:flex;align-items:center;gap:6px;white-space:nowrap;color:var(--color-neutral-800);"><i class="ph-duotone ph-sort-ascending" style="font-size:17px;"></i>Sort <i class="ph-duotone ph-caret-down"></i></span>
+                <button onClick="{{ toggleLegend }}" style="margin-left:auto;font:inherit;font-size:14px;border:0;background:none;cursor:pointer;color:var(--color-accent-700);display:flex;align-items:center;gap:6px;white-space:nowrap;"><i class="ph-duotone ph-info" style="font-size:17px;"></i>Cell guide <i class="ph-duotone {{ legendCaret }}"></i></button>
+              </div>
+              <sc-if value="{{ legendOpen }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;gap:6px 22px;flex-wrap:wrap;font-size:14px;background:var(--color-bg);padding:8px 12px;border-radius:var(--radius-md);">
+                  <span style="display:flex;gap:8px;align-items:baseline;"><b style="background:var(--color-accent-200);padding:1px 6px;border-radius:var(--radius-sm);">24.60</b>Winner</span>
+                  <span style="display:flex;gap:8px;align-items:baseline;"><b style="background:var(--color-accent-2-100);color:var(--color-accent-2-800);padding:1px 6px;border-radius:var(--radius-sm);">24.60?</b>Winner with a doubt</span>
+                  <span style="display:flex;gap:8px;align-items:baseline;"><span style="text-decoration:underline dotted;text-underline-offset:4px;">24.60</span>Converted to ₹/box</span>
+                  <span style="display:flex;gap:8px;align-items:baseline;"><i>24.60</i>Last year’s price</span>
+                  <span style="display:flex;gap:8px;align-items:baseline;"><span>24.60 ↑</span>Unusual vs should-cost</span>
+                  <span style="display:flex;gap:8px;align-items:baseline;"><span>—</span>Not quoted</span>
+                </div>
+              </sc-if>
+              <div style="display:flex;flex-direction:column;">
+                <div style="display:grid;grid-template-columns:minmax(190px,1.7fr) repeat(5,minmax(0,1fr));gap:8px;padding:0 0 6px;box-shadow:inset 0 -2px 0 var(--color-text);">
+                  <span style="font-size:14px;font-weight:600;color:var(--color-neutral-800);align-self:end;">Line · ₹ per box</span>
+                  <sc-for list="{{ cmpVendors }}" as="v" hint-placeholder-count="5">
+                    <div style="display:flex;flex-direction:column;align-items:flex-end;line-height:1.25;"><span style="font-size:15px;font-weight:600;white-space:nowrap;">{{ v.short }}</span><span style="font-size:13px;color:var(--color-neutral-700);white-space:nowrap;">{{ v.q }}</span></div>
+                  </sc-for>
+                </div>
+                <sc-for list="{{ cmpRows }}" as="r" hint-placeholder-count="14">
+                  <div style="display:grid;grid-template-columns:minmax(190px,1.7fr) repeat(5,minmax(0,1fr));gap:8px;align-items:center;min-height:36px;box-shadow:inset 0 -1px 0 var(--color-neutral-200);" style-hover="background:var(--color-bg);">
+                    <div style="display:flex;gap:8px;align-items:baseline;min-width:0;"><span style="font-size:13px;color:var(--color-neutral-700);">{{ r.id }}</span><span style="font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ r.name }}</span></div>
+                    <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="5">
+                      <div style="text-align:right;"><span onClick="{{ c.pick }}" style="{{ c.s }}">{{ c.t }}</span></div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </main>
+          <aside style="width:400px;flex:none;background:var(--color-surface);display:flex;flex-direction:column;min-height:0;">
+            <div style="display:flex;gap:22px;padding:20px 22px 0;">
+              <sc-if value="{{ isConv }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ toConv }}" style="font:inherit;font-size:16px;font-weight:600;border:0;background:none;cursor:pointer;padding:0 0 8px;box-shadow:inset 0 -3px 0 var(--color-accent);display:flex;align-items:center;gap:6px;color:var(--color-text);"><i class="ph-duotone ph-chats-circle" style="font-size:18px;"></i>Conversation</button>
+                <button onClick="{{ toSrc }}" style="font:inherit;font-size:16px;border:0;background:none;cursor:pointer;padding:0 0 8px;display:flex;align-items:center;gap:6px;color:var(--color-neutral-800);"><i class="ph-duotone ph-file-magnifying-glass" style="font-size:18px;"></i>{{ srcLabel }}</button>
+              </sc-if>
+              <sc-if value="{{ isSrc }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ toConv }}" style="font:inherit;font-size:16px;border:0;background:none;cursor:pointer;padding:0 0 8px;display:flex;align-items:center;gap:6px;color:var(--color-neutral-800);"><i class="ph-duotone ph-chats-circle" style="font-size:18px;"></i>Conversation</button>
+                <button onClick="{{ toSrc }}" style="font:inherit;font-size:16px;font-weight:600;border:0;background:none;cursor:pointer;padding:0 0 8px;box-shadow:inset 0 -3px 0 var(--color-accent);display:flex;align-items:center;gap:6px;color:var(--color-text);"><i class="ph-duotone ph-file-magnifying-glass" style="font-size:18px;"></i>{{ srcLabel }}</button>
+              </sc-if>
+            </div>
+            <sc-if value="{{ isConv }}" hint-placeholder-val="{{ true }}">
+              <div style="flex:1;min-height:0;padding:18px 22px;display:flex;flex-direction:column;gap:16px;overflow:hidden;">
+                <span style="font-size:15px;color:var(--color-accent-700);">Show 4 earlier messages</span>
+                <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:14px;color:var(--color-neutral-700);">Parakh</span><p style="margin:0;font-size:16px;text-wrap:pretty;">All 5 replies are in the table. {{ dCount }} doubts could change a winner.</p></div>
+                <div style="align-self:flex-end;max-width:90%;background:var(--color-accent-100);border-radius:var(--radius-lg);padding:10px 14px;display:flex;flex-direction:column;gap:4px;"><span style="font-size:14px;color:var(--color-accent-800);">You</span><p style="margin:0;font-size:16px;">What if we only use quality-cleared vendors?</p></div>
+                <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:14px;color:var(--color-neutral-700);">Parakh</span><p style="margin:0;font-size:16px;text-wrap:pretty;">The total rises by <b>{{ qualDelta }}</b>, to {{ qualTotal }}. Rohit Box’s and Anand’s lines move to the three cleared vendors.</p><span style="font-size:15px;color:var(--color-accent-700);padding-top:4px;">Show this scenario in the table</span></div>
+              </div>
+              <div style="padding:0 22px 20px;display:flex;flex-direction:column;gap:10px;">
+                <span style="font-size:15px;padding:8px 12px;background:var(--color-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);">Which doubts matter most?</span>
+                <span style="font-size:15px;padding:8px 12px;background:var(--color-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);">Split between two vendors</span>
+                <span style="font-size:15px;padding:8px 12px;background:var(--color-bg);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);">Worst case if doubts go against us</span>
+                <div style="display:flex;gap:8px;align-items:flex-end;"><textarea class="input" style="min-height:52px;font-size:16px;background:var(--color-bg);" placeholder="Ask about prices or scenarios"></textarea><button class="btn btn-primary btn-icon"><i class="ph-duotone ph-paper-plane-right" style="font-size:20px;"></i></button></div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isSrc }}" hint-placeholder-val="{{ false }}">
+              <div style="flex:1;min-height:0;padding:16px 22px 20px;display:flex;flex-direction:column;gap:12px;overflow:auto;">
+                <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:14px;color:var(--color-neutral-700);">{{ selLineId }} · {{ selVendor }}</span><span style="font-size:19px;font-weight:600;line-height:1.25;">{{ selLineName }}</span></div>
+                <dc-import name="SourceDoc" vid="{{ selVid }}" li="{{ selLi }}" hint-size="100%,520px"></dc-import>
+                <div style="display:flex;gap:8px;"><button class="btn btn-secondary" style="font-size:15px;white-space:nowrap;">I’ve checked this</button><button class="btn btn-primary" style="font-size:15px;white-space:nowrap;">Check &amp; open next winner</button></div>
+              </div>
+            </sc-if>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-award" data-screen-label="05 Award" style="display:flex;flex-direction:column;gap:24px;">
+    <div style="display:flex;align-items:baseline;gap:20px;">
+      <span style="font-size:20px;color:var(--color-neutral-700);">05</span>
+      <h2 style="margin:0;font-size:36px;font-weight:600;">Award</h2>
+      <span style="font-size:18px;color:var(--color-neutral-800);">Four key numbers · who gets what, per vendor · line snapshot stays, click a line to trace it on the right · decisions and rule changes collapse</span>
+    </div>
+    <div style="display:flex;gap:48px;align-items:flex-start;">
+      <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;"><span style="font-size:18px;font-weight:600;color:var(--color-neutral-700);">Before</span><iframe src="Shared Screens.dc.html#award" style="width:1440px;height:900px;border:0;display:block;box-shadow:var(--shadow-md);background:var(--color-bg);"></iframe></div>
+      <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;"><span style="font-size:18px;font-weight:600;color:var(--color-accent-700);">After</span>
+        <div style="width:1440px;height:900px;overflow:hidden;background:var(--color-bg);box-shadow:var(--shadow-md);display:flex;font-size:16px;line-height:1.45;font-variant-numeric:tabular-nums;">
+          <nav style="width:84px;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 0;">
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--color-text);color:var(--color-bg);font-size:22px;font-weight:700;border-radius:var(--radius-lg);margin-bottom:18px;">P</div>
+            <sc-for list="{{ railAward }}" as="r" hint-placeholder-count="5">
+              <sc-if value="{{ r.on }}"><div style="width:68px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;background:var(--color-accent-200);color:var(--color-accent-800);border-radius:var(--radius-lg);font-weight:600;"><i class="ph-duotone {{ r.icon }}" style="font-size:24px;"></i><span style="font-size:13px;">{{ r.label }}</span></div></sc-if>
+              <sc-if value="{{ r.off }}"><div style="width:68px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;color:var(--color-neutral-800);"><i class="ph-duotone {{ r.icon }}" style="font-size:24px;"></i><span style="font-size:13px;">{{ r.label }}</span></div></sc-if>
+            </sc-for>
+          </nav>
+          <main style="flex:1;min-width:0;padding:28px 28px 32px 16px;display:flex;flex-direction:column;gap:20px;overflow:hidden;">
+            <div style="display:flex;align-items:flex-end;gap:12px;">
+              <div style="margin-right:auto;display:flex;flex-direction:column;gap:2px;"><span style="font-size:15px;color:var(--color-neutral-700);">Award record · SE-2026-041 · frozen 9 Oct, 16:42</span><h1 style="margin:0;font-size:28px;line-height:1.15;font-weight:600;">Split award to three quality-cleared vendors</h1></div>
+              
+              <button class="btn btn-primary" style="font-size:16px;white-space:nowrap;">Send to Meera for approval</button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;">
+              <sc-for list="{{ awCards }}" as="k" hint-placeholder-count="4">
+                <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:14px 16px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:15px;color:var(--color-neutral-700);">{{ k.t }}</span><span style="font-size:26px;font-weight:600;line-height:1.2;">{{ k.v }}</span><span style="font-size:14px;color:var(--color-neutral-800);">{{ k.s }}</span></div>
+              </sc-for>
+            </div>
+            <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:20px 24px;display:flex;flex-direction:column;gap:6px;">
+              <span style="font-size:20px;font-weight:600;padding-bottom:8px;">Who gets what</span>
+              <div style="display:grid;grid-template-columns:minmax(0,1.5fr) 60px 110px minmax(0,1.2fr) 120px;gap:14px;padding:0 0 10px;font-size:15px;font-weight:600;color:var(--color-neutral-800);box-shadow:inset 0 -2px 0 var(--color-text);">
+                <span>Vendor</span><span style="text-align:right;">Lines</span><span style="text-align:right;">Value</span><span>Share</span><span>Quality</span>
+              </div>
+              <sc-for list="{{ awRows }}" as="r" hint-placeholder-count="3">
+                <div style="display:grid;grid-template-columns:minmax(0,1.5fr) 60px 110px minmax(0,1.2fr) 120px;gap:14px;align-items:center;min-height:50px;box-shadow:inset 0 -1px 0 var(--color-neutral-300);">
+                  <span style="font-size:17px;font-weight:600;">{{ r.name }}</span>
+                  <span style="font-size:17px;text-align:right;">{{ r.lines }}</span>
+                  <span style="font-size:17px;text-align:right;font-weight:600;">{{ r.value }}</span>
+                  <div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;height:8px;background:var(--color-neutral-300);border-radius:4px;overflow:hidden;"><div style="height:100%;background:var(--color-accent);width:{{ r.pct }};"></div></div><span style="font-size:15px;width:44px;text-align:right;">{{ r.pct }}</span></div>
+                  <div><span class="tag tag-accent" style="font-size:14px;">{{ r.q }}</span></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;">
+              <sc-for list="{{ awMore }}" as="m" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:14px;min-height:48px;box-shadow:inset 0 -1px 0 var(--color-neutral-300);" style-hover="background:var(--color-neutral-100);">
+                  <i class="ph-duotone ph-caret-right" style="font-size:18px;color:var(--color-neutral-700);"></i>
+                  <span style="font-size:17px;font-weight:600;">{{ m.t }}</span>
+                  <span style="font-size:15px;color:var(--color-neutral-700);">{{ m.s }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:18px 22px;display:flex;flex-direction:column;">
+              <div style="display:flex;align-items:baseline;gap:12px;padding-bottom:8px;"><span style="font-size:20px;font-weight:600;">Line snapshot</span><span style="font-size:15px;color:var(--color-neutral-700);">30 lines · click one to trace</span></div>
+              <div style="display:grid;grid-template-columns:44px minmax(0,1.5fr) minmax(0,1fr) 72px 96px 120px;gap:12px;padding:0 0 8px;font-size:15px;font-weight:600;color:var(--color-neutral-800);box-shadow:inset 0 -2px 0 var(--color-text);"><span>Line</span><span>Box</span><span>Awarded to</span><span style="text-align:right;">₹/box</span><span style="text-align:right;">Value</span><span>Checked by you</span></div>
+              <sc-for list="{{ snapRows }}" as="r" hint-placeholder-count="6">
+                <sc-if value="{{ r.sel }}"><div style="display:grid;grid-template-columns:44px minmax(0,1.5fr) minmax(0,1fr) 72px 96px 120px;gap:12px;align-items:center;min-height:44px;background:var(--color-accent-100);box-shadow:inset 3px 0 0 var(--color-accent);font-size:16px;margin:0 -8px;padding:0 8px;"><span style="color:var(--color-neutral-700);">{{ r.id }}</span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;">{{ r.name }}</span><span>{{ r.vendor }}</span><span style="text-align:right;">{{ r.p }}</span><span style="text-align:right;">{{ r.value }}</span><span style="font-size:15px;color:var(--color-accent-800);">{{ r.chk }}</span></div></sc-if>
+                <sc-if value="{{ r.unsel }}"><div style="display:grid;grid-template-columns:44px minmax(0,1.5fr) minmax(0,1fr) 72px 96px 120px;gap:12px;align-items:center;min-height:44px;box-shadow:inset 0 -1px 0 var(--color-neutral-200);font-size:16px;" style-hover="background:var(--color-bg);"><span style="color:var(--color-neutral-700);">{{ r.id }}</span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ r.name }}</span><span>{{ r.vendor }}</span><span style="text-align:right;">{{ r.p }}</span><span style="text-align:right;">{{ r.value }}</span><span style="font-size:15px;color:var(--color-neutral-700);">{{ r.chk }}</span></div></sc-if>
+              </sc-for>
+            </div>
+            
+          </main>
+          <aside style="width:440px;flex:none;background:var(--color-surface);padding:24px 22px;display:flex;flex-direction:column;gap:12px;overflow:hidden;">
+            <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:15px;color:var(--color-neutral-700);">Trace</span><span style="font-size:20px;font-weight:600;">{{ trId }} · {{ trName }}</span></div>
+            <dc-import name="SourceDoc" vid="{{ trVid }}" li="{{ trLi }}" hint-size="100%,600px"></dc-import>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-p" data-screen-label="06 Clicking P" style="display:flex;flex-direction:column;gap:24px;">
+    <div style="display:flex;align-items:baseline;gap:20px;">
+      <span style="font-size:20px;color:var(--color-neutral-700);">06</span>
+      <h2 style="margin:0;font-size:36px;font-weight:600;">Clicking P</h2>
+      <span style="font-size:18px;color:var(--color-neutral-800);">Same contents as the live menu. Larger type, sentence-case labels, status as a tag, clearer buyer/VP switch, demo resets kept at the bottom.</span>
+    </div>
+    <div style="display:flex;gap:48px;align-items:flex-start;">
+      <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;"><span style="font-size:18px;font-weight:600;color:var(--color-neutral-700);">Before · live site</span><img src="assets/live-p-menu.png" style="width:440px;display:block;box-shadow:var(--shadow-md);"></div>
+      <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;"><span style="font-size:18px;font-weight:600;color:var(--color-accent-700);">After</span>
+        <div style="width:620px;height:960px;overflow:hidden;background:var(--color-bg);box-shadow:var(--shadow-md);display:flex;font-size:16px;line-height:1.45;position:relative;">
+          <nav style="width:84px;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 0;">
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:var(--color-accent);color:var(--color-bg);font-size:22px;font-weight:700;border-radius:var(--radius-lg);margin-bottom:18px;box-shadow:0 0 0 3px var(--color-accent-200);">P</div>
+            <sc-for list="{{ railCompare }}" as="r" hint-placeholder-count="5">
+              <div style="width:68px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 0;color:var(--color-neutral-600);"><i class="ph-duotone {{ r.icon }}" style="font-size:24px;"></i><span style="font-size:13px;">{{ r.label }}</span></div>
+            </sc-for>
+          </nav>
+          <div style="position:absolute;left:92px;top:18px;width:420px;background:var(--color-neutral-100);box-shadow:var(--shadow-lg);border-radius:var(--radius-lg);padding:22px 24px;display:flex;flex-direction:column;gap:22px;">
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <span style="font-size:14px;font-weight:600;color:var(--color-neutral-800);">Current event</span>
+              <span style="font-size:21px;font-weight:600;line-height:1.25;">Corrugated boxes, FY27 H2</span>
+              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;"><span class="tag tag-accent" style="font-size:14px;">Comparing</span><span style="font-size:15px;color:var(--color-neutral-800);">SE-2026-041 · replies closed 3 Oct</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:2px;">
+              <span style="font-size:14px;font-weight:600;color:var(--color-neutral-800);padding-bottom:4px;">Switch event</span>
+              <sc-for list="{{ menuEvents }}" as="e" hint-placeholder-count="3">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 10px;margin:0 -10px;border-radius:var(--radius-md);" style-hover="background:var(--color-accent-100);">
+                  <div style="display:flex;flex-direction:column;line-height:1.3;"><span style="font-size:17px;">{{ e.name }}</span><span style="font-size:14px;color:var(--color-neutral-700);">{{ e.id }}</span></div>
+                  <span class="tag tag-neutral" style="font-size:13px;white-space:nowrap;">{{ e.status }}</span>
+                </div>
+              </sc-for>
+              <span style="font-size:16px;color:var(--color-accent-700);padding-top:6px;">All events →</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:14px;font-weight:600;color:var(--color-neutral-800);">Signed in as</span>
+              <div style="display:flex;flex-direction:column;line-height:1.3;"><span style="font-size:17px;font-weight:600;">Vikram Deshpande</span><span style="font-size:15px;color:var(--color-neutral-800);">Category Buyer, Packaging · Sahyadri Appliances</span></div>
+              <span style="font-size:14px;color:var(--color-neutral-700);padding-top:4px;">Demo: view as</span>
+              <div style="display:grid;grid-template-columns:1fr 1fr;background:var(--color-bg);border-radius:var(--radius-md);padding:3px;box-shadow:inset 0 0 0 1px var(--color-neutral-300);">
+                <span style="font-size:16px;text-align:center;padding:9px;background:var(--color-accent);color:var(--color-bg);border-radius:var(--radius-sm);font-weight:600;">Vikram · buyer</span>
+                <span style="font-size:16px;text-align:center;padding:9px;">Meera · VP</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:2px;box-shadow:inset 0 1px 0 var(--color-neutral-300);padding-top:12px;">
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;margin:0 -10px;font-size:17px;color:var(--color-accent-700);border-radius:var(--radius-md);" style-hover="background:var(--color-accent-100);"><i class="ph-duotone ph-scales" style="font-size:22px;"></i>Evaluation rules for this event</div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;margin:0 -10px;font-size:17px;color:var(--color-accent-700);border-radius:var(--radius-md);" style-hover="background:var(--color-accent-100);"><i class="ph-duotone ph-sign-out" style="font-size:22px;"></i>Sign out</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;background:var(--color-bg);border-radius:var(--radius-md);padding:12px 14px;">
+              <span style="font-size:14px;font-weight:600;color:var(--color-neutral-800);">Reset demo</span>
+              <div style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:16px;color:var(--color-accent-700);"><i class="ph-duotone ph-arrow-counter-clockwise" style="font-size:20px;"></i>Start empty: RFQ, upload, compare</div>
+              <div style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:16px;color:var(--color-accent-700);"><i class="ph-duotone ph-arrow-counter-clockwise" style="font-size:20px;"></i>Back to the full demo (five replies read)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { legendOpen: true, pane: 'conv', sel: null };
+  componentDidMount() {
+    if (!window.KD) { this._f = () => this.forceUpdate(); window.addEventListener('kd-ready', this._f); this._t = setInterval(() => { if (window.KD) { clearInterval(this._t); this.forceUpdate(); } }, 150); }
+  }
+  componentWillUnmount() { window.removeEventListener('kd-ready', this._f); clearInterval(this._t); }
+  rail(active) {
+    return [['ph-tray', 'Events'], ['ph-note-pencil', 'RFQ'], ['ph-envelope-open', 'Replies'], ['ph-table', 'Compare'], ['ph-seal-check', 'Award']]
+      .map(([icon, label]) => ({ icon, label, on: label === active, off: label !== active }));
+  }
+  renderVals() {
+    const K = window.KD, S = this.state;
+    const base = {
+      railEvents: this.rail('Events'), railRfq: this.rail('RFQ'), railReplies: this.rail('Replies'), railCompare: this.rail('Compare'), railAward: this.rail('Award'),
+      legendOpen: S.legendOpen, legendCaret: S.legendOpen ? 'ph-caret-up' : 'ph-caret-down',
+      toggleLegend: () => this.setState({ legendOpen: !S.legendOpen }),
+      menuEvents: [{ name: 'BOPP tape & stretch film', id: 'SE-2026-044', status: 'Collecting replies' }, { name: 'Moulded pulp trays', id: 'SE-2026-038', status: 'Awaiting approval' }, { name: 'Corrugated boxes, FY26 H2', id: 'SE-2025-037', status: 'Awarded' }],
+      noop: () => {},
+      flow: [
+        ['Sign in', 'Company sign-in, no password.', null],
+        ['Events', 'See what needs you; open or clone an event.', '#s-events'],
+        ['RFQ', 'Talk the RFQ into shape, edit lines, send.', '#s-rfq'],
+        ['Replies', 'Upload replies, check each one was read right.', '#s-replies'],
+        ['Compare', 'Compare prices, clear doubts, try scenarios.', '#s-compare'],
+        ['Award', 'Freeze, trace any line, send for approval.', '#s-award']
+      ].map(([t, d, href, hold], k, a) => ({ n: 'Step ' + (k + 1), t, d, href: href || '#flow', hold: !!hold, arrow: k < a.length - 1 })),
+      decided: [
+        ['Do', 'Header: bigger title, tabs beside it'], ['Do', 'Three key-number cards'], ['Do', 'Scenario by name only'], ['Do', 'Filter chips + “+ Filter”, Sort stays visible'],
+        ['Do', 'Quality score under vendor'], ['Do', 'Winner: pale fill + bold'], ['Skip', 'Fade losing prices'], ['Skip', 'Grey out uncleared vendors'],
+        ['Do', 'Table text 15px'], ['Do', 'Raised sheet'], ['Do', 'Chat: last 3 messages, 3 suggestions'], ['Keep', 'Cell guide, Conversation + Source panel']
+      ].map(([call, c]) => ({ call, c, cls: call === 'Do' ? 'tag tag-accent' : call === 'Skip' ? 'tag tag-outline' : 'tag tag-neutral' }))
+    };
+    if (!K) return base;
+    const money = x => x == null ? '—' : x >= 1e7 ? K.crore(x) : K.lakh(x);
+    const signed = x => (x < 0 ? '−' : '+') + money(Math.abs(x));
+
+    const act = { 'Comparing': [`Review ${K.doubts.length} doubts`, true], 'Collecting replies': ['Chase 3 vendors', false], 'Drafting': ['Finish RFQ', false], 'Awaiting approval': ['Remind Meera', false], 'Awarded': ['View record', false], 'Closed': ['View', false] };
+    const tagC = { 'Comparing': 'tag tag-accent', 'Collecting replies': 'tag tag-neutral', 'Drafting': 'tag tag-outline', 'Awaiting approval': 'tag tag-neutral', 'Awarded': 'tag tag-outline', 'Closed': 'tag tag-outline' };
+    const events = K.events.map(e => ({ id: e.id, name: e.name.replace(' · ', ', '), status: e.status, tagCls: tagC[e.status], due: e.due, valueTxt: money(e.value), action: act[e.status][0], primary: act[e.status][1], secondary: !act[e.status][1] }));
+    const open = K.events.filter(e => ['Comparing', 'Collecting replies', 'Drafting', 'Awaiting approval'].includes(e.status));
+    const evCards = [
+      { t: 'Need you this week', v: '3 events', s: 'Corrugated boxes due first, 15 Oct' },
+      { t: 'Open value', v: money(open.reduce((s, e) => s + (e.value || 0), 0)), s: `${open.length} events in progress` },
+      { t: 'Next deadline', v: '12 Oct', s: 'Send EPS foam inserts RFQ' }
+    ];
+    const cnt = st => K.events.filter(e => e.status === st).length;
+    const evChips = [['All', K.events.length, true], ['Comparing', cnt('Comparing')], ['Collecting', cnt('Collecting replies')], ['Drafting', cnt('Drafting')], ['Awaiting approval', cnt('Awaiting approval')], ['Awarded', cnt('Awarded')]]
+      .map(([t, n, on]) => ({ t, n, on: !!on, off: !on }));
+
+    const rfqFacts = [{ t: 'Deliver to', v: 'Chakan plant, Pune 410501' }, { t: 'Replies due', v: '7 Oct, 18:00' }, { t: 'Price basis', v: '₹ per box, delivered, ex-GST' }, { t: 'Contract', v: 'Oct 2026 – Mar 2027' }];
+    const rfqRows = K.lines.slice(0, 12).map(l => ({ id: l.id, name: l.name, ply: l.ply, flute: l.flute, dims: l.dims, gsm: l.gsm, bf: l.bf, print: l.print, qtyK: l.qtyK }));
+
+    const totalQ = K.vendors.reduce((s, v) => s + v.coverage, 0);
+    const repCards = [
+      { t: 'Replied', v: `${K.vendors.length} of ${K.vendors.length}`, s: 'Last reply 7 Oct, 20:12' },
+      { t: 'Prices read', v: `${totalQ} of ${K.vendors.length * 30}`, s: 'Anand left 3 lines blank' },
+      { t: 'Need you', v: '2 vendors', s: 'Rohit Box questionnaire · Anand quality' }
+    ];
+    const replies = K.vendors.map(v => {
+      const next = !v.q.returned ? 'Chase questionnaire' : !v.q.cleared ? 'See quality gaps' : null;
+      return { name: v.name, city: v.city, contact: v.contact, fmt: v.fmt, icon: v.icon, received: v.received, coverage: v.coverage, pct: Math.round(v.coverage / 30 * 100) + '%',
+        qLabel: !v.q.returned ? 'Not returned' : `${v.q.score} · ${v.q.cleared ? 'cleared' : 'not cleared'}`,
+        qCls: !v.q.returned ? 'tag tag-outline' : v.q.cleared ? 'tag tag-accent' : 'tag tag-neutral', next, act: !!next, ok: !next };
+    });
+
+    const per = K.baseline.per;
+    const cmpVendors = K.vendors.map(v => ({ short: v.short, q: v.q.returned ? `${v.q.score} · ${v.q.cleared ? 'cleared' : 'not cleared'}` : 'quality not returned' }));
+    const sel = this.state.sel || { vid: per[0].vid, li: 0 };
+    const cmpRows = K.lines.slice(0, 15).map(l => ({
+      id: l.id, name: l.name,
+      cells: K.vendors.map(v => {
+        const c = K.cells[v.id][l.i];
+        if (!c || c.p == null) return { t: '—', s: { fontSize: 15, color: 'var(--color-neutral-700)' }, pick: () => {} };
+        const win = per[l.i].vid === v.id, doubt = c.kind === 'doubt';
+        const s = { fontSize: 15, whiteSpace: 'nowrap', color: 'var(--color-text)', cursor: 'pointer', padding: '2px 6px', borderRadius: 'var(--radius-sm)' };
+        if (c.kind === 'conv') { s.textDecoration = 'underline dotted'; s.textUnderlineOffset = 4; }
+        if (c.ly) s.fontStyle = 'italic';
+        if (win) Object.assign(s, { fontWeight: 700, background: doubt ? 'var(--color-accent-2-100)' : 'var(--color-accent-200)', color: doubt ? 'var(--color-accent-2-800)' : 'var(--color-text)' });
+        if (this.state.pane === 'src' && sel.vid === v.id && sel.li === l.i) s.boxShadow = '0 0 0 2px var(--color-accent)';
+        const arrow = c.oor ? (c.dev > 0 ? ' ↑' : ' ↓') : '';
+        return { t: K.num(c.p) + (win && doubt ? '?' : '') + arrow, s, pick: () => this.setState({ sel: { vid: v.id, li: l.i }, pane: 'src' }) };
+      })
+    }));
+    const selInfo = { selVid: sel.vid, selLi: sel.li, selLineId: K.lines[sel.li].id, selLineName: K.lines[sel.li].name, selVendor: K.VI[sel.vid].short,
+      srcLabel: 'Source · ' + K.lines[sel.li].id + ' ' + K.VI[sel.vid].short,
+      isConv: this.state.pane === 'conv', isSrc: this.state.pane === 'src', toConv: () => this.setState({ pane: 'conv' }), toSrc: () => this.setState({ pane: 'src' }) };
+    let lyT = 0, curT = 0; K.lines.forEach(l => { if (l.lyPrice != null) { lyT += l.lyPrice * l.qty; curT += per[l.i].p * l.qty; } });
+    const dLines = new Set(); K.doubts.forEach(d => d.lines.forEach(i => dLines.add(i)));
+
+    const Q = K.qual, qBy = K.vendors.filter(v => Q.by[v.id].lines > 0);
+    let lyQ = 0, curQ = 0; K.lines.forEach(l => { if (l.lyPrice != null) { lyQ += l.lyPrice * l.qty; curQ += Q.per[l.i].p * l.qty; } });
+    const awCards = [
+      { t: 'Award total', v: money(Q.total), s: '30 lines · 3 vendors' },
+      { t: 'vs last year', v: signed(curQ - lyQ), s: 'Same 25 boxes' },
+      { t: 'Cost of quality rule', v: signed(Q.total - K.baseline.total), s: 'vs cheapest from all vendors' },
+      { t: 'Prices you checked', v: '3 of 30', s: 'Recorded with time' }
+    ];
+    const awRows = qBy.map(v => ({ name: v.name, lines: Q.by[v.id].lines, value: money(Q.by[v.id].value), pct: Math.round(Q.by[v.id].value / Q.total * 100) + '%', q: `${v.q.score} · cleared` }));
+    const awMore = [
+            { t: 'Decisions on record', s: `${K.doubts.length} doubts resolved` },
+      { t: 'Rule changes after sending', s: '1 change, logged' }
+    ];
+
+    return Object.assign(base, selInfo, {
+      events, evCards, evChips, rfqFacts, rfqRows, repCards, replies,
+      cmpVendors, cmpRows, cmpTotal: money(K.baseline.total), cmpLy: signed(curT - lyT),
+      dCount: K.doubts.length, dStake: K.lakh(K.totalStake), dLines: dLines.size,
+      qualDelta: money(Q.total - K.baseline.total), qualTotal: money(Q.total),
+      awCards, awRows, awMore,
+      snapRows: K.lines.slice(0, 5).map((l, k) => { const p = Q.per[l.i], v = K.VI[p.vid]; return { id: l.id, name: l.name, vendor: v.short, p: K.num(p.p), value: money(p.p * l.qty), chk: k < 3 ? '✓ 9 Oct' : '—', sel: k === 0, unsel: k !== 0 }; }),
+      trVid: Q.per[0].vid, trLi: 0, trId: K.lines[0].id, trName: K.lines[0].name
+    });
+  }
+}
+</script>
+</body>
+</html>

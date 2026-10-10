@@ -31,7 +31,7 @@
         <div style="display:flex; flex-direction:column; gap:6px;"><h1 style="font-size:40px; line-height:1.1; margin:0;">Sign in</h1><p style="margin:0; font-size:16px; color:var(--color-neutral-800);">Your sourcing workspace at Sahyadri Appliances.</p></div>
         <div class="field"><label>Work email</label><input class="input" value="vikram.deshpande@sahyadri-appliances.in" onChange="{{ noop }}"></div>
         <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-start;"><a class="btn btn-primary" href="Comparison - Ledger.dc.html" style="color:var(--color-bg); white-space:nowrap; flex:none;">Continue with company sign-in</a><span style="font-size:12px; color:var(--color-neutral-700);">Single sign-on · no separate password</span></div>
-        <span style="font-size:12px; color:var(--color-neutral-700);">You’ve been signed out. Your checks, scenarios and draft emails are saved with the event.</span>
+        <span style="font-size:12px; color:var(--color-neutral-700);">You’ve been signed out. Your work is saved.</span>
       </div>
     </sc-if>
     <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
@@ -123,15 +123,15 @@
             <div style="display:flex; flex-direction:column; gap:26px; max-width:1040px;">
               <div style="display:flex; align-items:center; gap:10px; color:var(--color-neutral-800);">
                 <i class="ph-duotone ph-lock-simple-open" style="font-size:18px; color:var(--color-neutral-700);"></i>
-                <span>How replies will be read, converted, checked and scored. Rules lock when you send; changes after that need a reason and are shown to the VP. <strong>Shared</strong> rules go to vendors with the RFQ; <strong>internal</strong> ones never do.</span>
+                <span>Rules lock when you send. <strong>Shared</strong> rules go to vendors.</span>
               </div>
               <div style="display:flex; flex-direction:column; gap:8px; background:var(--color-surface); padding:14px 16px;">
-                <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-accent-700);">Write or change a rule in plain words</span>
+                <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-accent-700);">Add a rule in plain words</span>
                 <div style="display:flex; gap:8px;">
-                  <input class="input" style="background:var(--color-bg);" placeholder="e.g. Treat any price more than 15% under should-cost as a doubt">
+                  <input class="input" style="background:var(--color-bg);" placeholder="e.g. Flag prices 15% under should-cost">
                   <button class="btn btn-primary" style="white-space:nowrap;"><i class="ph-duotone ph-sparkle" style="font-size:16px;"></i>Draft rule</button>
                 </div>
-                <span style="font-size:12px; color:var(--color-neutral-700);">Parakh drafts the rule; code runs it. You see the rule and its effect before it applies.</span>
+                <span style="font-size:12px; color:var(--color-neutral-700);">You’ll see the effect before it applies.</span>
               </div>
 
               <sc-for list="{{ ruleSecs }}" as="sec" hint-placeholder-count="5">
@@ -157,7 +157,7 @@
                     <div style="display:flex; gap:28px; align-items:center; padding-top:8px; flex-wrap:wrap;">
                       <span><span style="font-weight:600;">100</span> points in total</span>
                       <span style="display:flex; align-items:center; gap:8px;">Pass mark <input class="input" style="width:64px; min-height:30px; padding:3px 8px; text-align:right;" value="70" onChange="{{ noop }}"></span>
-                      <span style="color:var(--color-neutral-800);">Cleared = both mandatory items pass <em>and</em> score ≥ pass mark. Not returned = not cleared.</span>
+                      <span style="color:var(--color-neutral-800);">Cleared = mandatory items + pass mark.</span>
                     </div>
                   </sc-if>
                   <sc-for list="{{ sec.rules }}" as="r" hint-placeholder-count="3">
@@ -189,7 +189,7 @@
       <div style="padding:18px 40px 40px 8px; display:flex; flex-direction:column; gap:8px; max-width:1180px;">
         <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">SE-2026-041 · Corrugated boxes, FY27 H2</span>
         <h1 style="font-size:26px; margin:0;">Replies</h1>
-        <p style="margin:0 0 14px; color:var(--color-neutral-800); max-width:760px;">Five replies, five shapes. Each one is read twice by independent models; prices that disagree, or that could change a winner, are raised as doubts.</p>
+        
         <sc-for list="{{ resp }}" as="v" hint-placeholder-count="5">
           <div style="display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr); gap:28px; padding:16px 0 20px; border-top:1px solid var(--color-divider);">
             <div style="display:flex; flex-direction:column; gap:4px;">
@@ -224,7 +224,7 @@
         <div style="flex:1; min-width:0; padding:18px 32px 40px 8px; display:flex; flex-direction:column; gap:22px;">
           <div style="display:flex; align-items:flex-end; gap:14px;">
             <div style="margin-right:auto; display:flex; flex-direction:column; gap:2px;">
-              <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Award record · SE-2026-041 · for approval by Anita Kulkarni, VP Supply Chain</span>
+              <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">Award record · SE-2026-041</span>
               <h1 style="font-size:26px; margin:0;">Split award to three quality-cleared vendors</h1>
             </div>
             <a class="btn btn-secondary" href="Comparison - Ledger.dc.html#analyst" style="white-space:nowrap;">Ask a what-if</a>
@@ -244,7 +244,7 @@
             </sc-for>
           </div>
           <div style="display:flex; flex-direction:column; gap:6px;">
-            <div style="display:flex; align-items:baseline; gap:12px;"><h3 style="font-size:20px; margin:0;">Snapshot at decision</h3><span style="display:flex; align-items:center; gap:5px; color:var(--color-neutral-700);"><i class="ph-duotone ph-lock-simple"></i>Frozen 9 Oct 2026, 16:42 · snapshot 7c41e9 · later revisions will not change these numbers</span></div>
+            <div style="display:flex; align-items:baseline; gap:12px;"><h3 style="font-size:20px; margin:0;">Snapshot at decision</h3><span style="display:flex; align-items:center; gap:5px; color:var(--color-neutral-700);"><i class="ph-duotone ph-lock-simple"></i>Frozen 9 Oct, 16:42 · 7c41e9</span></div>
             <table class="table" style="font-size:13px;">
               <thead><tr><th>Line</th><th>Box</th><th>Awarded to</th><th style="text-align:right;">₹/box</th><th style="text-align:right;">Qty</th><th style="text-align:right;">Value</th><th>Source</th><th>Checked by you</th></tr></thead>
               <tbody>
@@ -287,14 +287,14 @@ class Component extends DCLogic {
     const statuses = ['All', 'Drafting', 'Collecting replies', 'Comparing', 'Awaiting approval', 'Awarded', 'Closed'];
     const tabs = statuses.map(s => ({ label: s, n: s === 'All' ? K.events.length : K.events.filter(e => e.status === s).length, go: () => this.setState({ tab: s }), s: tabS(S.tab === s) }));
     const tagFor = s => s === 'Comparing' ? 'tag tag-accent' : s === 'Awaiting approval' ? 'tag tag-accent-2' : s === 'Awarded' ? 'tag tag-outline' : 'tag tag-neutral';
-    const events = K.events.filter(e => S.tab === 'All' || e.status === S.tab).map(e => ({ ...e, tagCls: tagFor(e.status), valueTxt: e.value ? K.crore(e.value) : '—', href: e.current ? 'Comparison - Ledger.dc.html' : '#', action: e.current ? 'Open' : e.status === 'Drafting' ? 'Continue' : 'View', pastNote: e.past ? 'Source for “same as last year” in SE-2026-041' : '' }));
-    const rfqChat = [['Vikram', 'Same boxes as last year’s H2 event, plus the five new SKUs for the juicer and tower fan launch. Make the exhaust fan carton 5-ply — we had crushing complaints.'],
-      ['Parakh', 'Drafted 30 lines: 25 carried over from SE-2025-037, 5 new from the PLM bill of materials. L14 is now 5-ply BC, 180/120/150/120/180 GSM, BF 22. Quantities are from the H2 forecast.'],
-      ['Parakh', 'Two things to check: L28 has no artwork yet, so I set it to 2-colour. L30 is 1 lakh pieces, three times last year.'],
-      ['Vikram', 'L30 is right, warranty sleeves now ship with every SKU. Add a quality questionnaire — ISO and a recent test report are mandatory.'],
-      ['Parakh', 'Added 10 questions, 2 of them mandatory. Vendors can answer in any format; I’ll read whatever comes back.'],
+    const events = K.events.filter(e => S.tab === 'All' || e.status === S.tab).map(e => ({ ...e, tagCls: tagFor(e.status), valueTxt: e.value ? K.crore(e.value) : '—', href: e.current ? 'Comparison - Ledger.dc.html' : '#', action: e.current ? 'Open' : e.status === 'Drafting' ? 'Continue' : 'View', pastNote: e.past ? 'Used for “same as last year”' : '' }));
+    const rfqChat = [['Vikram', 'Same boxes as last year, plus 5 new SKUs. Make the exhaust fan carton 5-ply.'],
+      ['Parakh', 'Drafted 30 lines: 25 from last year, 5 new. L14 is now 5-ply.'],
+      ['Parakh', 'Check: L28 has no artwork (set to 2-colour). L30 is 3× last year.'],
+      ['Vikram', 'L30 is right. Add a quality questionnaire; ISO and test report mandatory.'],
+      ['Parakh', 'Added 10 questions, 2 mandatory.'],
       ['Vikram', 'Score rejection rate out of 15 — full marks at 0.5% or less.'],
-      ['Parakh', 'Done, in Evaluation rules → Q8. Total is still 100 (I took 5 points off the account-manager question). Scored against last year’s four vendors: 95, 88, 76 and 61 — the same two would clear.']].map(m => { const u = m[0] === 'Vikram';
+      ['Parakh', 'Done — see Evaluation rules, Q8. Still 100 points.']].map(m => { const u = m[0] === 'Vikram';
         return { who: m[0], text: m[1], s: { display: 'flex', flexDirection: 'column', gap: 3, alignItems: u ? 'flex-end' : 'flex-start', paddingLeft: u ? 40 : 0 }, ws: { fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', color: u ? 'var(--color-neutral-700)' : 'var(--color-accent-700)' }, ps: { margin: 0, fontSize: 14, fontStyle: u ? 'italic' : 'normal', textAlign: u ? 'right' : 'left', textWrap: 'pretty' } }; });
     const rfqRows = K.lines.map(l => { const ch = l.i === 13; return { id: l.id, tag: ch ? 'changed by chat' : l.i >= 25 ? 'new SKU' : '', name: l.name, ply: l.ply, flute: l.flute, dims: l.dims, gsm: l.gsm, bf: l.bf, print: l.print, qtyK: l.qtyK,
       plyS: { minHeight: 30, padding: '3px 8px', fontSize: 13, background: ch ? 'var(--color-accent-100)' : undefined, borderColor: ch ? 'var(--color-accent)' : undefined },
@@ -307,33 +307,33 @@ class Component extends DCLogic {
       s: { display: 'grid', gridTemplateColumns: '30px minmax(0,1.3fr) 120px minmax(0,1.6fr) 70px', gap: '0 12px', alignItems: 'center', padding: '5px 0', borderBottom: '1px solid color-mix(in srgb, var(--color-text) 8%, transparent)', background: k === 7 || k === 9 ? 'var(--color-accent-100)' : 'transparent' } }));
     const rr = (name, how, val, used, locked) => ({ name, how, val, used, editable: !locked, locked: !!locked });
     const ruleSecs = [
-      { title: 'Quality score', tag: 'Shared with vendors', tagCls: 'tag tag-accent', note: 'Sent with the questionnaire, so every vendor knows how they will be marked.', isQuality: true, rules: [] },
-      { title: 'Price basis', tag: 'Shared with vendors', tagCls: 'tag tag-accent', note: 'Every reply is brought onto this basis before comparing.', isQuality: false, rules: [
-        rr('Unit and currency', 'What every price in the comparison means.', '₹ per box', 'all 150 prices'),
-        rr('Delivery and tax', 'Freight included; GST shown separately.', 'Delivered Chakan · GST 18% extra', 'all 150 prices') ] },
-      { title: 'Conversions', tag: 'Internal', tagCls: 'tag tag-neutral', note: 'Applied by code when a reply ignores the basis. Every converted price shows its sum.', isQuality: false, rules: [
-        rr('Foreign currency', 'Rate is looked up, never read from the vendor’s document. Conditional discounts are raised as doubts.', 'RBI reference rate on the reply date', '30 prices · Vardhman'),
-        rr('Per 100 / per 1,000 pieces', 'Divide down; add freight quoted in the same unit.', '(price + freight) ÷ pack size', '30 prices · Kaveri'),
-        rr('Per kg', 'Board weight from blank area × GSM, with flute take-up B 1.32 · C 1.45 · E 1.25.', 'weight × rate + print + freight', '30 prices · Rohit Box'),
-        rr('“Freight extra”', 'Estimate, then raise as a doubt if it could change a winner.', 'Last year’s lane average, ₹ per box', '30 prices · Rohit Box'),
-        rr('“Same as last year”', 'Take the price from the last awarded event; new SKUs use the nearest spec and are flagged.', 'SE-2025-037 (Oct 2025)', '25 prices · Rohit Box') ] },
-      { title: 'Should-cost', tag: 'Internal · never sent', tagCls: 'tag tag-neutral', note: 'A sanity check, not a target. Prices outside the band get an ↑ or ↓.', isQuality: false, rules: [
-        rr('Board rate', 'Kraft board, landed, per kg.', '3-ply ₹41/kg · 5-ply ₹44/kg', 'all 30 lines'),
-        rr('Print add-on', 'Per box, by colours.', 'Plain 0 · 1-col ₹0.35 · 2-col ₹0.60 · 4-col ₹1.40', '24 lines'),
-        rr('Band', 'How far a price may sit from should-cost before it is marked unusual.', '± 12%', '9 prices outside today') ] },
-      { title: 'Doubts', tag: 'Company default', tagCls: 'tag tag-outline', note: 'Set by procurement for every event. Read-only here.', isQuality: false, rules: [
-        rr('When to interrupt', 'Raise a doubt only if it could change who wins a line; log the rest.', 'Could change a winner', '5 raised · 19 logged', true),
-        rr('Rupees at stake', 'Used to rank the doubt queue.', 'quantity × (worst case − as read)', '5 doubts', true),
-        rr('Two reads disagree', 'Each document is read twice, independently.', 'Raise as doubt, route to vendor', '1 doubt', true),
+      { title: 'Quality score', tag: 'Shared with vendors', tagCls: 'tag tag-accent', note: 'Sent to vendors.', isQuality: true, rules: [] },
+      { title: 'Price basis', tag: 'Shared with vendors', tagCls: 'tag tag-accent', note: '', isQuality: false, rules: [
+        rr('Unit and currency', '', '₹ per box', 'all 150 prices'),
+        rr('Delivery and tax', '', 'Delivered Chakan · GST 18% extra', 'all 150 prices') ] },
+      { title: 'Conversions', tag: 'Internal', tagCls: 'tag tag-neutral', note: 'Run by code.', isQuality: false, rules: [
+        rr('Foreign currency', 'Looked up, never taken from the quote.', 'RBI reference rate on the reply date', '30 prices · Vardhman'),
+        rr('Per 100 / per 1,000 pieces', '', '(price + freight) ÷ pack size', '30 prices · Kaveri'),
+        rr('Per kg', 'Weight from blank size × GSM.', 'weight × rate + print + freight', '30 prices · Rohit Box'),
+        rr('“Freight extra”', 'Estimated, then flagged.', 'Last year’s lane average, ₹ per box', '30 prices · Rohit Box'),
+        rr('“Same as last year”', 'New SKUs use nearest spec.', 'SE-2025-037 (Oct 2025)', '25 prices · Rohit Box') ] },
+      { title: 'Should-cost', tag: 'Internal · never sent', tagCls: 'tag tag-neutral', note: 'A sanity check, not a target.', isQuality: false, rules: [
+        rr('Board rate', '', '3-ply ₹41/kg · 5-ply ₹44/kg', 'all 30 lines'),
+        rr('Print add-on', '', 'Plain 0 · 1-col ₹0.35 · 2-col ₹0.60 · 4-col ₹1.40', '24 lines'),
+        rr('Band', '', '± 12%', '9 prices outside today') ] },
+      { title: 'Doubts', tag: 'Company default', tagCls: 'tag tag-outline', note: 'Read-only.', isQuality: false, rules: [
+        rr('When to interrupt', '', 'Could change a winner', '5 raised · 19 logged', true),
+        rr('Rupees at stake', '', 'quantity × (worst case − as read)', '5 doubts', true),
+        rr('Two reads disagree', '', 'Raise as doubt, route to vendor', '1 doubt', true),
         rr('Spec does not match', 'e.g. 3-ply offered where 5-ply was asked.', 'Raise as doubt, route to you', '1 doubt', true) ] }
     ];
     const qRows = K.questions.map((q, k) => ({ n: k + 1, t: q[0], mand: q[1] ? 'Mandatory' : 'Scored', ev: k < 2 ? 'Attach document' : 'Free answer' }));
     const resp = K.vendors.map(v => { const miss = K.cells[v.id].filter(c => c.p == null).map(c => K.lines[c.i].id); const dbl = K.doubts.filter(d => d.vid === v.id);
-      const conv = { SB: 'No conversion. Matched their item names to our 30 lines by size, ply and BF.', VP: 'USD → ₹ at RBI reference ₹88.20; 2.5% footnote discount applied.', KP: 'Per 100 nos → per box; freight ₹38 per 100 added.', AC: 'Read from photo; perspective corrected. One hand-written correction.', RB: 'Per kg → per box from board weight; print from last year; freight estimated.' }[v.id];
+      const conv = { SB: 'Matched by size, ply, BF.', VP: 'USD → ₹ at 88.20, less 2.5%.', KP: 'Per 100 → per box, + freight.', AC: 'Read from photo. 1 hand correction.', RB: 'Per kg → per box. Freight estimated.' }[v.id];
       return { ...v, revised: v.revised || '', coverTxt: `${30 - miss.length} of 30 lines quoted`, missTxt: miss.length ? `${miss.length} missing: ${miss.join(', ')}` : 'All lines quoted',
         seg: K.cells[v.id].map(c => ({ display: 'block', width: 9, height: 14, background: c.p == null ? 'transparent' : c.kind === 'doubt' ? 'var(--color-accent-2)' : 'var(--color-neutral-700)', boxShadow: c.p == null ? 'inset 0 0 0 1px var(--color-neutral-400)' : 'none' })),
-        readTxt: dbl.length ? `Read · ${dbl.length} doubt${dbl.length > 1 ? 's' : ''} raised (${dbl.map(d => d.lineIds).join('; ')})` : 'Read · both reads agree on every price', convTxt: conv,
-        qTxt: v.q.returned ? `${v.q.score} / 100 · ${v.q.cleared ? 'cleared' : v.q.mandFail + ' mandatory items failed'}` : 'not returned', docsL: v.docs.map(d => ({ n: d[0], s: d[1] })), noDocs: v.docs.length ? '' : 'No documents attached. Reminder drafted.' }; });
+        readTxt: dbl.length ? `Read · ${dbl.length} doubt${dbl.length > 1 ? 's' : ''} raised (${dbl.map(d => d.lineIds).join('; ')})` : 'Read · no doubts', convTxt: conv,
+        qTxt: v.q.returned ? `${v.q.score} / 100 · ${v.q.cleared ? 'cleared' : v.q.mandFail + ' mandatory items failed'}` : 'not returned', docsL: v.docs.map(d => ({ n: d[0], s: d[1] })), noDocs: v.docs.length ? '' : 'No documents.' }; });
     const Q = K.qual, delta = Q.total - K.baseline.total;
     const ly = K.lines.filter(l => l.lastYear).reduce((s, l) => s + l.lyPrice * l.qty, 0), now = K.lines.filter(l => l.lastYear).reduce((s, l) => s + Q.per[l.i].p * l.qty, 0);
     let V = {}; try { V = JSON.parse(localStorage.getItem('parakh-verified') || '{}') || {}; } catch (e) {}
@@ -341,9 +341,9 @@ class Component extends DCLogic {
     const awardRows = Q.per.map((x, k) => { const l = K.lines[x.i], c = K.cells[x.vid][x.i], ck = V[x.vid + ':' + x.i]; return { chk: ck ? '✓ ' + ck : 'not yet', chkS: { whiteSpace: 'nowrap', color: ck ? 'var(--color-accent-800)' : 'var(--color-neutral-600)' }, id: l.id, name: l.name, vendor: K.VI[x.vid].short, p: K.num(x.p), qty: l.qty.toLocaleString('en-IN'), value: K.lakh(x.p * l.qty), src: `${K.VI[x.vid].fmt} · ${c.loc.split(';')[0]}`, go: () => this.setState({ tr: k }),
       s: { cursor: 'pointer', background: S.tr === k ? 'var(--color-accent-100)' : undefined } }; });
     const trx = Q.per[S.tr];
-    const res = { D1: 'Moot — Anand excluded on quality.', D4: 'Moot — Anand excluded on quality.', D3: 'Moot — Rohit Box excluded (no questionnaire).', D5: 'Moot — Rohit Box excluded (no questionnaire).', D2: 'Resolved — Vardhman confirmed by email (9 Oct, 11:05): discount applies on the half-year award value.' };
+    const res = { D1: 'Moot — Anand excluded on quality.', D4: 'Moot — Anand excluded on quality.', D3: 'Moot — Rohit Box excluded (no questionnaire).', D5: 'Moot — Rohit Box excluded (no questionnaire).', D2: 'Resolved — discount applies to the full award.' };
     return { ...base, tabs, events, rfqChat, rfqRows, rfqTabs, qRows, rfqLines: S.rfqTab === 'lines', rfqQ: S.rfqTab === 'q', rfqT: S.rfqTab === 't', rfqR: S.rfqTab === 'r', ruleSecs, qScheme, resp,
-      awardSummary: `Award each line to the lowest price among vendors who cleared the quality questionnaire: Shree Balaji ${Q.by.SB.lines} lines, Vardhman ${Q.by.VP.lines}, Kaveri ${Q.by.KP.lines}. This costs ${K.lakh(delta)} more than the cheapest-per-line option, which would have given 26 lines to two vendors without a valid ISO certificate or questionnaire.`,
+      awardSummary: `${K.lakh(delta)} above cheapest per line. That option relied on two vendors who failed quality.`,
       kpis: [{ v: K.crore(Q.total), t: 'award value, ex-GST' }, { v: '+' + K.lakh(delta), t: 'vs cheapest per line' }, { v: '+' + ((now / ly - 1) * 100).toFixed(1) + '%', t: 'vs last year, like-for-like 25 lines' }, { v: '3', t: 'vendors · none above 50% of value' }, { v: nChk + ' of 30', t: 'awarded prices checked by Vikram' }],
       decisions: K.doubts.map(d => ({ rank: d.rank, title: d.title, res: res[d.id] })), awardRows, trLine: K.lines[trx.i], trVid: trx.vid, trLi: trx.i };
   }

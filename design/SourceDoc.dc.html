@@ -46,7 +46,7 @@
             </sc-if>
           </div>
         </sc-for>
-        <div style="padding:6px; font-size:11px; color:var(--color-neutral-700);">Rows are in their own order; matched to our {{ l.id }} by size, ply and BF</div>
+        <div style="padding:6px; font-size:11px; color:var(--color-neutral-700);">Matched to {{ l.id }} by size, ply, BF</div>
       </div>
     </sc-if>
 
@@ -182,7 +182,7 @@ class Component extends DCLogic {
       docHit: sent(li), docAfter: li < 29 ? sent(li + 1) : '',
       m42: hit(l.ply === 5, false), m38: hit(l.ply === 3, false), mLy: hit(!!c.ly || (li >= 25 && l.print !== 'none'), isDoubt && doubt.id === 'D5'), mFr: hit(true, isDoubt && doubt.id === 'D3'),
       pTxt: c.p == null ? 'Not quoted' : K.inr(c.p), steps,
-      decideTxt: isDoubt ? doubt.ask : c.p == null ? 'Line will be awarded among vendors who quoted it.' : 'Nothing to decide — the number stands.'
+      decideTxt: isDoubt ? doubt.ask : c.p == null ? 'Not quoted.' : 'Nothing to decide.'
     };
   }
 }

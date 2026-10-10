@@ -15,6 +15,78 @@ The `.dc.html` files are self-contained "Design Component" pages. Open them in a
 ## Fidelity
 **High-fidelity.** Colours, typography, spacing, copy and interactions are final. Recreate them pixel-close, using the tokens below. The demo data is realistic but invented. In production it comes from the extraction/calculation pipeline (see "State & data").
 
+## ⚠ Read this first — Readability pass v2 (supersedes older specs below)
+**`Target Screens v2.dc.html` is the build target.** Each section shows the current prototype ("Before", live iframe or live-site screenshot) beside the approved redesign ("After"). Where this section or the "After" frames disagree with the per-screen specs further down, **v2 wins**. The older specs remain valid for behaviour, data, rules and anything v2 doesn't mention.
+
+Goal: a reviewer with 5–10 minutes must understand any screen in about 2 minutes. Pattern taken from Stripe (a few key numbers first, details one click away), Linear (one-row toolbar, filters added on demand) and Coupa/Ariba bid analysis (the best bid per line highlighted, totals above the grid).
+
+### Global changes (every screen)
+- **Type:** body 16 px (was 13–14); table cells 15–17 px; small labels min 14 px (13 px only for rail labels and vendor sub-lines). Uppercase 10–11 px micro-labels are replaced by 14–15 px sentence-case labels in neutral-700.
+- **Contrast:** no text lighter than `--color-neutral-700` (`#605d5d`), except "—" for not quoted (neutral-600/700).
+- **H1:** 30–32 px/600, line-height 1.15, with a 15 px neutral-700 meta line above.
+- **Depth:** the page sits on `--color-bg`. The working table or list sits on a **raised sheet**: bg `--color-neutral-100` (`#f8f4f4`), `--shadow-md`, radius `--radius-lg` (4 px), padding 16–24 px. Key-number cards use the same fill with `--shadow-sm`. Side panels (chat, source, trace) stay on `--color-surface` with no shadow.
+- **Key-number cards:** a 3- or 4-column grid, gap 12–16 px. Each card: label 14–15 px neutral-700, value 26–30 px/600, optional 14 px neutral-800 sub-line. The doubts card uses bg accent-2-100 with text accent-2-800.
+- **Table headers:** 14–15 px/600 neutral-800 with a 2 px `--color-text` inset bottom rule. Rows have a 1 px neutral-200/300 inset bottom rule and hover `--color-bg`.
+- **Icon rail:** 84 px wide (was 68). The "P" mark is 44 × 44, bg `--color-text`, text `--color-bg`, 22 px/700, radius-lg. Items are 68 px wide with a 24 px duotone icon over a **13 px label** (was 10 px). Active item: bg accent-200, text accent-800, 600, radius-lg. Inactive: neutral-800.
+- **Colour:** cyan only for actions, selection and winners; magenta only for doubts.
+- **VP name:** **Meera** (matches the live site). Replace "Anita" everywhere, e.g. "Send to Meera for approval", "Remind Meera".
+
+### 00 · Flow
+Sign in → Events → RFQ → Replies → Compare → Award. "P" opens the workspace menu from every screen. Shown as a strip at the top of the target file.
+
+### 01 · Events
+- **Header:** "Sourcing events" plus search (300 px) and primary "New event".
+- **Key numbers (3 cards):** Need you this week · Open value · Next deadline.
+- **Status filter:** pill chips (All / Comparing / Collecting / Drafting / Awaiting approval / Awarded, each with a count). Active chip = `--color-text` fill; inactive = 1 px neutral-400 inset. A "+ Filter" link sits in accent-700.
+- **Table (5 columns):** Event (name 17 px/600 + ID 14 px) · Stage (tag) · Due · Value · Next step. Rows are 64 px.
+- **Next step:** one action per row. The most urgent ("Review 5 doubts") is a primary button; the others are accent-700 text links with "→".
+- **Row actions:** the **Clone** (`ph-copy`) and **More** (`ph-dots-three`) icon buttons stay on every row.
+
+### 02 · RFQ
+- **Keep input boxes everywhere.** The boxes signal that the RFQ is editable; do not convert them to a plain table.
+- **Four key terms:** `.field` + `.input` in a 4-column grid, 42 px high, 15 px text.
+- **Line grid:** inputs 38 px high, 15 px text. Columns `40 | 1.5fr | 44 | 52 | 112 | 128 | 44 | 76 | 56`.
+- **Tabs:** Lines 30 · Quality questions 10 · Terms, at 17 px with a 3 px accent underline on the active tab.
+- **Evaluation rules:** collapse to one pill at the right of the tabs: lock icon + "Rules · 14 · lock when sent" + "Edit". The full Evaluation rules tab remains behind it.
+- **Co-pilot (380 px):** shows the last 3 messages, with "Show 6 earlier messages" above them. Messages are 16 px.
+
+### 03 · Replies
+- **One-line intro:** "Read by AI, every number checked by code against the original file." The "How well did Parakh read? Scorecard" link stays.
+- **Upload bar (keep, for the live demo):** a single raised strip containing an upload icon, "Upload a reply", "Choose files", the file name, a "From" dropdown ("Work it out from the file"), primary "Read it", and a right-aligned "Up to 4 MB · joins this session's comparison".
+- **Key numbers (3 cards):** Replied · Prices read · Need you.
+- **Table:** one row per vendor (72 px): Vendor (name + city · contact) · Sent as (format icon) · Received · Lines priced ("27 of 30" + a 6 px progress bar, replacing the 30-segment strip) · Quality (tag) · Reply.
+- **Reply column:** "Open original" and "See what was read" links, plus "Saved reading, <date> · Read again live".
+
+### 04 · Compare (each change approved one by one)
+1. **Header:** title 30 px; "SE-2026-041 · award by 15 Oct" above it; tabs **Compare** | **Doubts 5** (count in accent-2-700) beside the title; primary "Freeze for award" on the right.
+2. **Three key-number cards:** Award total · vs last year, same 25 boxes (value in accent-800) · Doubts that could change a winner (accent-2-100 card, "5 · ₹6.99 L").
+3. **Scenario dropdown:** shows the scenario name only (e.g. "Cheapest per line"). The one-line rule description moves inside the open list. **Remove the rule text below the toolbar.**
+4. **Toolbar (one row):** scenario dropdown · chips **All 30 / Doubts n / Not checked** · "+ Filter" (opens Won by, Board, Unusual, Missing, Last year's) · **Sort** (stays visible) · "Cell guide" toggle on the right.
+5. **Quality score under each vendor name:** 13 px neutral-700, e.g. "95 · cleared" or "quality not returned".
+6. **Winner:** 700 weight with a **pale fill**: bg accent-200, radius-sm, padding 2 × 6 px. A winner with a doubt uses bg accent-2-100, text accent-2-800 and a "?" suffix. This replaces "bold = lowest".
+7. **Losing prices do not fade.**
+8. **Uncleared vendors are not greyed out** in any scenario.
+9. **Table text 15 px**, rows 36 px. About 15 of the 30 lines are visible with the guide open; the grid scrolls.
+10. **The table sits on a raised sheet** (see Global).
+11. **Chat:** the last 3 messages plus "Show n earlier messages"; at most 3 suggested questions as small raised chips.
+12. **Kept as is:** the collapsible **cell guide** (all states: winner, winner with a doubt, converted, last year's, unusual, not quoted). The full-height right panel keeps its **Conversation** and **Source · <line> <vendor>** tabs. Clicking a price opens Source with SourceDoc and the "I've checked this" / "Check & open next winner" buttons; the selected cell gets a 2 px accent ring.
+
+### 05 · Award
+- **Header:** "Split award to three quality-cleared vendors" (28 px) plus primary "Send to Meera for approval" (buyer) or "Approve award" (VP).
+- **Key numbers (4 cards):** Award total · vs last year · Cost of quality rule · Prices you checked.
+- **"Who gets what":** one row per vendor: Vendor · Lines · Value · Share (8 px accent bar + %) · Quality tag.
+- **Collapsed rows:** "Decisions on record" and "Rule changes after sending" (caret, 17 px/600 title, 15 px sub-line).
+- **Line snapshot (keep):** Line · Box · Awarded to · ₹/box · Value · Checked by you. Clicking a row selects it (accent-100 + 3 px accent left inset).
+- **Trace panel (keep), right side, 440 px on surface:** "Trace" + line title, then SourceDoc for the selected line.
+
+### 06 · Workspace menu (P)
+- **Same contents as the live site** (see `assets/live-p-menu.png`): Current event · Switch event (3 recent + "All events →") · Signed in as · Demo: view as (Vikram · buyer / Meera · VP) · Evaluation rules for this event · Sign out · **Reset demo** (Start empty: RFQ, upload, compare / Back to the full demo).
+- **Popover:** 420 px, bg neutral-100, `--shadow-lg`, padding 22 × 24. Section labels are 14 px/600 neutral-800 sentence case (not uppercase). The event name is 21 px/600 with a status tag. Event rows are 17 px with a 14 px ID and a status tag; hover accent-100.
+- **View-as switch:** a 2-segment control; the active segment is filled accent.
+- **Links:** 17 px accent-700 with 22 px icons.
+- **Reset demo:** sits in its own `--color-bg` box at the bottom.
+- **P button:** while open, the P mark is filled accent with a 3 px accent-200 ring.
+
 ## Screens / views
 
 Target viewport: **desktop, 1440 px wide** (the app shell has `min-width: 1360px`). Light mode only.
@@ -281,6 +353,8 @@ Formatting: Indian grouping (`en-IN`), "₹x.xx L" for lakhs and "₹x.xx Cr" fo
 - All names (Parakh, Sahyadri Appliances, the vendors, the people) are invented.
 
 ## Files
+- **`Target Screens v2.dc.html` — the approved readability redesign: Before vs After for every screen, plus the flow. Build to the After frames.**
+- `assets/live-p-menu.png`, `assets/live-replies.png` — screenshots of the live site, used as "Before" references
 - `Overview.dc.html` — one-page summary of the direction (idea, cell states, trade-offs, links)
 - `Comparison - Ledger.dc.html` — **home screen**; screens 4, 5, 6 (comparison, doubts, conversation and scenarios). Start here.
 - `Shared Screens.dc.html` — screens 1, 2, 3, 7 (events, RFQ co-pilot, replies, award record); switch with the hash `#events`, `#rfq`, `#rules` (RFQ → Evaluation rules), `#responses`, `#award`, `#login`

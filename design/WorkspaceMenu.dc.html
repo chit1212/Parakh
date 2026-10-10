@@ -47,7 +47,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:420,&quot;height&quot;:520}}">
 class Component extends DCLogic {
-  state = { open: false, role: (() => { try { return localStorage.getItem('parakh-role') || 'Buyer'; } catch (e) { return 'Buyer'; } })() };
+  state = { open: (() => { try { return location.hash === '#open'; } catch (e) { return false; } })(), role: (() => { try { return localStorage.getItem('parakh-role') || 'Buyer'; } catch (e) { return 'Buyer'; } })() };
   componentDidMount() { this._r = e => this.setState({ role: e.detail }); window.addEventListener('parakh-role', this._r); }
   componentWillUnmount() { window.removeEventListener('parakh-role', this._r); }
   setRole(r) { try { localStorage.setItem('parakh-role', r); } catch (e) {} window.dispatchEvent(new CustomEvent('parakh-role', { detail: r })); this.setState({ role: r }); }
