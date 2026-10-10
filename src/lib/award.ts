@@ -1,6 +1,7 @@
 // L27: freeze for award. A snapshot copies every number and its source at decision time, so later
 // readings or revisions never change it. The AI never decides: the buyer freezes, the VP approves.
 import { cellKey, type Award, type Grid } from "./compare";
+import type { Decision } from "./decisions";
 import type { DoubtReport } from "./doubts";
 import { hashOfText, where } from "./format";
 import type { Quality } from "./quality";
@@ -22,9 +23,11 @@ export interface SnapshotRow {
   replyId: string | null;
   source: SourceRef | null;
   raw: { text: string; value: number } | null;
-  /** "Verified by you": who checked this price against the document, and when, as at freezing. */
+  /** "Approved by you": who approved this price against the document, and when, as at freezing. */
   checked: { who: string; at: string } | null;
 }
+
+export interface AuditEntry { at: string; who: string; what: string; why: string }
 
 export interface Snapshot {
   id: string;
@@ -44,6 +47,8 @@ export interface Snapshot {
   /** Set when only some lines were exported (a filtered view). */
   partial?: string;
   decisions: { title: string; status: string }[];
+  /** Every approval, decision and override behind the award: when, who, what, why. Oldest first. */
+  audit?: AuditEntry[];
   frozenBy: string;
   approvedBy: string | null;
   approvedAt: string | null;
@@ -53,9 +58,12 @@ export interface Snapshot {
 
 const NUMBER = ["", "one", "two", "three", "four", "five"];
 
+/** A time on the record, in India time, e.g. "10 Oct, 15:41". */
+export const fmtAt = (iso: string) => new Date(iso).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Kolkata" });
+
 export function freeze(o: {
   ev: SourcingEvent; grid: Grid; quality: Quality[]; report: DoubtReport; lastYear: LastYearLine[];
-  scenario: { title: string; result: ScenarioResult } | null; decisions: Record<string, string>; overrides?: Override[];
+  scenario: { title: string; result: ScenarioResult } | null; decisions: Decision[]; overrides?: Override[];
   /** Buyer sign-offs, keyed "vendorId:lineId". */
   checks?: Record<string, { who: string; at: string }>;
   /** Only these lines (an exported view); all lines when absent. */
@@ -96,12 +104,28 @@ export function freeze(o: {
     cheapestOverall: o.only ? rows.reduce((a, r) => a + (grid.asQuoted.per[r.lineId]?.perBox ?? 0) * r.qty, 0) : grid.asQuoted.total,
     lastYear, byVendor, ...(o.only ? { partial: `${rows.length} of ${ev.lines.length} lines, as filtered` } : {}),
     decisions: [
-      ...o.report.raised.map((d) => ({ title: d.title, status: o.decisions[d.title] ?? "Open: not yet answered" })),
+      ...o.report.raised.map((d) => {
+        const x = o.decisions.find((y) => y.title === d.title || (y.vendorId === d.vendorId && y.lineIds.join() === d.lineIds.join()));
+        return { title: d.title, status: x ? `${x.choice} (${x.who}, ${fmtAt(x.at)})` : "Open: not yet answered" };
+      }),
+      // Decided doubts that no longer change a winner (e.g. an accepted price now competes).
+      ...o.decisions.filter((x) => !o.report.raised.some((d) => d.title === x.title)).map((x) => ({ title: x.title, status: `${x.choice} (${x.who}, ${fmtAt(x.at)})` })),
       ...(o.overrides ?? []).map((x) => ({
         title: `Override: ${x.lineId} from ${grid.vendors.find((v) => v.id === x.from)?.short ?? "nobody"} to ${grid.vendors.find((v) => v.id === x.to)?.short ?? x.to}`,
-        status: `${x.who}, ${x.at.slice(0, 16).replace("T", " ")} UTC: ${x.why}`,
+        status: `${x.who}, ${fmtAt(x.at)}: ${x.why}`,
       })),
     ],
+    audit: [
+      ...Object.entries(o.checks ?? {}).map(([k, c]) => {
+        const [vid, lid] = k.split(":");
+        const cell = grid.cells[cellKey(vid, lid)];
+        const v = grid.vendors.find((x) => x.id === vid)?.short ?? vid;
+        const won = award.per[lid]?.vendorId === vid;
+        return { at: c.at, who: c.who, what: `Approved ${v}'s price for ${lid}${cell?.perBox != null ? ` (₹${cell.perBox.toFixed(2)})` : ""}${won ? ", awarded" : ", not awarded in this view"}`, why: `Matches the source: ${cell?.norm.source ? where(cell.norm.source) : "as read"}` };
+      }),
+      ...o.decisions.map((x) => ({ at: x.at, who: x.who, what: `${x.title}: ${x.choice}`, why: x.why })),
+      ...(o.overrides ?? []).map((x) => ({ at: x.at, who: x.who, what: `Override: ${x.lineId} from ${grid.vendors.find((v) => v.id === x.from)?.short ?? "nobody"} to ${grid.vendors.find((v) => v.id === x.to)?.short ?? x.to}`, why: x.why })),
+    ].sort((a, b) => a.at.localeCompare(b.at)),
     frozenBy: ev.buyer, approvedBy: null, approvedAt: null,
   };
 }

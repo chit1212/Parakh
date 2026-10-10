@@ -1,6 +1,6 @@
 "use client";
-// "Verified by you" (design): the buyer's own sign-off that a price matches the document.
-// Starts empty: nothing counts as checked until a person clicks "I've checked this".
+// "Approved by you" (design: "Verified by you"): the buyer's own sign-off that a price matches the document.
+// Starts empty: nothing counts as approved until a person clicks "Approve this price".
 // Kept in this browser, keyed "vendorId:lineId"; the award snapshot copies it when frozen.
 import { useEffect, useState } from "react";
 

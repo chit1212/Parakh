@@ -8,7 +8,9 @@ import {
 import { Rail } from "@/components/Rail";
 import { SourceDoc } from "@/components/SourceDoc";
 import { Conversation, type ChatMsg } from "@/components/Conversation";
-import { DECISIONS_KEY, DoubtsView } from "@/components/DoubtsView";
+import { DoubtsView } from "@/components/DoubtsView";
+import { useDecisions } from "@/components/useDecisions";
+import { applyDecisions } from "@/lib/decisions";
 import { freeze, OVERRIDES_KEY, SNAPSHOT_KEY, type Override, type Snapshot } from "@/lib/award";
 import { download } from "@/lib/download";
 import { useRouter } from "next/navigation";
@@ -214,7 +216,7 @@ const STATE_LABEL: Record<GridCell["kind"], string> = {
 
 type Show = "all" | "doubts" | "changed" | "unverified";
 interface Asked { title: string; rules: ScenarioRules; asker: "buyer" | "vp"; libKey: string | null }
-const SHOW: [Show, string][] = [["all", "All lines"], ["doubts", "With doubts"], ["changed", "Winner changed"], ["unverified", "Not verified by you"]];
+const SHOW: [Show, string][] = [["all", "All lines"], ["doubts", "With doubts"], ["changed", "Winner changed"], ["unverified", "Not approved by you"]];
 const NO_FILTER = { show: "all" as Show, win: "" };
 
 export default function ComparePage() {
@@ -222,6 +224,7 @@ export default function ComparePage() {
   const [scheme] = useScheme();
   const [role] = useRole();
   const [checks, setCheck] = useVerified();
+  const [decisions, recordDecision, undoDecision] = useDecisions();
   const [sel, setSel] = useState<{ v: string; l: string } | null>(null);
   const [legendUser, setLegendUser] = useState<boolean | null>(null);
   const [tab, setTab] = useState<"compare" | "doubts">("compare");
@@ -245,8 +248,9 @@ export default function ComparePage() {
   const grid = useMemo(() => {
     if (!data) return null;
     const files = Object.fromEntries(data.replies.map((r) => [r.id, mainFile(r, state[r.id]?.reading ?? null) ?? undefined]));
-    return buildGrid(data.event, readings, { sheets: data.historySheets }, files, data.lastYear);
-  }, [data, readings, state]);
+    // The buyer's recorded decisions apply on top of the table as read (accepted prices may win).
+    return applyDecisions(data.event, buildGrid(data.event, readings, { sheets: data.historySheets }, files, data.lastYear), decisions);
+  }, [data, readings, state, decisions]);
 
   // Quality (code, from the questionnaire as read, marked against the buyer's scheme) and the doubts that could change a winner.
   const quality = useMemo(() => (data ? data.event.vendors.map((v) => qualityOf(data.event, v.id, readings, scheme)) : []), [data, readings, scheme]);
@@ -318,7 +322,7 @@ export default function ComparePage() {
       const res = await fetch("/api/chat", {
         method: "POST",
         body: JSON.stringify({
-          scheme, readings, prior: asked.map((a) => ({ title: a.title, ...a.rules })),
+          scheme, readings, decisions, prior: asked.map((a) => ({ title: a.title, ...a.rules })),
           messages: next.map((m) => ({ role: m.role, text: m.text, asker: m.asker === "vp" ? `${data!.event.vp} (VP)` : m.asker ? `${data!.event.buyer} (buyer)` : undefined })),
         }),
       });
@@ -376,7 +380,7 @@ export default function ComparePage() {
   const shown = pre.filter((l) => f.show === "all" || tests?.[f.show](l.id));
   const filtered = f.show !== "all" || !!f.win;
 
-  // "Verified by you": winners in the active view, and every quoted price.
+  // "Approved by you": winners in the active view.
   const winners = grid && award ? grid.lines.filter((l) => award.per[l.id]) : [];
   const winChecked = winners.filter((l) => checks[checkKey(award!.per[l.id]!.vendorId, l.id)]).length;
   const nextWinner = (after?: string) => {
@@ -391,8 +395,6 @@ export default function ComparePage() {
 
   // The table as shown (as quoted, or the active strategy), frozen with every number's source.
   const snapshotNow = (only?: string[]): Snapshot => {
-    let decisions: Record<string, string> = {};
-    try { decisions = JSON.parse(localStorage.getItem(DECISIONS_KEY) ?? "{}"); } catch { /* none */ }
     return freeze({ ev: data!.event, grid: grid!, quality, report: report!, lastYear: data!.lastYear, decisions, checks, only,
       scenario: cur ? { title: `${isScenario ? active.title : "As quoted"}${overrides.length ? `, with ${overrides.length} override${overrides.length > 1 ? "s" : ""}` : ""}`, result: cur } : null,
       overrides });
@@ -441,16 +443,17 @@ export default function ComparePage() {
           {!readings.length && <span style={{ color: "var(--color-neutral-700)" }}>{empty ? "No replies yet. " : "Nothing read yet. "}<Link href={`/events/${ev.id}/replies`}>Upload a reply on Replies</Link> and it joins this table when it is read.</span>}
           <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12, fontSize: 12.5 }}>
             <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", lineHeight: 1.25 }}>
-              <span><b>{winChecked} of {winners.length}</b> winning prices verified by you</span>
+              <span><b>{winChecked} of {winners.length}</b> winning prices approved by you</span>
             </span>
             <button className="btn btn-secondary" style={{ padding: "4px 10px", fontSize: 12.5 }} disabled={winChecked === winners.length} onClick={() => nextWinner(sel?.l)}>
-              <SealCheck size={14} weight="duotone" />Check next winner
+              <SealCheck size={14} weight="duotone" />Next winner to approve
             </button>
           </span>
         </div>
 
         {tab === "doubts" ? (
-          <DoubtsView grid={grid} report={report} overrides={overrides} onSee={(v, l) => { setSel({ v, l }); setTab("compare"); }} />
+          <DoubtsView grid={grid} report={report} overrides={overrides} onSee={(v, l) => { setSel({ v, l }); setTab("compare"); }}
+            decisions={decisions} onRecord={recordDecision} onUndo={undoDecision} me={me} />
         ) : (
         <>
         <Legend open={legendOpen} toggle={() => setLegendUser(!legendOpen)} />
@@ -584,7 +587,7 @@ function Legend({ open, toggle }: { open: boolean; toggle: () => void }) {
       {item(<span style={{ ...chip, color: "var(--color-neutral-500)" }}>—</span>, "Not quoted", "vendor skipped this line")}
       {item(<span style={{ ...chip, boxShadow: "none", background: "var(--color-accent-2-100)", color: "var(--color-accent-2-800)", fontWeight: 600 }}>24.60?</span>, "Doubt", "could change who wins", "var(--color-accent-2-800)")}
       {item(<span style={{ ...chip, fontWeight: 600 }}>24.60</span>, "Lowest", "bold = cheapest on the line")}
-      {item(<span style={{ ...chip, display: "inline-flex", alignItems: "center", gap: 3, justifyContent: "flex-end" }}><SealCheck size={12} weight="duotone" color="var(--color-accent-700)" />24.60</span>, "Verified by you", "you checked it against the document")}
+      {item(<span style={{ ...chip, display: "inline-flex", alignItems: "center", gap: 3, justifyContent: "flex-end" }}><SealCheck size={12} weight="duotone" color="var(--color-accent-700)" />24.60</span>, "Approved by you", "you checked it against the document")}
     </div>
   );
 }
@@ -680,10 +683,10 @@ function Cell({ c, checked, out, doubt, win, selected, onClick, tip }: { c: Grid
   return (
     <button
       onClick={onClick}
-      title={checked ? `${tip} · verified by you` : tip}
+      title={checked ? `${tip} · approved by you` : tip}
       style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", height: "100%", minHeight: 38, padding: "0 10px", border: 0, font: "inherit", fontSize: 13.5, background: doubt ? "var(--color-accent-2-100)" : "transparent", outline: selected ? "2px solid var(--color-accent)" : "none", outlineOffset: -2, color: "inherit", opacity: out ? 0.4 : 1 }}
     >
-      {checked && c.perBox != null && <SealCheck size={12} weight="duotone" color="var(--color-accent-700)" style={{ marginRight: 3, flex: "none" }} aria-label="Verified by you" />}
+      {checked && c.perBox != null && <SealCheck size={12} weight="duotone" color="var(--color-accent-700)" style={{ marginRight: 3, flex: "none" }} aria-label="Approved by you" />}
       <span style={ns}>
         {c.perBox == null ? (k === "unclear" ? "n/a" : "—") : num2(c.perBox)}
         {mark && <sup style={{ fontSize: k === "last_year" ? 8 : 10, fontStyle: "normal", fontWeight: 600, marginLeft: 1, letterSpacing: "0.04em", display: "inline-block" }}>{mark}</sup>}
@@ -801,7 +804,7 @@ function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, overrid
         <div style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--color-accent-100)", padding: "8px 10px" }}>
           <SealCheck size={22} weight="duotone" color="var(--color-accent-700)" />
           <span style={{ display: "flex", flexDirection: "column", marginRight: "auto", lineHeight: 1.3 }}>
-            <span style={{ fontWeight: 600 }}>Verified by you</span>
+            <span style={{ fontWeight: 600 }}>Approved by you</span>
             <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{check.who} · {stamp(check.at)} · recorded on the award</span>
           </span>
           <button className="btn btn-ghost" onClick={() => onCheck(null, false)}>Undo</button>
@@ -809,11 +812,11 @@ function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, overrid
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <div style={{ display: "flex", gap: 8 }}>
-            <button className="btn btn-primary" onClick={() => onCheck({ at: new Date().toISOString(), who: me }, false)}><SealCheck size={16} weight="duotone" />I’ve checked this</button>
-            <button className="btn btn-secondary" onClick={() => onCheck({ at: new Date().toISOString(), who: me }, true)}>Check &amp; open next winner</button>
+            <button className="btn btn-primary" onClick={() => onCheck({ at: new Date().toISOString(), who: me }, false)}><SealCheck size={16} weight="duotone" />Approve this price</button>
+            <button className="btn btn-secondary" onClick={() => onCheck({ at: new Date().toISOString(), who: me }, true)}>Approve &amp; open next winner</button>
           </div>
           <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>
-            {doubt ? `Confirms the number matches the document. Doubt ${doubt.rank} stays open until it is resolved.` : "Confirms the number matches the document. Recorded with your name, and copied onto the award when you freeze it."}
+            {doubt ? `Confirms the price matches the document. Doubt ${doubt.rank} stays open until you decide it on the Doubts tab.` : "Confirms the price matches the document. Recorded with your name and the time, and listed on the award when you freeze it."}
           </span>
         </div>
       ))}
