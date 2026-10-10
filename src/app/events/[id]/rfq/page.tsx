@@ -2,11 +2,12 @@
 // L0 RFQ co-pilot (design: Shared Screens #rfq). Chat on the left turns the buyer's words into edits;
 // the draft RFQ on the right stays directly editable. Kept light: the demo RFQ was sent on its issue date.
 import { useEffect, useMemo, useState } from "react";
-import { PaperPlaneRight, Plus, X } from "@phosphor-icons/react";
+import { LockSimple, PaperPlaneRight, Plus, X } from "@phosphor-icons/react";
+import { tabStyle } from "@/components/ui";
 import { Rail } from "@/components/Rail";
 import { useReadings } from "@/components/useReadings";
 import type { DraftRfq, Edit } from "@/lib/rfqDraft";
-import { EvaluationRules } from "@/components/EvaluationRules";
+import { EvaluationRules, FIXED_RULES } from "@/components/EvaluationRules";
 import { useScheme } from "@/components/useScheme";
 import { buildGrid } from "@/lib/compare";
 import { findDoubts } from "@/lib/doubts";
@@ -22,9 +23,10 @@ type Draft = Omit<DraftRfq, "lines"> & {
   refId?: string; title?: string; due?: string; vendors?: RfqVendor[]; sent?: Record<string, Sent>;
 };
 const KEY = "parakh.rfq.v1";
-const label11 = { fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--color-neutral-700)" };
+const label11 = { fontSize: 14, color: "var(--color-neutral-700)" };
+const KEEP = 3;
 const COLS = "44px minmax(200px,1.4fr) minmax(160px,1fr) minmax(220px,1.6fr) 80px 30px";
-const inp: React.CSSProperties = { minHeight: 30, padding: "3px 8px", fontSize: 13 };
+const inp: React.CSSProperties = { minHeight: 38, padding: "4px 10px", fontSize: 15, background: "var(--color-bg)" };
 
 export default function RfqPage() {
   const { data, state } = useReadings();
@@ -44,6 +46,7 @@ export default function RfqPage() {
   const [msgs, setMsgs] = useState<{ role: "user" | "assistant"; text: string; model?: string }[]>([]);
   const [q, setQ] = useState("");
   const [busy, setBusy] = useState(false);
+  const [all, setAll] = useState(false);
 
   const fresh = (): Draft | null => data && {
     from: `the RFQ issued ${data.event.issued}`,
@@ -113,7 +116,8 @@ export default function RfqPage() {
     }
   };
 
-  const tabS = (on: boolean): React.CSSProperties => ({ whiteSpace: "nowrap", background: "none", border: 0, padding: "4px 0", font: "inherit", fontSize: 14, color: on ? "var(--color-text)" : "var(--color-neutral-700)", fontWeight: on ? 600 : 400, boxShadow: on ? "inset 0 -2px 0 var(--color-text)" : "none" });
+  const tabS = tabStyle;
+  const hidden = all ? 0 : Math.max(0, msgs.length - KEEP);
   const ev = data?.event;
   const refId = draft?.refId ?? ev?.id ?? "";
   const title = draft?.title ?? ev?.title ?? "";
@@ -131,21 +135,23 @@ export default function RfqPage() {
     URL.revokeObjectURL(a.href);
   };
   return (
-    <div style={{ display: "flex", height: "100vh", minWidth: 1360, fontSize: 13, lineHeight: 1.45 }}>
+    <div style={{ display: "flex", height: "100vh", minWidth: 1360, fontSize: 16, lineHeight: 1.45 }}>
       <Rail />
-      <section style={{ width: 430, flex: "none", background: "var(--color-surface)", display: "flex", flexDirection: "column" }}>
+      <section style={{ width: 380, flex: "none", background: "var(--color-surface)", display: "flex", flexDirection: "column" }}>
         <div style={{ flex: 1, overflow: "auto", padding: "22px 24px", display: "flex", flexDirection: "column", gap: 18 }}>
           <span style={label11}>RFQ co-pilot</span>
-          <div><span style={{ ...label11, color: "var(--color-accent-700)" }}>Parakh</span>
-            <p style={{ margin: "4px 0 0", fontSize: 14 }}>This draft starts from {draft?.from ?? "the RFQ"}. Tell me what to add or change, e.g. “make L14 5-ply BC”, “add an air fryer master carton, 400 x 300 x 350 mm, 5-ply BC, 8,000 boxes”, or “ask for FSC certification”. You can also edit any field directly.</p>
-          </div>
-          {msgs.map((m, i) => m.role === "user" ? (
+          {hidden > 0 ? (
+            <button className="btn btn-ghost" style={{ alignSelf: "flex-start", fontSize: 15, color: "var(--color-accent-700)", padding: "2px 0" }} onClick={() => setAll(true)}>Show {hidden + 1} earlier messages</button>
+          ) : <div><span style={{ ...label11, color: "var(--color-accent-700)" }}>Parakh</span>
+            <p style={{ margin: "4px 0 0", fontSize: 16 }}>This draft starts from {draft?.from ?? "the RFQ"}. Tell me what to add or change, e.g. “make L14 5-ply BC”, “add an air fryer master carton, 400 x 300 x 350 mm, 5-ply BC, 8,000 boxes”, or “ask for FSC certification”. You can also edit any field directly.</p>
+          </div>}
+          {msgs.map((m, i) => i < hidden ? null : m.role === "user" ? (
             <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
               <span style={label11}>{ev?.buyer ?? "Buyer"}</span>
-              <p style={{ margin: 0, fontSize: 14, fontStyle: "italic", textAlign: "right" }}>{m.text}</p>
+              <p style={{ margin: 0, fontSize: 16, fontStyle: "italic", textAlign: "right" }}>{m.text}</p>
             </div>
           ) : (
-            <div key={i}><span style={{ ...label11, color: "var(--color-accent-700)" }}>Parakh{m.model ? <span style={{ color: "var(--color-neutral-500)", textTransform: "none", letterSpacing: 0 }}> · {m.model}</span> : null}</span><p style={{ margin: "4px 0 0", fontSize: 14 }}>{m.text}</p></div>
+            <div key={i}><span style={{ ...label11, color: "var(--color-accent-700)" }}>Parakh{m.model ? <span style={{ color: "var(--color-neutral-500)", textTransform: "none", letterSpacing: 0 }}> · {m.model}</span> : null}</span><p style={{ margin: "4px 0 0", fontSize: 16 }}>{m.text}</p></div>
           ))}
           {busy && <p style={{ margin: 0, color: "var(--color-neutral-700)" }}>Working on the draft…</p>}
         </div>
@@ -155,14 +161,14 @@ export default function RfqPage() {
           <button className="btn btn-primary btn-icon" type="submit" disabled={busy || !q.trim()} style={{ alignSelf: "flex-end" }} title="Send"><PaperPlaneRight size={18} weight="duotone" /></button>
         </form>
       </section>
-      <section style={{ flex: 1, minWidth: 0, overflow: "auto", padding: "18px 32px 32px 32px", display: "flex", flexDirection: "column", gap: 16 }}>
+      <section style={{ flex: 1, minWidth: 0, overflow: "auto", padding: "20px 32px 32px 28px", display: "flex", flexDirection: "column", gap: 16 }}>
         {!draft || !ev ? <span style={{ color: "var(--color-neutral-700)" }}>Loading the RFQ…</span> : (
           <>
             <div style={{ display: "flex", alignItems: "flex-end", gap: 10, flexWrap: "wrap" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: "1 0 100%" }}>
-                <span style={{ ...label11, whiteSpace: "nowrap" }}>Draft RFQ · {refId} · saved in this browser{refId !== ev.id ? " · separate from the demo comparison" : ""}</span>
+                <span style={{ fontSize: 15, color: "var(--color-neutral-700)", whiteSpace: "nowrap" }}>Draft RFQ · {refId} · saved in this browser{refId !== ev.id ? " · separate from the demo comparison" : ""}</span>
                 <input aria-label="RFQ title" value={title} placeholder="Name this RFQ, e.g. Corrugated boxes, FY28 H1" onChange={(e) => save({ ...draft, title: e.target.value })}
-                  style={{ fontSize: 26, fontFamily: "inherit", border: 0, borderBottom: "1px dashed var(--color-divider)", background: "transparent", padding: "0 0 2px", color: "var(--color-text)", width: "100%" }} />
+                  style={{ fontSize: 30, fontWeight: 600, lineHeight: 1.15, fontFamily: "inherit", border: 0, borderBottom: "1px dashed var(--color-divider)", background: "transparent", padding: "0 0 2px", color: "var(--color-text)", width: "100%" }} />
               </div>
               <span style={{ flex: 1 }} />
               <button className="btn btn-secondary" style={{ whiteSpace: "nowrap" }} onClick={() => { save(fresh()!); setTab("lines"); }}>Start from the issued RFQ</button>
@@ -172,26 +178,31 @@ export default function RfqPage() {
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 14 }}>
               {[["Deliver to", ev.plant], ["Price basis asked", draft.terms["Price basis"] ?? ev.basis], ["Contract period", "Oct 2026 – Mar 2027"]].map(([k, v]) => (
-                <label key={k} style={{ display: "flex", flexDirection: "column", gap: 4 }}><span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{k}</span><input className="input" defaultValue={v} /></label>
+                <label key={k} style={{ display: "flex", flexDirection: "column", gap: 4 }}><span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>{k}</span><input className="input" style={{ minHeight: 42, fontSize: 15 }} defaultValue={v} /></label>
               ))}
-              <label style={{ display: "flex", flexDirection: "column", gap: 4 }}><span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>Replies due</span>
-                <input className="input" value={due} placeholder="e.g. 20 Oct 2026" onChange={(e) => save({ ...draft, due: e.target.value })} /></label>
+              <label style={{ display: "flex", flexDirection: "column", gap: 4 }}><span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>Replies due</span>
+                <input className="input" style={{ minHeight: 42, fontSize: 15 }} value={due} placeholder="e.g. 20 Oct 2026" onChange={(e) => save({ ...draft, due: e.target.value })} /></label>
             </div>
-            <div style={{ display: "flex", gap: 22 }}>
-              <button style={tabS(tab === "lines")} onClick={() => setTab("lines")}>Line items · {draft.lines.length}</button>
-              <button style={tabS(tab === "q")} onClick={() => setTab("q")}>Questionnaire · {draft.questions.length}</button>
+            <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
+              <button style={tabS(tab === "lines")} onClick={() => setTab("lines")}>Lines {draft.lines.length}</button>
+              <button style={tabS(tab === "q")} onClick={() => setTab("q")}>Quality questions {draft.questions.length}</button>
               <button style={tabS(tab === "t")} onClick={() => setTab("t")}>Terms</button>
-              <button style={tabS(tab === "r")} onClick={() => setTab("r")}>Evaluation rules</button>
               <button style={tabS(tab === "s")} onClick={() => setTab("s")}>Send · {vendors.length} vendor{vendors.length === 1 ? "" : "s"}</button>
+              {/* The evaluation rules fold into one pill; the full tab is behind "Edit". */}
+              <button onClick={() => setTab("r")} title="Evaluation rules for this event" style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8, border: 0, font: "inherit", fontSize: 15, padding: "6px 14px", borderRadius: 999, cursor: "pointer",
+                background: tab === "r" ? "var(--color-accent-200)" : "var(--color-neutral-100)", boxShadow: tab === "r" ? "none" : "var(--shadow-sm)", color: "var(--color-text)", whiteSpace: "nowrap" }}>
+                <LockSimple size={16} weight="duotone" />Rules · {FIXED_RULES} · lock when sent <span style={{ color: "var(--color-accent-700)", fontWeight: 600 }}>Edit</span>
+              </button>
             </div>
+            <div className="sheet" style={{ padding: "16px 20px" }}>
             {tab === "lines" && (
               <div>
-                <div style={{ display: "grid", gridTemplateColumns: COLS, gap: "0 8px", ...label11, paddingBottom: 6, borderBottom: "1px solid var(--color-text)" }}>
+                <div style={{ display: "grid", gridTemplateColumns: COLS, gap: "0 8px", fontSize: 14, fontWeight: 600, color: "var(--color-neutral-800)", paddingBottom: 8, boxShadow: "inset 0 -2px 0 var(--color-text)" }}>
                   <span>Line</span><span>Box</span><span>Size</span><span>Board and print</span><span style={{ textAlign: "right" }}>Qty</span><span />
                 </div>
                 {draft.lines.map((l, i) => (
-                  <div key={l.id} style={{ display: "grid", gridTemplateColumns: COLS, gap: "0 8px", alignItems: "center", padding: "5px 0", borderBottom: "1px solid color-mix(in srgb, var(--color-text) 8%, transparent)", background: l.tag === "changed by chat" || l.tag === "new SKU" ? "var(--color-accent-100)" : undefined }}>
-                    <span style={{ color: "var(--color-neutral-700)", display: "flex", flexDirection: "column", lineHeight: 1.15 }}>{l.id}{l.tag && <span style={{ fontSize: 10, color: "var(--color-accent-800)" }}>{l.tag}</span>}</span>
+                  <div key={l.id} style={{ display: "grid", gridTemplateColumns: COLS, gap: "0 8px", alignItems: "center", padding: "6px 0", boxShadow: "inset 0 -1px 0 var(--color-neutral-300)", background: l.tag === "changed by chat" || l.tag === "new SKU" ? "var(--color-accent-100)" : undefined }}>
+                    <span style={{ color: "var(--color-neutral-700)", display: "flex", flexDirection: "column", lineHeight: 1.15 }}>{l.id}{l.tag && <span style={{ fontSize: 13, color: "var(--color-accent-800)" }}>{l.tag}</span>}</span>
                     {(["name", "size", "spec"] as const).map((f) => (
                       <input key={f} className="input" style={inp} value={l[f]} onChange={(e) => save({ ...draft, lines: draft.lines.map((x, j) => (j === i ? { ...x, [f]: e.target.value } : x)) })} />
                     ))}
@@ -211,7 +222,7 @@ export default function RfqPage() {
                 {draft.questions.map((x, i) => (
                   <div key={x.id + i} style={{ display: "grid", gridTemplateColumns: "30px minmax(0,1fr) 120px 30px", gap: 12, alignItems: "center", padding: "8px 0", borderBottom: "1px solid color-mix(in srgb, var(--color-text) 8%, transparent)" }}>
                     <span style={{ color: "var(--color-neutral-700)" }}>{x.id}</span>
-                    <input className="input" value={x.text} onChange={(e) => save({ ...draft, questions: draft.questions.map((y, j) => (j === i ? { ...y, text: e.target.value } : y)) })} />
+                    <input className="input" style={{ minHeight: 38, background: "var(--color-bg)" }} value={x.text} onChange={(e) => save({ ...draft, questions: draft.questions.map((y, j) => (j === i ? { ...y, text: e.target.value } : y)) })} />
                     <span style={{ color: x.type === "Mandatory" ? "var(--color-accent-2-800)" : undefined, fontWeight: x.type === "Mandatory" ? 600 : 400 }}>{x.type}</span>
                     <button className="btn btn-ghost btn-icon" title={`Remove ${x.id}`} onClick={() => save({ ...draft, questions: draft.questions.filter((_, j) => j !== i).map((y, j) => ({ ...y, id: `Q${j + 1}` })) })}><X size={14} weight="duotone" /></button>
                   </div>
@@ -223,7 +234,7 @@ export default function RfqPage() {
                   <select className="input" value={newQ.type} onChange={(e) => setNewQ({ ...newQ, type: e.target.value })} style={{ minHeight: 34 }}><option>Scored</option><option>Mandatory</option></select>
                   <button className="btn btn-secondary" type="submit" disabled={!newQ.text.trim()}><Plus size={14} weight="duotone" />Add question</button>
                 </form>
-                {refId === ev.id && <p style={{ fontSize: 12.5, color: "var(--color-neutral-700)" }}>The quality score for this event is marked on the Evaluation rules tab. Questions you add here go out with your RFQ; marking them is not part of this demo yet.</p>}
+                {refId === ev.id && <p style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>The quality score for this event is marked on the Evaluation rules tab. Questions you add here go out with your RFQ; marking them is not part of this demo yet.</p>}
               </div>
             )}
             {tab === "s" && (
@@ -234,11 +245,12 @@ export default function RfqPage() {
             {tab === "t" && (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 14, maxWidth: 900 }}>
                 {Object.entries(draft.terms).map(([k, v]) => (
-                  <label key={k} style={{ display: "flex", flexDirection: "column", gap: 4 }}><span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{k}</span>
+                  <label key={k} style={{ display: "flex", flexDirection: "column", gap: 4 }}><span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>{k}</span>
                     <input className="input" value={v} onChange={(e) => save({ ...draft, terms: { ...draft.terms, [k]: e.target.value } })} /></label>
                 ))}
               </div>
             )}
+            </div>
           </>
         )}
       </section>

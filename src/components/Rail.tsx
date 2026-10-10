@@ -17,28 +17,27 @@ export function Rail() {
     { icon: SealCheck, label: "Award", href: `/events/${EVENT}/award` },
   ];
   return (
-    <nav style={{ width: 68, flex: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "18px 0", position: "sticky", top: 0, height: "100vh", zIndex: 30 }}>
+    <nav style={{ width: 84, flex: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "22px 0", position: "sticky", top: 0, height: "100vh", zIndex: 30 }}>
       <WorkspaceMenu />
       {items.map((r) => {
         const on = r.href.split("?")[0] === path;
-        const s = {
-          display: "flex", flexDirection: "column" as const, alignItems: "center", gap: 2, padding: "8px 0", width: 56, textDecoration: "none",
-          color: on ? "var(--color-accent)" : r.href ? "var(--color-neutral-700)" : "var(--color-neutral-400)",
+        const s: React.CSSProperties = {
+          width: 68, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "10px 0", textDecoration: "none", borderRadius: "var(--radius-lg)",
+          background: on ? "var(--color-accent-200)" : "transparent", color: on ? "var(--color-accent-800)" : "var(--color-neutral-800)", fontWeight: on ? 600 : 400,
         };
-        const body = <><r.icon size={20} weight="duotone" /><span style={{ fontSize: 10 }}>{r.label}</span></>;
-        return r.href ? <Link key={r.label} href={r.href} style={s}>{body}</Link> : <span key={r.label} style={s} title="Coming in a later milestone">{body}</span>;
+        return <Link key={r.label} href={r.href} style={s} className={on ? undefined : "rail-item"}><r.icon size={24} weight="duotone" /><span style={{ fontSize: 13 }}>{r.label}</span></Link>;
       })}
     </nav>
   );
 }
 
-/** Screen header pattern: an 11 px uppercase meta line, then a 26 px H1. */
+/** Screen header pattern (v2): a 15 px meta line, then a 30 px H1. */
 export function ScreenHead({ meta, title, children }: { meta: React.ReactNode; title: React.ReactNode; children?: React.ReactNode }) {
   return (
     <div style={{ display: "flex", alignItems: "flex-end", gap: 16 }}>
       <div style={{ display: "flex", flexDirection: "column", gap: 2, marginRight: "auto" }}>
-        <span style={{ fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-neutral-700)" }}>{meta}</span>
-        <h1 style={{ fontSize: 26, margin: 0, lineHeight: 1.2 }}>{title}</h1>
+        <span style={{ fontSize: 15, color: "var(--color-neutral-700)" }}>{meta}</span>
+        <h1 style={{ fontSize: 30, fontWeight: 600, margin: 0, lineHeight: 1.15 }}>{title}</h1>
       </div>
       {children}
     </div>

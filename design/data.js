@@ -158,26 +158,26 @@
   const D = [];
   const st = (i, p, alt) => lines[i].qty * (alt - p);
   { const i = 13, ru = best(i)[1]; D.push({ id: 'D1', vid: 'AC', lines: [i], stake: lines[i].qty * (ru.p - 18.30), route: 'buyer', kind: 'Spec substitution',
-    title: 'Anand offered 3-ply on L14 where 5-ply was asked', why: `Anand wins L14 at ₹18.30 only because the card prices a 3-ply box. The next 5-ply offer is ${VI[ru.vid].short} at ${inr(ru.p)}.`,
-    ask: 'Judgement call: accept a 3-ply substitute for the exhaust fan carton, or price it out?',
+    title: 'Anand offered 3-ply on L14 where 5-ply was asked', why: `Quoted 3-ply. Next 5-ply: ${VI[ru.vid].short} at ${inr(ru.p)}.`,
+    ask: 'Accept 3-ply for this carton?',
     options: ['Reject the substitute (award goes to ' + VI[ru.vid].short + ')', 'Ask Anand to quote 5-ply', 'Accept 3-ply, with a note for QA'] }); }
   { const ls = [4, 10, 23]; let s = 0; ls.forEach(i => s += st(i, cells.VP[i].p, cells.VP[i].gross)); D.push({ id: 'D2', vid: 'VP', lines: ls, stake: s, route: 'vendor', kind: 'Conditional discount',
-    title: 'Vardhman’s 2.5% discount applies only above ₹25 lakh per PO', why: 'The discount sits in footnote ‡ on page 3. Our monthly POs to one vendor run ₹14–18 lakh, so it may never apply. Without it, Vardhman loses L05, L11 and L24.',
-    ask: 'Ask Vardhman whether the discount applies to the event value or to each PO.',
+    title: 'Vardhman’s 2.5% discount applies only above ₹25 lakh per PO', why: 'Our POs are ₹14–18 lakh. Without it, Vardhman loses L05, L11, L24.',
+    ask: 'Ask Vardhman how the discount applies.',
     email: { to: 'ritu.shah@vardhmanpackwell.in', subject: 'SE-2026-041 — footnote ‡ on your quote VPE/Q/2026/118', body: 'Dear Ritu,\n\nThank you for quotation VPE/Q/2026/118. Footnote ‡ offers 2.5% off on orders above ₹25 lakh per PO. Our releases are monthly, typically ₹14–18 lakh each.\n\nCould you confirm whether the discount is applied on the total annual award, or only on a single PO above ₹25 lakh?\n\nRegards,\nVikram Deshpande\nCategory Buyer, Packaging — Sahyadri Appliances' } }); }
   { const ls = lines.filter(l => l.win === 'RB' && l.second && l.second.p - l.winP < 0.38 && !(l.i >= 25 && l.print !== 'none')).map(l => l.i); let s = 0; ls.forEach(i => s += st(i, cells.RB[i].p, cells.RB[i].p + 0.38));
     D.push({ id: 'D3', vid: 'RB', lines: ls, stake: s, route: 'vendor', kind: 'Missing commercial term',
-      title: `Rohit Box said "freight extra" — ${ls.length} wins depend on it`, why: `We added ₹0.42 per box from last year’s Pune → Chakan lane rate. If real freight is ₹0.80, Rohit Box loses ${ls.map(i => lines[i].id).join(', ')}.`,
-      ask: 'Ask Rohit Box for freight per trip, or a delivered price.',
+      title: `Rohit Box said "freight extra" — ${ls.length} wins depend on it`, why: `Assumed ₹0.42/box. At ₹0.80, Rohit Box loses ${ls.map(i => lines[i].id).join(', ')}.`,
+      ask: 'Ask Rohit Box for a delivered price.',
       email: { to: 'rohit@rohitbox.co.in', subject: 'SE-2026-041 — freight to Chakan', body: 'Dear Rohit ji,\n\nThanks for your rates (₹42/kg 5-ply, ₹38/kg 3-ply). You mentioned freight extra. To compare fairly, could you share either:\n\n• freight per trip, Pune to our Chakan plant (32 ft truck), or\n• a delivered price per kg.\n\nRegards,\nVikram Deshpande' } }); }
   { const i = 18; D.push({ id: 'D4', vid: 'AC', lines: [i], stake: st(i, 31.20, 37.20), route: 'vendor', kind: 'Unclear reading',
-    title: 'Hand-corrected price on Anand’s card: ₹31.20 or ₹37.20?', why: `L19 is struck through and re-written by hand. Two independent reads disagree on the first digit. At ₹31.20 Anand wins; at ₹37.20 ${VI[best(i)[1].vid].short} does.`,
-    ask: 'Ask Anand to confirm the L19 rate in writing.',
+    title: 'Hand-corrected price on Anand’s card: ₹31.20 or ₹37.20?', why: `Hand-corrected; two reads disagree. At ₹31.20 Anand wins; at ₹37.20 ${VI[best(i)[1].vid].short} does.`,
+    ask: 'Ask Anand to confirm in writing.',
     email: { to: 'dilip@anandcartons.com', subject: 'SE-2026-041 — please confirm rate for juicer carton', body: 'Dear Dilip bhai,\n\nOn your rate card the juicer carton (380×300×320, 5-ply) is corrected by hand. Please confirm the rate per box in writing: ₹31.20 or ₹37.20?\n\nRegards,\nVikram' } }); }
   { const ls = lines.filter(l => l.i >= 25 && l.print !== 'none' && l.win === 'RB').map(l => l.i); if (ls.length) { let s = 0; ls.forEach(i => s += st(i, cells.RB[i].p, cells.RB[i].p + 1.10));
     D.push({ id: 'D5', vid: 'RB', lines: ls, stake: s, route: 'buyer', kind: '"Same as last year"',
-      title: `"Rest same as last year" can’t cover ${ls.map(i => lines[i].id).join(', ')} — they’re new`, why: 'SE-2025-037 had no price for these SKUs. Print cost was taken from the nearest last-year spec. If it is printed 4-colour like its siblings, print runs up to ₹1.10 higher and Rohit Box loses.',
-      ask: 'Judgement call: accept nearest-spec print cost, or ask Rohit Box to price these lines?', options: ['Accept nearest-spec print cost', 'Ask Rohit Box to price these lines'] }); } }
+      title: `"Rest same as last year" can’t cover ${ls.map(i => lines[i].id).join(', ')} — they’re new`, why: 'New SKUs. Print cost taken from nearest last-year spec.',
+      ask: 'Accept nearest-spec print cost?', options: ['Accept nearest-spec print cost', 'Ask Rohit Box to price these lines'] }); } }
   D.sort((a, b) => b.stake - a.stake);
   D.forEach((d, k) => { d.rank = k + 1; d.vendor = VI[d.vid]; d.stakeL = lakh(d.stake); d.lineIds = d.lines.map(i => lines[i].id).join(', '); d.lines.forEach(i => { const c = cells[d.vid][i]; c.kind = 'doubt'; c.doubt = d.id; }); });
   const totalStake = D.reduce((s, d) => s + d.stake, 0);

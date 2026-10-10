@@ -1,7 +1,7 @@
 "use client";
 // L25 conversation panel (design: right panel, "Conversation"). Shared by the buyer and the VP;
 // every question is labelled with who asked it. Answers that produced a scenario carry a result card.
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChartBarHorizontal, PaperPlaneRight, Table } from "@phosphor-icons/react";
 import { crore, lakh } from "@/lib/format";
 import type { ScenarioResult } from "@/lib/scenario";
@@ -20,7 +20,8 @@ export interface ChatMsg {
 
 export interface People { buyer: string; vp: string }
 
-const label = { fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const };
+const label = { fontSize: 14 };
+const KEEP = 3;
 const SUGGESTIONS = [
   "What if we split it, cheapest per line, but only among vendors who cleared the quality questionnaire?",
   "Same split, but assume every open doubt goes against us.",
@@ -38,12 +39,19 @@ export function Conversation({ msgs, results, titles, people, asker, busy, q, se
     if (el) el.scrollTop = el.scrollHeight;
   }, [msgs.length, busy]);
   const asked = new Set(msgs.filter((m) => m.role === "user").map((m) => m.text));
+  // v2: the last three messages, with the earlier ones one click away.
+  const [all, setAll] = useState(false);
+  const hidden = all ? 0 : Math.max(0, msgs.length - KEEP);
 
   return (
     <>
       <div ref={thread} style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "16px 22px", display: "flex", flexDirection: "column", gap: 18 }}>
-        <Bot text={opening} />
-        {msgs.map((m, i) =>
+        {hidden > 0 ? (
+          <button className="btn btn-ghost" style={{ alignSelf: "flex-start", fontSize: 15, color: "var(--color-accent-700)", padding: "2px 0" }} onClick={() => setAll(true)}>
+            Show {hidden + 1} earlier message{hidden ? "s" : ""}
+          </button>
+        ) : <Bot text={opening} />}
+        {msgs.map((m, i) => i < hidden ? null :
           m.role === "user" ? (
             <div key={i} style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-end", paddingLeft: 44 }}>
               <span style={{ ...label, display: "flex", gap: 6, alignItems: "center", color: "var(--color-neutral-700)" }}>
@@ -67,10 +75,10 @@ export function Conversation({ msgs, results, titles, people, asker, busy, q, se
                       <span style={{ color: "var(--color-accent-800)" }}>{d >= 0 ? "+" : "−"}{lakh(Math.abs(d))} vs cheapest overall</span>
                     </span>
                     <span style={{ color: "var(--color-neutral-800)" }}>{Object.entries(r.award.byVendor).filter(([, b]) => b.lines).map(([v, b]) => `${vendorNames[v]} ${b.lines}`).join(" · ")} lines</span>
-                    <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{r.rules.length} rules · {r.excluded.length ? `${r.excluded.length} vendor${r.excluded.length > 1 ? "s" : ""} excluded` : "no vendors excluded"} · {r.changed.length} lines change hands</span>
+                    <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>{r.rules.length} rules · {r.excluded.length ? `${r.excluded.length} vendor${r.excluded.length > 1 ? "s" : ""} excluded` : "no vendors excluded"} · {r.changed.length} lines change hands</span>
                     <div style={{ display: "flex", gap: 6, paddingTop: 2 }}>
-                      <button className="btn btn-secondary" onClick={() => onShow(si, "table")} style={{ padding: "4px 10px", fontSize: 12 }}><Table size={14} weight="duotone" />Table</button>
-                      <button className="btn btn-secondary" onClick={() => onShow(si, "chart")} style={{ padding: "4px 10px", fontSize: 12 }}><ChartBarHorizontal size={14} weight="duotone" />Chart</button>
+                      <button className="btn btn-secondary" onClick={() => onShow(si, "table")} style={{ padding: "4px 10px", fontSize: 14 }}><Table size={14} weight="duotone" />Table</button>
+                      <button className="btn btn-secondary" onClick={() => onShow(si, "chart")} style={{ padding: "4px 10px", fontSize: 14 }}><ChartBarHorizontal size={14} weight="duotone" />Chart</button>
                     </div>
                   </div>
                 );
@@ -82,11 +90,11 @@ export function Conversation({ msgs, results, titles, people, asker, busy, q, se
       </div>
       <div style={{ padding: "10px 22px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-          {SUGGESTIONS.filter((s) => !asked.has(s)).map((s) => (
-            <button key={s} disabled={busy} onClick={() => onAsk(s)} style={{ background: "var(--color-bg)", border: 0, padding: "4px 10px", font: "inherit", fontSize: 12, color: "var(--color-accent-800)", borderRadius: "var(--radius-md)", textAlign: "left" }}>{s}</button>
+          {SUGGESTIONS.filter((s) => !asked.has(s)).slice(0, 3).map((s) => (
+            <button key={s} disabled={busy} onClick={() => onAsk(s)} style={{ background: "var(--color-neutral-100)", boxShadow: "var(--shadow-sm)", border: 0, padding: "5px 10px", font: "inherit", fontSize: 14, color: "var(--color-accent-800)", borderRadius: "var(--radius-lg)", textAlign: "left", cursor: "pointer" }}>{s}</button>
           ))}
         </div>
-        <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>
+        <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>
           Asking as {asker === "vp" ? `${people.vp}, VP` : `${people.buyer}, buyer`} · switch in the P menu
         </span>
         <form style={{ display: "flex", gap: 8 }} onSubmit={(e) => { e.preventDefault(); if (q.trim() && !busy) onAsk(q.trim()); }}>
@@ -103,7 +111,7 @@ function Bot({ text, muted, model }: { text: string; muted?: boolean; model?: st
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <span style={{ ...label, color: "var(--color-accent-700)" }}>Parakh{model ? <span style={{ color: "var(--color-neutral-500)", letterSpacing: 0, textTransform: "none" }}> · {model}</span> : null}</span>
-      <p style={{ margin: 0, fontSize: 14, color: muted ? "var(--color-neutral-700)" : undefined, whiteSpace: "pre-wrap" }}>{text}</p>
+      <p style={{ margin: 0, fontSize: 16, color: muted ? "var(--color-neutral-700)" : undefined, whiteSpace: "pre-wrap" }}>{text}</p>
     </div>
   );
 }

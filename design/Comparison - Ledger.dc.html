@@ -29,7 +29,7 @@
         <span style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700);">SE-2026-041 · Sahyadri Appliances, Chakan · Vikram Deshpande</span>
         <h1 style="font-size:26px; margin:0;">Corrugated boxes, FY27 H2</h1>
       </div>
-      <span style="color:var(--color-neutral-700); max-width:330px; text-align:right;">Every price per box, in rupees, delivered Chakan, GST 18% extra.</span>
+      <span style="color:var(--color-neutral-700); max-width:330px; text-align:right;">Per box · ₹ · delivered · GST extra</span>
       <button class="btn btn-secondary"><i class="ph-duotone ph-export" style="font-size:16px;"></i>Export</button>
       <a class="btn btn-primary" href="Shared Screens.dc.html#award" style="color:var(--color-bg); white-space:nowrap;"><i class="ph-duotone ph-seal-check" style="font-size:16px;"></i>Freeze for award</a>
     </header>
@@ -39,7 +39,7 @@
       <button onClick="{{ toDoubts }}" style="{{ tabD }}" title="Doubts">Doubts <span style="color:var(--color-accent-2-700);">{{ doubtCount }}</span> · {{ stakeL }} at stake</button>
       <span style="margin-left:auto; display:flex; align-items:center; gap:10px; font-size:13px;">
         <i class="ph-duotone ph-seal-check" style="font-size:18px; color:var(--color-accent-700);"></i>
-        <span style="display:flex; flex-direction:column; line-height:1.25;"><span><span style="font-weight:600;">{{ winVerTxt }}</span> winning prices verified by you</span><span style="font-size:11px; color:var(--color-neutral-700);">{{ allVerTxt }} of all quoted prices</span></span>
+        <span style="display:flex; flex-direction:column; line-height:1.25;"><span><span style="font-weight:600;">{{ winVerTxt }}</span> winners verified</span><span style="font-size:11px; color:var(--color-neutral-700);">{{ allVerTxt }} prices overall</span></span>
         <button class="btn btn-secondary" onClick="{{ nextWinner }}" style="padding:4px 10px; font-size:12px; white-space:nowrap;">{{ nextWinnerTxt }}</button>
       </span>
     </div>
@@ -51,14 +51,14 @@
       <sc-if value="{{ legendOpen }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px 26px; padding:14px 28px 10px 8px; font-size:12px; line-height:1.25;">
         <button onClick="{{ toggleLegend }}" style="display:flex; align-items:center; gap:6px; background:none; border:0; padding:0; font:inherit; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700); cursor:pointer;"><i class="ph-duotone ph-caret-down"></i>How to read a price</button>
-        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider);">24.60</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Checked</span><span style="color:var(--color-neutral-700);">as written, two reads agree</span></span></span>
-        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider);"><span style="text-decoration:underline dotted var(--color-neutral-600); text-underline-offset:3px;">24.60</span></span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Converted</span><span style="color:var(--color-neutral-700);">dotted line = a sum, click it</span></span></span>
-        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider); font-style:italic; color:var(--color-neutral-800);">24.60<sup style="font-size:8px; font-style:normal; letter-spacing:0.04em; margin-left:1px;">LY</sup></span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Last year’s price</span><span style="color:var(--color-neutral-700);">italic, from SE-2025-037</span></span></span>
-        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider);">24.60<sup style="font-size:10px; font-weight:600; margin-left:1px;">↑</sup></span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Unusual price</span><span style="color:var(--color-neutral-700);">↑ or ↓ over 12% from should-cost</span></span></span>
-        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider); color:var(--color-neutral-500);">—</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Not quoted</span><span style="color:var(--color-neutral-700);">vendor skipped this line</span></span></span>
-        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; background:var(--color-accent-2-100); color:var(--color-accent-2-800); font-weight:600;">24.60?</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600; color:var(--color-accent-2-800);">Doubt</span><span style="color:var(--color-neutral-700);">could change who wins</span></span></span>
-        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider); font-weight:600;">24.60</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Lowest</span><span style="color:var(--color-neutral-700);">bold = cheapest on the line</span></span></span>
-        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; display:flex; gap:3px; justify-content:flex-end; align-items:center; box-shadow:inset 0 0 0 1px var(--color-divider);"><i class="ph-duotone ph-seal-check" style="font-size:12px; color:var(--color-accent-700);"></i>24.60</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Verified by you</span><span style="color:var(--color-neutral-700);">you checked it against the source</span></span></span>
+        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider);">24.60</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Checked</span></span></span>
+        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider);"><span style="text-decoration:underline dotted var(--color-neutral-600); text-underline-offset:3px;">24.60</span></span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Converted</span><span style="color:var(--color-neutral-700);">click for the sum</span></span></span>
+        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider); font-style:italic; color:var(--color-neutral-800);">24.60<sup style="font-size:8px; font-style:normal; letter-spacing:0.04em; margin-left:1px;">LY</sup></span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Last year’s price</span></span></span>
+        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider);">24.60<sup style="font-size:10px; font-weight:600; margin-left:1px;">↑</sup></span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Unusual price</span><span style="color:var(--color-neutral-700);">12%+ off should-cost</span></span></span>
+        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider); color:var(--color-neutral-500);">—</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Not quoted</span></span></span>
+        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; background:var(--color-accent-2-100); color:var(--color-accent-2-800); font-weight:600;">24.60?</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600; color:var(--color-accent-2-800);">Doubt</span><span style="color:var(--color-neutral-700);">may change winner</span></span></span>
+        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; text-align:right; box-shadow:inset 0 0 0 1px var(--color-divider); font-weight:600;">24.60</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Lowest</span></span></span>
+        <span style="display:flex; gap:8px; align-items:center;"><span style="min-width:50px; padding:3px 6px; display:flex; gap:3px; justify-content:flex-end; align-items:center; box-shadow:inset 0 0 0 1px var(--color-divider);"><i class="ph-duotone ph-seal-check" style="font-size:12px; color:var(--color-accent-700);"></i>24.60</span><span style="display:flex; flex-direction:column;"><span style="font-weight:600;">Verified by you</span></span></span>
       </div>
       </sc-if>
 
@@ -190,7 +190,7 @@
                   </sc-for>
                 </tbody>
               </table>
-              <sc-if value="{{ noChanged }}" hint-placeholder-val="{{ false }}"><span style="color:var(--color-neutral-700);">No lines change hands — this is the as-quoted view.</span></sc-if>
+              <sc-if value="{{ noChanged }}" hint-placeholder-val="{{ false }}"><span style="color:var(--color-neutral-700);">No changes.</span></sc-if>
             </div>
           </div>
         </sc-if>
@@ -201,7 +201,7 @@
 
     <sc-if value="{{ isDoubts }}" hint-placeholder-val="{{ false }}">
       <div style="flex:1; min-height:0; overflow:auto; padding:18px 28px 32px 8px; display:flex; flex-direction:column; gap:16px; max-width:1180px;">
-        <p style="margin:0; max-width:760px; color:var(--color-neutral-800); text-wrap:pretty;">Only doubts that could change who wins a line, ranked by rupees at stake. {{ loggedCount }} more were checked and logged — none of them changes a winner.</p>
+        <p style="margin:0; max-width:760px; color:var(--color-neutral-800); text-wrap:pretty;">Ranked by rupees at stake. {{ loggedCount }} minor checks logged.</p>
         <div style="display:grid; grid-template-columns:40px minmax(0,1fr) 120px 110px 120px; gap:0 16px; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-neutral-700); padding-bottom:6px; border-bottom:1px solid var(--color-text);">
           <span>Rank</span><span>Doubt</span><span>Lines</span><span>Goes to</span><span style="text-align:right;">At stake</span>
         </div>
@@ -290,7 +290,7 @@
                 <div class="seg"><button onClick="{{ asBuyer }}" style="{{ asBuyerS }}">Vikram · buyer</button><button onClick="{{ asVp }}" style="{{ asVpS }}">Anita · VP</button></div>
               </div>
               <div style="display:flex; gap:8px;">
-                <textarea class="input" style="min-height:58px; background:var(--color-bg);" placeholder="Ask a what-if — e.g. cap any one vendor at 40%" value="{{ q }}" onChange="{{ onQ }}"></textarea>
+                <textarea class="input" style="min-height:58px; background:var(--color-bg);" placeholder="Ask a what-if…" value="{{ q }}" onChange="{{ onQ }}"></textarea>
                 <button class="btn btn-primary btn-icon" onClick="{{ ask }}" style="align-self:flex-end;" title="Ask"><i class="ph-duotone ph-paper-plane-right" style="font-size:18px;"></i></button>
               </div>
             </div>
@@ -332,7 +332,7 @@
                 </div>
               </sc-if>
               <sc-if value="{{ noSel }}" hint-placeholder-val="{{ false }}">
-                <p style="margin:0; color:var(--color-neutral-700); max-width:320px;">Click any price in the table to see the original document, the exact place it was read from, and the arithmetic.</p>
+                <p style="margin:0; color:var(--color-neutral-700); max-width:320px;">Click a price to see its source.</p>
               </sc-if>
             </div>
           </sc-if>
@@ -361,11 +361,11 @@ class Component extends DCLogic {
   scroll() { setTimeout(() => { const el = this.threadRef.current; if (el) el.scrollTop = el.scrollHeight; }, 60); }
   defs() {
     return {
-      S1: { id: 'S1', name: 'Cheapest per line, quality-cleared only', title: 'Cheapest per line, quality-cleared only', desc: 'Each line goes to its lowest price, but only vendors who passed the quality questionnaire can win. The usual starting point for a defensible award.', short: 'Split cheapest per line, quality-cleared only', q: 'What if we split it, cheapest per line, but only among vendors who cleared the quality questionnaire?', elig: true },
-      S5: { id: 'S5', name: 'Two vendors only, lowest total', title: 'Two vendors only, lowest total', desc: 'Award to the best pair of quality-cleared vendors: every pair that covers all lines is tried, each line goes to the cheaper of the two, and the cheapest pair wins. Keeps a second source without managing five.', short: 'Best pair of vendors', elig: true, pair: true },
-      S4: { id: 'S4', name: 'One vendor for everything, lowest total', title: 'One vendor for everything, lowest total', desc: 'A single quality-cleared vendor takes every line. Only vendors who quoted all lines qualify; the lowest total wins. Simplest to run, no second source.', short: 'Single vendor', elig: true, single: true },
-      S3: { id: 'S3', name: 'Spread the risk, no vendor above 40%', title: 'Spread the risk, no vendor above 40%', desc: 'Cheapest per line among quality-cleared vendors, but no vendor may take more than 40% of award value. Lines move to the next-cheapest vendor, cheapest moves first.', short: 'Cap any one vendor at 40% of the value', q: 'Keep it to quality-cleared vendors, but don’t let any one vendor take more than 40% of the value.', elig: true, cap: 0.4 },
-      S2: { id: 'S2', name: 'Worst case on open doubts', title: 'Worst case on open doubts', desc: 'Cheapest per line among quality-cleared vendors, with every open doubt resolved against us: conditional discounts dropped, freight at the high estimate, unclear readings at the higher figure. Shows the most the doubts can cost.', short: 'Same, but assume open doubts go against us', q: 'Same split, but assume every open doubt goes against us.', elig: true, worst: true }
+      S1: { id: 'S1', name: 'Cheapest per line, quality-cleared only', title: 'Cheapest per line, quality-cleared only', desc: 'Lowest price per line, quality-cleared vendors only.', short: 'Split cheapest per line, quality-cleared only', q: 'What if we split it, cheapest per line, but only among vendors who cleared the quality questionnaire?', elig: true },
+      S5: { id: 'S5', name: 'Two vendors only, lowest total', title: 'Two vendors only, lowest total', desc: 'Best pair of cleared vendors. Each line to the cheaper one.', short: 'Best pair of vendors', elig: true, pair: true },
+      S4: { id: 'S4', name: 'One vendor for everything, lowest total', title: 'One vendor for everything, lowest total', desc: 'One cleared vendor takes all 30 lines.', short: 'Single vendor', elig: true, single: true },
+      S3: { id: 'S3', name: 'Spread the risk, no vendor above 40%', title: 'Spread the risk, no vendor above 40%', desc: 'Lowest price per line. No vendor above 40% of value.', short: 'Cap any one vendor at 40% of the value', q: 'Keep it to quality-cleared vendors, but don’t let any one vendor take more than 40% of the value.', elig: true, cap: 0.4 },
+      S2: { id: 'S2', name: 'Worst case on open doubts', title: 'Worst case on open doubts', desc: 'Every open doubt resolved against us.', short: 'Same, but assume open doubts go against us', q: 'Same split, but assume every open doubt goes against us.', elig: true, worst: true }
     };
   }
   worstP(c) { if (c.p == null) return null; if (c.vid === 'VP') return c.gross; if (c.kind !== 'doubt') return c.p; return { D1: null, D3: c.p + 0.38, D4: c.alt, D5: c.p + 1.10 }[c.doubt] ?? c.p; }
@@ -433,34 +433,34 @@ class Component extends DCLogic {
     const fBy = {}; K.vendors.forEach(v => fBy[v.id] = { lines: 0, value: 0 }); let fTot = 0; vis.forEach(l => { const w = sol.per[l.i]; fBy[w.vid].lines++; fBy[w.vid].value += w.p * l.qty; fTot += w.p * l.qty; });
     const filtered = vis.length !== 30;
     const foot = K.vendors.map(v => { const b = filtered ? fBy[v.id] : sol.by[v.id]; return { lines: b.lines || '—', value: b.lines ? K.lakh(b.value) : '' }; });
-    const chipDefs = [['all', 'All lines'], ['doubt', 'With doubts'], ['changed', 'Winner changed'], ['unver', 'Winner not verified by you'], ['oor', 'Unusual price'], ['miss', 'Missing quotes'], ['ly', 'Last year’s prices']].filter(c => c[0] !== 'changed' || def);
+    const chipDefs = [['all', 'All lines'], ['doubt', 'With doubts'], ['changed', 'Winner changed'], ['unver', 'Not verified'], ['oor', 'Unusual price'], ['miss', 'Missing quotes'], ['ly', 'Last year']].filter(c => c[0] !== 'changed' || def);
     const chips = chipDefs.map(c => { const on = F.show === c[0]; return { t: c[1], n: base1.filter(tests[c[0]]).length, go: () => setF({ show: c[0] }),
       s: { whiteSpace: 'nowrap', border: 0, padding: '4px 10px', font: 'inherit', fontSize: 12.5, cursor: 'pointer', borderRadius: 'var(--radius-md)', background: on ? 'var(--color-accent)' : 'transparent', color: on ? 'var(--color-bg)' : 'var(--color-accent-800)', boxShadow: on ? 'none' : 'inset 0 0 0 1px var(--color-divider)' },
       ns: { opacity: 0.75, marginLeft: 2 } }; });
     const pct = x => (x / K.baseline.total * 100).toFixed(1);
     const dTxt = s2 => { const d = s2.total - K.baseline.total; return (d >= 0 ? '+' : '−') + K.lakh(Math.abs(d)) + ' (' + (d >= 0 ? '+' : '−') + Math.abs(+pct(d)) + '%) vs cheapest overall'; };
     const split = s2 => K.vendors.filter(v => s2.by[v.id].lines).map(v => `${v.short} ${s2.by[v.id].lines}`).join(' · ') + ' lines';
-    const rulesFor = d => { const r = [{ n: 'R1', t: 'Basis unchanged: per box, ₹, delivered Chakan, GST extra.' }];
-      if (d.elig) r.push({ n: 'R2', t: 'Eligible: questionnaire returned, score 70 or more, both mandatory items passed.' });
+    const rulesFor = d => { const r = [{ n: 'R1', t: 'Per box, ₹, delivered, GST extra.' }];
+      if (d.elig) r.push({ n: 'R2', t: 'Quality cleared: score 70+, mandatory items passed.' });
       const sd = solFor(d.id), nm = c => c.map(id => K.VI[id].short).join(' + ');
-      if (d.single) { r.push({ n: 'R3', t: 'One vendor takes every line; only vendors who quoted all 30 lines qualify. Lowest total wins.' }); r.push({ n: 'R5', t: 'Compared: ' + sd.considered.map(x => nm(x.c) + ' ' + K.crore(x.tot)).join(' · ') + '.' }); }
-      else if (d.pair) { r.push({ n: 'R3', t: 'At most two vendors. Each pair that covers all 30 lines is tried; each line goes to the cheaper of the pair; lowest total wins.' }); r.push({ n: 'R5', t: 'Best: ' + sd.considered.slice(0, 3).map(x => nm(x.c) + ' ' + K.crore(x.tot)).join(' · ') + ' (' + sd.considered.length + ' pairs tried).' }); }
-      else r.push({ n: 'R3', t: 'Each line goes to the lowest eligible price.' });
-      r.push(d.worst ? { n: 'R4', t: 'Open doubts priced against us: Vardhman without the 2.5% footnote discount, freight ₹0.80, ₹37.20 on L19, no 3-ply substitute.' } : { n: 'R4', t: 'Open doubts priced as read; flagged where they still matter.' });
-      if (d.cap) r.push({ n: 'R5', t: `No vendor above ${d.cap * 100}% of award value; lines move to the next-cheapest eligible vendor, cheapest moves first.` });
+      if (d.single) { r.push({ n: 'R3', t: 'One vendor, all 30 lines. Lowest total.' }); r.push({ n: 'R5', t: 'Compared: ' + sd.considered.map(x => nm(x.c) + ' ' + K.crore(x.tot)).join(' · ') + '.' }); }
+      else if (d.pair) { r.push({ n: 'R3', t: 'Two vendors max. Lowest total.' }); r.push({ n: 'R5', t: 'Best: ' + sd.considered.slice(0, 3).map(x => nm(x.c) + ' ' + K.crore(x.tot)).join(' · ') + ' (' + sd.considered.length + ' pairs tried).' }); }
+      else r.push({ n: 'R3', t: 'Lowest eligible price per line.' });
+      r.push(d.worst ? { n: 'R4', t: 'Doubts priced against us.' } : { n: 'R4', t: 'Doubts priced as read.' });
+      if (d.cap) r.push({ n: 'R5', t: `Max ${d.cap * 100}% of value per vendor.` });
       return r; };
     const quals = K.vendors.filter(v => v.q.cleared).map(v => v.id);
     const s1 = solFor('S1');
     const answers = {
       S1: () => { let risk = 0; s1.per.forEach(x => { if (x.vid !== 'VP') return; const alt = Math.min(...quals.filter(id => id !== 'VP').map(id => K.cells[id][x.i].p)); if (K.cells.VP[x.i].gross > alt) risk++; });
-        return `Split three ways — Shree Balaji ${s1.by.SB.lines} lines, Vardhman ${s1.by.VP.lines}, Kaveri ${s1.by.KP.lines}. It costs ${K.lakh(s1.total - K.baseline.total)} more than cheapest-per-line, because the two vendors left out held 26 of the 30 lines. Four of the five open doubts stop mattering. One still does: ${risk} of Vardhman’s lines assume the 2.5% footnote discount.`; },
+        return `Shree Balaji ${s1.by.SB.lines} · Vardhman ${s1.by.VP.lines} · Kaveri ${s1.by.KP.lines} lines. ${K.lakh(s1.total - K.baseline.total)} above cheapest. Vardhman’s footnote discount still matters on ${risk} lines.`; },
       S2: () => { const s2 = solFor('S2'), lost = s1.per.filter((x, i) => x.vid === 'VP' && s2.per[i].vid !== 'VP').length;
-        return `If Vardhman’s footnote discount doesn’t apply, Vardhman loses ${lost} line${lost === 1 ? '' : 's'} and keeps ${s2.by.VP.lines}. Total ${K.crore(s2.total)} — ${K.lakh(s2.total - s1.total)} above the quality-cleared split. That is the most the open doubts can cost us inside the quality-cleared set.`; },
+        return `Vardhman loses ${lost} line${lost === 1 ? '' : 's'}. ${K.lakh(s2.total - s1.total)} more than the quality-cleared split.`; },
       S3: () => { const s3 = solFor('S3'), top = K.vendors.map(v => ({ v, sh: s3.by[v.id].value / s3.total })).sort((a, b) => b.sh - a.sh)[0];
-        return `In the quality-cleared split Vardhman takes ${(s1.by.VP.value / s1.total * 100).toFixed(0)}% of the value. Capping at 40% moves ${s3.moved} line${s3.moved === 1 ? '' : 's'} to the next-cheapest cleared vendor, for ${K.lakh(s3.total - s1.total)} more than the quality-cleared split. Largest share is now ${top.v.short} at ${(top.sh * 100).toFixed(0)}%.`; }
+        return `${s3.moved} line${s3.moved === 1 ? '' : 's'} move. ${K.lakh(s3.total - s1.total)} more. Largest share: ${top.v.short}, ${(top.sh * 100).toFixed(0)}%.`; }
     };
     const who = a => a === 'VP' ? { who: 'Anita Kulkarni', role: 'VP', tagCls: 'tag tag-accent-2' } : { who: 'Vikram Deshpande', role: 'Buyer', tagCls: 'tag tag-neutral' };
-    const msgs = [{ isBot: true, isHuman: false, hasScen: false, text: `All five replies are read and on one basis. ${K.doubts.length} doubts could change a winner (${K.lakh(K.totalStake)} at stake) — see the Doubts tab. Ask me anything about this table; every answer is applied to it as a scenario you can keep, compare and export.` }];
+    const msgs = [{ isBot: true, isHuman: false, hasScen: false, text: `All 5 replies read. ${K.doubts.length} doubts could change a winner (${K.lakh(K.totalStake)}). Ask a what-if.` }];
     S.asked.forEach(a => { const d = D[a.id], s2 = solFor(a.id);
       msgs.push({ isBot: false, isHuman: true, hasScen: false, text: a.text || d.q, ...who(a.asker) });
       msgs.push({ isBot: true, isHuman: false, hasScen: true, text: answers[a.id](), scenName: d.name, total: K.crore(s2.total), delta: dTxt(s2), split: split(s2), ruleTxt: `${rulesFor(d).length} rules · ${d.elig ? '2 vendors excluded' : 'no vendors excluded'}`,
@@ -491,13 +491,13 @@ class Component extends DCLogic {
     return { ...base, scen: !!def, headS: { position: 'sticky', top: 0, zIndex: 2, background: 'var(--color-bg)', display: 'grid', gridTemplateColumns: cols, alignItems: 'end', padding: '8px 0', borderBottom: '1px solid var(--color-text)' },
       footLabel: filtered ? 'Shown lines · value' : 'Lines won · award value', noRows: !vis.length, isFiltered: filtered, showingTxt: `Showing ${vis.length} of 30 lines${filtered ? ' · ' + K.lakh(fTot) : ''}`, chips,
       clearFilters: () => this.setState({ f: { show: 'all', win: 'all', ply: 'all', sort: F.sort } }),
-      scenDesc: def ? def.desc : 'Every line to its lowest price across all five vendors, doubts priced as read. The floor — useful for comparison, rarely what you would award.', scenVal: S.scen, onScen: e => this.setState({ scen: e.target.value }), scenOpts: [{ v: 'base', t: 'As quoted — cheapest per line, all vendors' }].concat(['S1', 'S5', 'S4', 'S3', 'S2'].map(id => ({ v: id, t: D[id].title + (S.asked.some(a => a.id === id) ? ' · asked in chat' : '') }))),
+      scenDesc: def ? def.desc : 'Lowest price per line, all vendors.', scenVal: S.scen, onScen: e => this.setState({ scen: e.target.value }), scenOpts: [{ v: 'base', t: 'As quoted — cheapest per line, all vendors' }].concat(['S1', 'S5', 'S4', 'S3', 'S2'].map(id => ({ v: id, t: D[id].title + (S.asked.some(a => a.id === id) ? ' · asked in chat' : '') }))),
       winVal: F.win, onWin: e => setF({ win: e.target.value }), winOpts: [{ v: 'all', t: 'Any vendor' }].concat(K.vendors.map(v => ({ v: v.id, t: v.short + (sol.by[v.id].lines ? '' : ' (none)') }))),
       plyVal: F.ply, onPly: e => setF({ ply: e.target.value }),
-      sortVal: F.sort, onSort: e => setF({ sort: e.target.value }), sortOpts: [{ v: 'line', t: 'Line number' }, { v: 'stake', t: 'Rupees at stake in doubts' }, { v: 'value', t: 'Award value, highest first' }, { v: 'close', t: 'Closest calls (gap to 2nd)' }, { v: 'sc', t: 'Furthest above should-cost' }],
+      sortVal: F.sort, onSort: e => setF({ sort: e.target.value }), sortOpts: [{ v: 'line', t: 'Line number' }, { v: 'stake', t: 'Rupees at stake' }, { v: 'value', t: 'Award value' }, { v: 'close', t: 'Closest calls' }, { v: 'sc', t: 'Above should-cost' }],
       footS: { display: 'grid', gridTemplateColumns: cols, padding: '10px 0 24px', borderTop: '1px solid var(--color-text)', alignItems: 'baseline' }, heads, rows, foot, total: K.crore(sol.total),
       showGrid: S.view === 'table', showChart: S.view === 'chart', legendOpen: S.legend ?? !def, legendShut: !(S.legend ?? !def), toggleLegend: () => this.setState({ legend: !(S.legend ?? !def) }), scenTabs, scenName: def ? def.name : 'As quoted',
-      rules: def ? rulesFor(def) : [], excluded: K.vendors.filter(v => !v.q.cleared).map(v => ({ name: v.name, why: v.q.returned ? `scored ${v.q.score} of 100 and failed both mandatory items — no ISO 9001 certificate, test report dated Jan 2025.` : 'questionnaire not returned (replied by email only).' })),
+      rules: def ? rulesFor(def) : [], excluded: K.vendors.filter(v => !v.q.cleared).map(v => ({ name: v.name, why: v.q.returned ? `score ${v.q.score}, no ISO 9001` : 'no questionnaire' })),
       askedBy: askedEntry ? `Asked by ${who(askedEntry.asker).who}, ${askedEntry.asker === 'VP' ? 'VP Supply Chain' : 'buyer'}` : '',
       scenTotal: K.crore(sol.total), scenDelta: def ? dTxt(sol) : '', scenSplit: split(sol), bars, changed, noChanged: !changed.length,
       viewTable: () => this.setState({ view: 'table' }), viewChart: () => this.setState({ view: 'chart' }), segT: seg(S.view === 'table'), segC: seg(S.view === 'chart'), clearScen: () => this.setState({ scen: 'base' }),
@@ -507,7 +507,7 @@ class Component extends DCLogic {
       winVerTxt: `${winVer} of 30`, allVerTxt: `${Object.keys(V).length} of ${quotedN}`, nextWinnerTxt: nextW ? 'Check next winner' : 'All winners checked', nextWinner: () => goNext(),
       selVerified: !!(vk && V[vk]), selUnverified: !!(sel && !V[vk] && selCell.p != null), selVTime: vk && V[vk] ? V[vk] : '',
       verify: () => this.setState({ verified: this.setV(vk, true) }), unverify: () => this.setState({ verified: this.setV(vk, false) }), verifyNext: () => goNext(this.setV(vk, true)),
-      verifyNote: selDoubt ? `Confirms the number matches the document. Doubt ${selDoubt.rank} stays open until it is resolved.` : 'Records your name and the time against this price. It appears on the award record.',
+      verifyNote: selDoubt ? `Doubt ${selDoubt.rank} stays open.` : 'Logged on the award record.',
       hasSel: !!sel, noSel: !sel, selLine: sl || {}, selVid: sel ? sel.vid : 'SB', selLi: sel ? sel.li : 0, selPeers, closeSel: () => this.setState({ sel: null }),
       doubtCount: K.doubts.length, stakeL: K.lakh(K.totalStake), doubtRows, loggedCount: K.loggedCount, noop: () => {},
       q: S.q, onQ: e => this.setState({ q: e.target.value }), ask: () => nextId ? askId(nextId) : this.setState({ q: '' })
