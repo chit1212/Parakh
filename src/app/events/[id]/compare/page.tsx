@@ -411,7 +411,7 @@ export default function ComparePage() {
   if (!data || !grid || !report || !award) return <div style={{ padding: 40, color: "var(--color-neutral-700)" }}>Loading the event…</div>;
   const ev = data.event;
   const pending = data.replies.filter((r) => !state[r.id] || state[r.id].stage !== "done").length;
-  const guideOpen = legendUser ?? !isScenario;
+  const guideOpen = legendUser ?? false;
   const shownValue = shown.reduce((a, l) => a + (award.per[l.id] ? award.per[l.id]!.perBox * l.qty : 0), 0);
   const askedLabel = (a: Asked) => (a.asker === "vp" ? `Asked by ${ev.vp}, ${ev.vpRole}` : `Asked by ${ev.buyer}, buyer`);
   const sel11 = { ...label11, display: "flex", flexDirection: "column" as const, gap: 4 };
@@ -481,6 +481,11 @@ export default function ComparePage() {
               style={{ flex: "none", display: "flex", alignItems: "center", gap: 6, background: "none", border: 0, padding: 0, font: "inherit", fontSize: 16, fontWeight: 600, cursor: "pointer", color: filtersOpen ? "var(--color-text)" : "var(--color-accent-800)" }}>
               {filtersOpen ? <CaretDown weight="duotone" /> : <CaretRight weight="duotone" />}Filters
             </button>
+            {/* "How to read a price" folds away the same way as Filters. */}
+            <button onClick={() => setLegendUser(!guideOpen)} aria-expanded={guideOpen}
+              style={{ flex: "none", display: "flex", alignItems: "center", gap: 6, background: "none", border: 0, padding: 0, marginLeft: 12, font: "inherit", fontSize: 16, fontWeight: 600, cursor: "pointer", color: guideOpen ? "var(--color-text)" : "var(--color-accent-800)" }}>
+              {guideOpen ? <CaretDown weight="duotone" /> : <CaretRight weight="duotone" />}How to read a price
+            </button>
             {filtered && <button className="btn btn-ghost" onClick={() => setF(NO_FILTER)} style={{ padding: "2px 8px", flex: "none", whiteSpace: "nowrap" }}>Clear filters</button>}
             <div style={{ marginLeft: "auto", flex: "none", display: "flex", alignItems: "center", gap: 12 }}>
               <span style={{ color: "var(--color-neutral-700)", whiteSpace: "nowrap", fontSize: 15 }}>Showing {shown.length} of {grid.lines.length} lines · {shownValue >= 1e7 ? crore(shownValue) : lakh(shownValue)}</span>
@@ -489,9 +494,6 @@ export default function ComparePage() {
                 <button onClick={() => setView("chart")} style={segS(view === "chart")}>Chart</button>
               </div>
               <button className="btn btn-ghost" style={{ whiteSpace: "nowrap" }} title="Download the lines shown, as shown (Excel)" onClick={() => download(snapshotNow(shown.map((l) => l.id)), "xlsx")}><Export size={16} weight="duotone" />Export</button>
-              <button className="btn btn-ghost" aria-expanded={guideOpen} onClick={() => setLegendUser(!guideOpen)} style={{ whiteSpace: "nowrap", color: guideOpen ? "var(--color-text)" : "var(--color-accent-800)" }}>
-                {guideOpen ? <CaretDown weight="duotone" /> : <CaretRight weight="duotone" />}Cell guide
-              </button>
             </div>
           </div>
           {filtersOpen && (
@@ -570,7 +572,7 @@ export default function ComparePage() {
   );
 }
 
-/** The collapsible cell guide (v2): every cell state, shown on the same number. */
+/** "How to read a price" (collapsible): every cell state, shown on the same number. */
 function CellGuide() {
   const item = (sample: React.ReactNode, name: string, meaning: string) => (
     <span style={{ display: "flex", gap: 8, alignItems: "center", whiteSpace: "nowrap" }}>
