@@ -581,10 +581,12 @@ export default function ComparePage() {
   const now = cur ?? store!.solve(rulesNow);
   const baseRes = store!.solve(BASELINES[compareWith].rules);
   const dVsBase = now.award.total - baseRes.award.total;
-  const affects = report.raised.filter((d) => (flips.get(d.id)?.size ?? 0) > 0);
-  const notAffecting = report.raised.filter((d) => !(flips.get(d.id)?.size ?? 0));
+  // Open doubts only: one the buyer has decided (other than "asked the vendor") no longer counts.
+  const decided = (d: Doubt) => decisions.some((x) => x.key === decisionKey(d) && x.effect !== "asked");
+  const affects = report.raised.filter((d) => (flips.get(d.id)?.size ?? 0) > 0 && !decided(d));
+  const notAffecting = report.raised.filter((d) => !(flips.get(d.id)?.size ?? 0) || decided(d));
   const affStake = affects.reduce((a, d) => a + d.stake, 0);
-  const notReason = (d: Doubt) => now.excluded.some((e) => e.vendorId === d.vendorId) ? `${grid.vendors.find((v) => v.id === d.vendorId)?.short} not eligible here` : "no winner changes in this scenario";
+  const notReason = (d: Doubt) => decided(d) ? "decided by you" : now.excluded.some((e) => e.vendorId === d.vendorId) ? `${grid.vendors.find((v) => v.id === d.vendorId)?.short} not eligible here` : "no winner changes in this scenario";
   // Freight pending: totals that include such a vendor's line are provisional.
   const pendingVendors = new Set([...report.raised, ...report.logged].filter((d) => d.kind === "freight_unknown").map((d) => d.vendorId));
   const provisionalLines = grid.lines.filter((l) => award.per[l.id] && pendingVendors.has(award.per[l.id]!.vendorId));
