@@ -20,6 +20,10 @@ type Draft = { to: string; subject: string; body: string; model?: string } | { e
 function choicesFor(d: Doubt): { label: string; effect: Decision["effect"] }[] {
   if (d.kind === "substitute_spec") return [{ label: "Accept the substitute for this award", effect: "accept" }, { label: "Reject: hold to the RFQ spec", effect: "hold" }];
   if (d.kind === "far_below_should_cost") return [{ label: "Approve the price as written: I have confirmed it", effect: "accept" }, { label: "Hold it until the vendor confirms", effect: "hold" }];
+  // Vendor questions the buyer can also settle with a recorded judgement (the prices stay as compared).
+  if (d.kind === "conditional_discount") return [{ label: "Award without the discount: don’t count on it", effect: "hold" }];
+  if (d.kind === "freight_unknown") return [{ label: "Keep comparing before freight; settle freight before the PO", effect: "hold" }];
+  if (d.kind === "hard_to_read") return [{ label: "Use the price as read: I have checked the original", effect: "hold" }];
   return [];
 }
 
@@ -126,7 +130,7 @@ export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord
                       {decisionOf(d)!.choice} · {decisionOf(d)!.who}, {stamp(decisionOf(d)!.at)} · “{decisionOf(d)!.why}”{" "}
                       <button className="btn btn-ghost" style={{ padding: "0 4px" }} onClick={() => onUndo(decisionKey(d))}>Undo</button>
                     </span>
-                  ) : acceptable(d) ? (
+                  ) : choicesFor(d).length ? (
                     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                       {choicesFor(d).map((o, k) => (
                         <label key={k} style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -141,7 +145,7 @@ export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord
                         {d.route === "vendor" && !dr && <button className="btn btn-ghost" onClick={() => draft(d)}>Or ask the vendor by email</button>}
                       </div>
                       <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>
-                        {choicesFor(d)[0].label.split(":")[0]} lets this price compete in the comparison, every scenario and the chat. You can undo it until the award is submitted.
+                        {acceptable(d) ? `${choicesFor(d)[0].label.split(":")[0]} lets this price compete in the comparison, every scenario and the chat.` : "Recorded with your name and reason; it closes this doubt for the award without changing any price."} You can undo it until the award is submitted.
                       </span>
                       {dr && dr !== "loading" && !("error" in dr) && (
                         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
