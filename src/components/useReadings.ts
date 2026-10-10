@@ -69,6 +69,20 @@ export const setEmptyEvent = (on: boolean) => {
   window.location.reload();
 };
 
+/**
+ * Reset the demo in this browser: every Parakh setting, upload, tick, override, decision, frozen
+ * award, marking change and RFQ draft is removed. Optionally start the event empty, then open a page.
+ */
+export const resetDemo = (o: { empty: boolean; to: string }) => {
+  for (const store of [localStorage, sessionStorage]) {
+    try {
+      for (const k of Object.keys(store)) if (k.startsWith("parakh")) store.removeItem(k);
+    } catch { /* blocked storage: nothing kept to clear */ }
+  }
+  try { if (o.empty) localStorage.setItem(EMPTY, "1"); } catch { /* blocked */ }
+  window.location.href = o.to;
+};
+
 export function useReadings() {
   const [data, setData] = useState<EventData | null>(null);
   const [state, setState] = useState<Record<string, ReplyState>>({});
