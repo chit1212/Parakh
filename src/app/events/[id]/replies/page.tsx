@@ -1,21 +1,21 @@
 "use client";
-import { useState } from "react";
-import { Camera, Envelope, File, FileDoc, FilePdf, FileXls, Paperclip, UploadSimple, Warning } from "@phosphor-icons/react";
+import { useRef, useState } from "react";
+import { Camera, CaretDown, CaretRight, Envelope, File, FileDoc, FilePdf, FileXls, UploadSimple, Warning } from "@phosphor-icons/react";
 import { Kpis } from "@/components/ui";
 import Link from "next/link";
 import { ScreenHead } from "@/components/Rail";
 import { Shell } from "@/components/Shell";
 import { useReadings, type EventData, type ReplyState } from "@/components/useReadings";
-import { buildGrid, cellKey } from "@/lib/compare";
+import { buildGrid, cellKey, type Grid } from "@/lib/compare";
 import { qualityOf, type Quality } from "@/lib/quality";
 import { useScheme } from "@/components/useScheme";
 import type { ReplyReading } from "@/lib/reader/pipeline";
 import { mainFile, type ReplySummary } from "@/lib/summary";
-import { readStamp, where } from "@/lib/format";
+import { lakh, readStamp, where } from "@/lib/format";
 import type { SourcingEvent } from "@/lib/types";
 
 const KIND_ICON: Record<string, typeof File> = { xlsx: FileXls, pdf: FilePdf, docx: FileDoc, image: Camera, eml: Envelope };
-const KIND_LABEL: Record<string, string> = { xlsx: "Excel workbook", pdf: "PDF", docx: "Word document", image: "Photo", eml: "Email", text: "Text file" };
+const FORMAT_LABEL: Record<string, string> = { xlsx: "Excel", pdf: "PDF", docx: "Word", image: "Photo", eml: "Email", text: "Text" };
 
 const STAGE_LABEL: Record<string, string> = {
   queued: "Waiting its turn",
@@ -35,26 +35,6 @@ const when = (iso: string | null) =>
 
 
 
-function needsLook(rd: ReplyReading) {
-  const ids = new Set<string>();
-  for (const p of rd.prices) {
-    if (!p.line_id) continue;
-    if (p.verification.status === "failed" || p.differs_from_rfq || p.legibility !== "clear") ids.add(p.line_id);
-  }
-  return ids;
-}
-
-function CoverageBar({ ev, rd }: { ev: SourcingEvent; rd: ReplyReading }) {
-  const look = needsLook(rd);
-  const quoted = rd.coverage.quoted.length;
-  return (
-    <div aria-label={`${quoted} of ${ev.lines.length} lines quoted`} title={look.size ? `${look.size} need a look: ${[...look].join(", ")}` : undefined}
-      style={{ display: "flex", height: 6, background: "var(--color-neutral-300)", borderRadius: 3, overflow: "hidden", margin: "6px 0", maxWidth: 220 }}>
-      <span style={{ width: `${(100 * (quoted - look.size)) / ev.lines.length}%`, background: "var(--color-accent)" }} />
-      <span style={{ width: `${(100 * look.size) / ev.lines.length}%`, background: "var(--color-accent-2)" }} />
-    </div>
-  );
-}
 
 function termLine(rd: ReplyReading): string[] {
   const out: string[] = [];
@@ -68,145 +48,178 @@ function termLine(rd: ReplyReading): string[] {
   return out;
 }
 
-function Row({ r, st, ev, onRead, impact, quality }: { r: ReplySummary; st: ReplyState | undefined; ev: SourcingEvent; onRead: (fresh: boolean) => void; impact?: string | null; quality?: Quality }) {
+/** "Included in the delivered price", as opposed to "extra and not included". */
+const includedInPrice = (t: string) => /includ/i.test(t) && !/not includ|exclud|extra|separately/i.test(t);
+
+/** What needs the buyer on this reply, worked out in code from the reading: lines to look at, and messages to answer. */
+function needsYou(rd: ReplyReading | null, grid?: Grid): { kind: "Line" | "Message"; text: string }[] {
+  if (!rd) return [];
+  if (rd.status === "unreadable" || rd.status === "pending" || rd.status === "incomplete" || rd.status === "error")
+    return rd.nextStep.text ? [{ kind: "Message", text: rd.nextStep.text }] : [];
+  if (rd.status !== "read") return [];
+  const out: { kind: "Line" | "Message"; text: string }[] = [];
+  const seen = new Set<string>();
+  for (const p of [...rd.prices].sort((x, y) => (x.line_id ?? "Z").localeCompare(y.line_id ?? "Z"))) {
+    if (!p.line_id || seen.has(p.line_id)) continue;
+    // The same alternative readings the comparison tests (the reader's, or code's likely pen correction).
+    const cell = grid && rd.vendorId ? grid.cells[cellKey(rd.vendorId, p.line_id)] : null;
+    const alts = cell?.norm.replyId === rd.replyId ? cell.norm.alternatives.map((x) => x.value) : p.alternative_readings.map((x) => x.value);
+    const diff = (p.difference ?? "a different spec").replace(/\.$/, "");
+    const t = p.differs_from_rfq ? `${p.line_id} ${/^offered/i.test(diff) ? diff[0].toLowerCase() + diff.slice(1) : `offered ${diff}`}`
+      : p.legibility !== "clear" ? `${p.line_id} price unclear: ${[Number(p.raw_value), ...alts].sort((x, y) => x - y).map((v) => `₹${v.toFixed(2)}`).join(" or ")}`
+      : p.verification.status === "failed" ? `${p.line_id} not found where the reader said` : null;
+    if (t) { seen.add(p.line_id); out.push({ kind: "Line", text: t }); }
+  }
+  for (const t of rd.terms) {
+    if (t.verification.status === "failed") continue;
+    if (t.kind === "discount" && t.condition)
+      out.push({ kind: "Message", text: t.value != null && t.value_unit === "percent" && t.condition_threshold_inr ? `${t.value}% discount only above ${lakh(t.condition_threshold_inr).replace(".00 ", " ")} per PO` : `Discount only if ${t.condition}` });
+    // A charge said to exist with no amount ("freight extra"); not one said to be included in the price.
+    else if ((t.kind === "freight" || t.kind === "handling") && !t.amount_stated && !includedInPrice(`${t.summary} ${t.source.snippet}`))
+      out.push({ kind: "Message", text: `“${t.kind === "freight" ? "Freight" : "Handling"} extra”, no amount given` });
+  }
+  if (rd.unsourced > 0) out.push({ kind: "Message", text: `${rd.unsourced} value(s) not found in the file; kept out` });
+  return out;
+}
+
+const ROW_COLS = "28px minmax(0,1.6fr) minmax(0,0.75fr) minmax(0,0.9fr) minmax(0,0.9fr) minmax(0,1.9fr) 56px";
+
+function Row({ r, st, ev, onRead, impact, quality, grid }: { r: ReplySummary; st: ReplyState | undefined; ev: SourcingEvent; onRead: (fresh: boolean) => void; impact?: string | null; quality?: Quality; grid?: Grid }) {
+  const [expanded, setExpanded] = useState(false);
   const [open, setOpen] = useState(false);
   const rd = st?.reading ?? null;
   const f = mainFile(r, rd);
   const Icon = f ? KIND_ICON[f.kind] ?? File : File;
   const name = r.vendorName ?? rd?.vendorName ?? rd?.classification?.vendor_name ?? r.from?.replace(/<.*>/, "").trim() ?? "Unknown sender";
   const reading = st && st.stage !== "done";
-  const look = rd ? needsLook(rd) : new Set<string>();
   const docs = rd?.qualityDocs ?? [];
-
+  const isQuote = rd && (rd.status === "read" || rd.status === "incomplete");
+  const needs = needsYou(rd, grid);
   const sub = "text-[14px] text-n-700";
-  const qTag = !rd || !(rd.status === "read" || rd.status === "incomplete") ? null
-    : quality?.returned ? <span className={quality.cleared ? "tag tag-accent" : "tag tag-accent-2"}>{quality.score} · {quality.cleared ? "cleared" : quality.mandatoryFailed ? `${quality.mandatoryFailed} mandatory failed` : "below pass mark"}</span>
-    : <span className="tag tag-neutral">{rd.questionnaire.length ? `${rd.questionnaire.length} of ${ev.questions.length} answers` : "not returned"}</span>;
+  const fileHref = f ? `/api/file?path=${encodeURIComponent(f.path)}` : null;
+  const blank = rd ? rd.coverage.missing.length : 0;
 
   return (
-    <section className="hover-row grid grid-cols-[1.3fr_0.8fr_1.1fr_1fr_1fr] gap-[20px] px-[12px] py-[14px] text-[15px]" style={{ boxShadow: "inset 0 -1px 0 var(--color-neutral-300)", minHeight: 72 }}>
-      <div>
-        <h2 className="text-[17px] font-semibold leading-tight m-0">{name}</h2>
-        <div className={sub + " mt-[2px]"}>
-          Received {when(r.receivedAt)}
-          {r.contact ? ` · ${r.contact}` : r.from ? ` · ${r.from}` : " · no sender (arrived without an email)"}
+    <section style={{ boxShadow: "inset 0 -1px 0 var(--color-neutral-300)" }}>
+      <div className="hover-row" onClick={() => setExpanded(!expanded)} style={{ display: "grid", gridTemplateColumns: ROW_COLS, gap: 16, alignItems: "center", padding: "12px 0", minHeight: 72, cursor: "pointer", fontSize: 16 }}>
+        <span style={{ display: "flex", justifyContent: "center", color: "var(--color-neutral-800)" }} aria-label={expanded ? "Hide details" : "Show details"}>
+          {expanded ? <CaretDown size={16} weight="duotone" /> : <CaretRight size={16} weight="duotone" />}
+        </span>
+        <div style={{ minWidth: 0 }}>
+          <div className="text-[17px] font-semibold leading-tight">{name}</div>
+          <div className={sub}>
+            {when(r.receivedAt).replace(/ \d{4},?/, ",")}
+            {r.contact ? ` · ${r.contact}` : r.from ? ` · ${r.from.replace(/<.*>/, "").trim()}` : " · no sender"}
+          </div>
+          {rd?.revision?.is_revision && <div className="text-[14px] text-a-700">Revised offer{rd.revision.supersedes ? `, supersedes ${rd.revision.supersedes}` : ""}</div>}
         </div>
-        {rd?.revision?.is_revision && <div className="text-[14px] text-a-700 mt-[4px]">Revised offer{rd.revision.supersedes ? `: supersedes ${rd.revision.supersedes}` : ""}</div>}
-        {impact && <div className="text-[14px] text-n-800 mt-[2px]">{impact}</div>}
+        <span className="flex items-center gap-[8px]">{f ? <><Icon size={22} weight="duotone" />{FORMAT_LABEL[f.kind] ?? f.kind}</> : "No file"}</span>
+        <div>
+          {reading ? (
+            <>
+              <div className="text-[15px] font-semibold">{STAGE_LABEL[st.stage] ?? st.stage}</div>
+              <div className="h-[6px] bg-n-300 mt-[6px] rounded-[3px] overflow-hidden" style={{ maxWidth: 160 }}>
+                <div className="h-[6px] bg-accent transition-all duration-500" style={{ width: `${(100 * (STAGE_STEP[st.stage] ?? 0)) / 6}%` }} />
+              </div>
+            </>
+          ) : isQuote ? (
+            <span><span className={blank ? "font-semibold" : undefined}>{rd.coverage.quoted.length} of {rd.coverage.total}</span>{blank ? <span className="text-n-700 text-[15px]"> · {blank} blank</span> : null}</span>
+          ) : st?.error ? <span className="text-d-700">Not read</span>
+            : rd ? <span>{{ unreadable: "Unreadable", pending: "Pending", ignored: "Ignored", error: "Not read" }[rd.status as "unreadable"] ?? "—"}</span> : "—"}
+        </div>
+        <div>
+          {!isQuote ? "—"
+            : quality?.returned ? (quality.cleared ? <span className="tag tag-accent">{quality.score} · cleared</span> : <span style={{ fontSize: 15 }}>{quality.score} · not cleared</span>)
+            : rd.questionnaire.length ? <span className="tag tag-neutral">{rd.questionnaire.length} of {ev.questions.length} answers</span>
+            : <span className="tag tag-outline">Not returned</span>}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 2, color: "var(--color-accent-2-800)", fontSize: 15 }}>
+          {st?.error ? <span>{st.error}</span> : needs.length ? needs.map((n, i) => (
+            <span key={i} style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 8 }}><b>{n.kind}</b><span>{n.text}</span></span>
+          )) : <span style={{ color: "var(--color-neutral-800)" }}>—</span>}
+        </div>
+        <span style={{ textAlign: "right" }}>
+          {fileHref ? <a href={fileHref} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} title="Open the original file">Open</a> : null}
+        </span>
       </div>
 
-      <div>
-        {f ? <div className="flex items-center gap-[6px]"><Icon size={20} weight="duotone" /> {KIND_LABEL[f.kind] ?? f.kind}</div> : <div>No file</div>}
-        {f && <div className={sub + " break-all"}>{f.name}</div>}
-        <div className={sub}>
-          {r.files.length > 1 ? `+ ${r.files.length - 1} attachment${r.files.length > 2 ? "s" : ""}` : ""}
-          {r.cover && r.files.length ? `${r.files.length > 1 ? ", " : ""}cover email` : ""}
-        </div>
-      </div>
-
-      <div>
-        {reading ? (
-          <div>
-            <div className="font-semibold">{STAGE_LABEL[st.stage] ?? st.stage}</div>
-            {st.detail && <div className={sub}>{st.detail}</div>}
-            <div className="h-[6px] bg-n-300 mt-[8px] rounded-[3px] overflow-hidden" style={{ maxWidth: 220 }}>
-              <div className="h-[6px] bg-accent transition-all duration-500" style={{ width: `${(100 * (STAGE_STEP[st.stage] ?? 0)) / 6}%` }} />
+      {expanded && (
+        <div style={{ padding: "4px 0 18px 44px", display: "flex", flexDirection: "column", gap: 14, fontSize: 15 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)", gap: 24 }}>
+            <div>
+              <div className="font-semibold">File</div>
+              <div className="break-all">{f?.name ?? "No file"}</div>
+              <div className={sub}>
+                {r.files.length > 1 ? `+ ${r.files.length - 1} attachment${r.files.length > 2 ? "s" : ""}` : ""}
+                {r.cover && r.files.length ? `${r.files.length > 1 ? ", " : ""}cover email` : ""}
+              </div>
+              {impact && <div className="text-n-800 mt-[6px]">{impact}</div>}
+              {st?.notice && <div className="text-n-800 mt-[6px]">{st.notice}</div>}
+            </div>
+            <div>
+              <div className="font-semibold">{isQuote ? "Price basis, as read" : "What it is"}</div>
+              {isQuote ? (
+                <>
+                  {termLine(rd).map((t, i) => <div key={i}>{t}</div>)}
+                  {rd.coverage.missing.length > 0 && <div className={sub}>Not quoted: {rd.coverage.missing.join(", ")}</div>}
+                  {rd.status === "incomplete" && <div className="text-doubt">Held out of the comparison: {rd.headline}</div>}
+                </>
+              ) : rd ? (
+                <>
+                  <div>{rd.headline}</div>
+                  {rd.nextStep.text && <div className={sub}>Next: {rd.nextStep.text}</div>}
+                </>
+              ) : null}
+            </div>
+            <div>
+              {isQuote && (
+                <>
+                  <div className="font-semibold">Quality documents</div>
+                  {docs.map((d, i) => (
+                    <div key={i}>
+                      {d.kind === "iso_certificate" ? "ISO 9001" : d.kind === "test_report" ? "Test report" : d.summary}
+                      {d.valid_until ? ` · valid to ${d.valid_until}` : d.date ? ` · ${d.date}` : ""}
+                      {d.marked_as_sample ? <span className="text-n-700"> · marked sample</span> : null}
+                    </div>
+                  ))}
+                  {!docs.length && <div className="text-n-700">No documents attached.</div>}
+                  {quality?.returned && !rd.questionnaire.length && <div className={sub}>Answers in another reply from this vendor</div>}
+                  {quality?.returned && rd.questionnaire.length > 0 && (
+                    <details className="mt-[2px]">
+                      <summary className="cursor-pointer text-a-700" style={{ listStyle: "none" }}>How code marked it</summary>
+                      <div className={sub + " mt-[2px]"}>{rd.questionnaire.length} of {ev.questions.length} answers read; pass mark {quality.passMark}</div>
+                      <ul className="mt-[4px] space-y-[2px] text-[14px]">
+                        {quality.items.map((x) => (
+                          <li key={x.id} className="grid grid-cols-[30px_48px_1fr] gap-[6px]">
+                            <span className="text-n-700">{x.id}</span>
+                            <span className={x.mandatory && x.pts === 0 ? "font-semibold text-[var(--color-accent-2-800)]" : ""}>{x.pts} / {x.of}</span>
+                            <span className="text-n-700">{x.why}{x.mandatory ? " · mandatory" : ""}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <Link href={`/events/${ev.id}/rfq?tab=rules`}>See the marking scheme</Link>
+                    </details>
+                  )}
+                </>
+              )}
             </div>
           </div>
-        ) : st?.error ? (
-          <div className="text-d-700">Could not read: {st.error}</div>
-        ) : rd ? (
-          rd.status === "read" || rd.status === "incomplete" ? (
-            <>
-              <div><b className="text-[17px]">{rd.coverage.quoted.length} of {rd.coverage.total}</b> <span className="text-n-700">lines priced</span></div>
-              <CoverageBar ev={ev} rd={rd} />
-              <div className={sub}>
-                {rd.coverage.missing.length === 0 ? "All lines quoted" : `Missing ${rd.coverage.missing.join(", ")}`}
-              </div>
-              <div className="text-[14px] mt-[4px]">
-                {rd.status === "incomplete" ? (
-                  <span className="text-doubt">Held out of the comparison: {rd.headline}</span>
-                ) : look.size ? (
-                  <span className="text-doubt">{look.size} line{look.size > 1 ? "s" : ""} need a look ({[...look].join(", ")})</span>
-                ) : (
-                  <span className="text-n-800">Every price checked against the original</span>
-                )}
-              </div>
-              {rd.unsourced > 0 && (
-                <div className="text-doubt text-[14px] mt-[2px]">{rd.unsourced} value(s) not found where the reader said; kept out of the comparison</div>
-              )}
-              <ul className={sub + " mt-[6px] space-y-[2px]"}>
-                {termLine(rd).map((t, i) => <li key={i}>{t}</li>)}
-              </ul>
-            </>
-          ) : (
-            <>
-              <div className="font-semibold">{{ unreadable: "Unreadable", pending: "Pending: not a quote yet", ignored: "Ignored", error: "Reading stopped" }[rd.status]}</div>
-              <div className="mt-[4px] text-[14px]">{rd.headline}</div>
-              {rd.nextStep.text && <div className={sub + " mt-[6px]"}>Next: {rd.nextStep.text}</div>}
-            </>
-          )
-        ) : null}
-      </div>
-
-      <div>
-        {qTag}
-        {rd && (rd.status === "read" || rd.status === "incomplete") && (
-          <>
-            {quality?.returned && !rd.questionnaire.length && <div className={sub + " mt-[4px]"}>Answers in another reply from this vendor</div>}
-            {quality?.returned && rd.questionnaire.length > 0 && (
-              <details className="text-[14px] mt-[4px]">
-                <summary className="cursor-pointer text-a-700">How code marked it</summary>
-                <div className={sub + " mt-[2px]"}>{rd.questionnaire.length} of {ev.questions.length} answers read; pass mark {quality.passMark}</div>
-                <ul className="mt-[4px] space-y-[2px]">
-                  {quality.items.map((x) => (
-                    <li key={x.id} className="grid grid-cols-[30px_48px_1fr] gap-[6px]">
-                      <span className="text-n-700">{x.id}</span>
-                      <span className={x.mandatory && x.pts === 0 ? "font-semibold text-[var(--color-accent-2-800)]" : ""}>{x.pts} / {x.of}</span>
-                      <span className="text-n-700">{x.why}{x.mandatory ? " · mandatory" : ""}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Link href={`/events/${ev.id}/rfq?tab=rules`}>See the marking scheme</Link>
-              </details>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+            {fileHref && <a className="btn btn-secondary" href={fileHref} target="_blank" rel="noreferrer" style={{ color: "var(--color-text)" }}>Open original</a>}
+            {rd && (rd.prices.length > 0 || rd.terms.length > 0) && (
+              <button className="btn btn-secondary" onClick={() => setOpen(!open)}>{open ? "Hide what was read" : "See what was read"}</button>
             )}
-            <ul className="mt-[6px] space-y-[3px] text-[14px]">
-              {docs.map((d, i) => (
-                <li key={i} className="flex gap-[6px]">
-                  <Paperclip size={15} className="mt-[3px] shrink-0" />
-                  <span>
-                    {d.kind === "iso_certificate" ? "ISO 9001 certificate" : d.kind === "test_report" ? "Test report" : d.summary}
-                    <span className="text-n-700">
-                      {d.valid_until ? ` · valid to ${d.valid_until}` : d.date ? ` · ${d.date}` : ""}
-                      {d.marked_as_sample ? " · marked sample" : ""}
-                    </span>
-                  </span>
-                </li>
-              ))}
-              {rd.questionnaire.length === 0 && docs.length === 0 && <li className="text-n-700">No documents attached.</li>}
-            </ul>
-          </>
-        )}
-      </div>
-
-      <div className="flex flex-col gap-[4px] text-[15px]">
-        {f && <a href={`/api/file?path=${encodeURIComponent(f.path)}`} target="_blank" rel="noreferrer">Open original</a>}
-        {rd && (rd.prices.length > 0 || rd.terms.length > 0) && (
-          <button className="text-a-700 text-left" onClick={() => setOpen(!open)}>
-            {open ? "Hide what was read" : "See what was read"}
-          </button>
-        )}
-        {st?.notice && <div className="text-[14px] text-n-800 bg-[var(--color-bg)] px-[8px] py-[4px] rounded-[var(--radius-md)]">{st.notice}</div>}
-        {rd && !reading && (
-          <div className={sub}>
-            {rd.status === "error" ? "Not read yet" : `${rd.saved ? "Saved reading, " : "Read live, "}${readStamp(rd)}`}
-            {r.origin !== "upload" && <>{" · "}<button className="text-a-700" onClick={() => onRead(true)}>Read again live</button></>}
-            {r.origin === "upload" && " · uploaded in this session"}
+            {rd && !reading && (
+              <span className={sub}>
+                {rd.status === "error" ? "Not read yet" : `${rd.saved ? "Saved reading, " : "Read live, "}${readStamp(rd)}`}
+                {r.origin !== "upload" && <>{"  "}<button className="text-a-700 ml-[8px]" onClick={() => onRead(true)}>Read again live</button></>}
+                {r.origin === "upload" && " · uploaded in this session"}
+              </span>
+            )}
           </div>
-        )}
-      </div>
-
-      {open && rd && <Detail rd={rd} ev={ev} />}
+          {open && rd && <Detail rd={rd} ev={ev} />}
+        </div>
+      )}
     </section>
   );
 }
@@ -226,7 +239,7 @@ function Detail({ rd, ev }: { rd: ReplyReading; ev: SourcingEvent }) {
   const td = "py-[4px] pr-[var(--space-3)] align-top border-b border-rule";
   const sorted = [...rd.prices].sort((a, b) => (a.line_id ?? "Z").localeCompare(b.line_id ?? "Z"));
   return (
-    <div className="col-span-5 text-[14px] bg-[var(--color-bg)] p-[var(--space-4)] rounded-[var(--radius-lg)]">
+    <div className="text-[14px] bg-[var(--color-bg)] p-[var(--space-4)] rounded-[var(--radius-lg)]">
       {sorted.length > 0 && (
         <>
           <h3 className="text-[16px] mb-[6px]">Prices, as written</h3>
@@ -323,9 +336,10 @@ function Upload({ vendors, onUpload, disabled }: { vendors: SourcingEvent["vendo
   const [files, setFiles] = useState<File[]>([]);
   const [vendorId, setVendorId] = useState("");
   const [busy, setBusy] = useState(false);
+  const pick = useRef<HTMLInputElement>(null);
   return (
     <form
-      className="sheet flex flex-wrap items-center gap-[12px] text-[15px]" style={{ padding: "12px 16px" }}
+      className="sheet flex flex-wrap items-center gap-[14px] text-[16px]" style={{ padding: "12px 16px", boxShadow: "var(--shadow-sm)" }}
       onSubmit={async (e) => {
         e.preventDefault();
         if (!files.length) return;
@@ -336,18 +350,17 @@ function Upload({ vendors, onUpload, disabled }: { vendors: SourcingEvent["vendo
         (e.target as HTMLFormElement).reset();
       }}
     >
-      <UploadSimple size={22} weight="duotone" />
-      <span className="font-semibold">Upload a reply</span>
-      <input type="file" multiple accept=".xlsx,.docx,.pdf,.jpg,.jpeg,.png,.eml,.txt,.csv" onChange={(e) => setFiles([...(e.target.files ?? [])])} disabled={busy || disabled} />
-      <label className="flex items-center gap-[6px]">
+      <input ref={pick} type="file" multiple hidden accept=".xlsx,.docx,.pdf,.jpg,.jpeg,.png,.eml,.txt,.csv" onChange={(e) => setFiles([...(e.target.files ?? [])])} disabled={busy || disabled} />
+      <button type="button" className="btn btn-secondary" style={{ background: "var(--color-bg)" }} onClick={() => pick.current?.click()} disabled={busy || disabled}>Choose file{files.length > 1 ? "s" : ""}</button>
+      <span className="text-n-700">{files.length ? files.map((x) => x.name).join(", ") : "No file chosen"} · up to 4 MB</span>
+      <label className="flex items-center gap-[10px] ml-auto">
         From
-        <select className="input" style={{ width: 240, minHeight: 36, padding: "4px 8px", background: "var(--color-bg)" }} value={vendorId} onChange={(e) => setVendorId(e.target.value)} disabled={busy || disabled}>
+        <select className="input" style={{ width: 260, minHeight: 38, padding: "4px 8px", background: "var(--color-bg)" }} value={vendorId} onChange={(e) => setVendorId(e.target.value)} disabled={busy || disabled}>
           <option value="">Work it out from the file</option>
           {vendors.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
         </select>
       </label>
       <button className="btn btn-primary" type="submit" disabled={!files.length || busy || disabled}>{busy ? "Reading…" : "Read it"}</button>
-      <span className="text-n-700 text-[14px] ml-auto">Up to 4 MB · joins this session’s comparison</span>
     </form>
   );
 }
@@ -388,6 +401,7 @@ function revisionImpact(data: EventData, state: Record<string, ReplyState>, id: 
 export default function RepliesPage() {
   const { data, state, blocked, readOne, upload, empty } = useReadings();
   const [scheme] = useScheme();
+  const [uploadOpen, setUploadOpen] = useState(false);
   if (!data) return <Shell><div className="text-n-700">Loading the event…</div></Shell>;
   const ev = data.event;
   const readings = data.replies.map((x) => state[x.id]?.reading).filter((x): x is ReplyReading => Boolean(x && x.status !== "error"));
@@ -407,17 +421,25 @@ export default function RepliesPage() {
   const quotes = readings.filter((x) => x.vendorId && (x.status === "read" || x.status === "incomplete"));
   const replied = new Set(quotes.map((x) => x.vendorId)).size;
   const priced = ev.vendors.reduce((a, v) => a + new Set(quotes.filter((x) => x.vendorId === v.id).flatMap((x) => x.coverage.quoted)).size, 0);
-  const unsourced = quotes.reduce((a, x) => a + x.unsourced, 0);
-  const lookLines = quotes.reduce((a, x) => a + needsLook(x).size, 0);
-  const toAnswer = other.filter((r) => state[r.id]?.reading?.nextStep.text && state[r.id]?.reading?.status !== "ignored").length;
+  const files = Object.fromEntries(data.replies.map((x) => [x.id, mainFile(x, state[x.id]?.reading ?? null) ?? undefined]));
+  const grid = buildGrid(ev, readings, { sheets: data.historySheets }, files, data.lastYear);
+  const needs = data.replies.flatMap((r) => (state[r.id]?.reading?.status === "ignored" ? [] : needsYou(state[r.id]?.reading ?? null, grid)));
+  const nLines = needs.filter((n) => n.kind === "Line").length;
+  const nMsgs = needs.length - nLines;
+  const head = (
+    <div style={{ display: "grid", gridTemplateColumns: ROW_COLS, gap: 16, padding: "10px 0", fontSize: 15, fontWeight: 600, color: "var(--color-neutral-800)", boxShadow: "inset 0 -2px 0 var(--color-text)" }}>
+      <span /><span>Vendor</span><span>Sent as</span><span>Lines priced</span><span>Quality</span><span>Needs you</span><span />
+    </div>
+  );
 
   return (
     <Shell>
-      <div className="flex flex-col gap-[16px]" style={{ maxWidth: 1240 }}>
+      <div className="flex flex-col gap-[16px]" style={{ maxWidth: 1300 }}>
       <ScreenHead meta={`${ev.id} · ${ev.title}`} title="Replies">
-        <Link href="/scorecard" style={{ fontSize: 15 }}>How well did Parakh read? Scorecard</Link>
+        <Link href="/scorecard" style={{ fontSize: 16, marginRight: 8 }}>Reading scorecard</Link>
+        <button className="btn btn-secondary" style={{ whiteSpace: "nowrap" }} aria-expanded={uploadOpen} onClick={() => setUploadOpen(!uploadOpen)}><UploadSimple size={18} weight="duotone" />Upload a reply</button>
+        <Link className="btn btn-primary" href={`/events/${ev.id}/compare`} style={{ whiteSpace: "nowrap", color: "var(--color-bg)" }}>Open comparison</Link>
       </ScreenHead>
-      <p className="text-[16px] m-0 text-n-800">Read by AI, every number checked by code against the original file.</p>
       {!data.keyConfigured && (
         <div className="p-[var(--space-3)] bg-d-100 text-[15px] rounded-[var(--radius-md)]">
           Live reading is off: no Gemini API key is set on the server yet. Saved readings still show.
@@ -425,26 +447,24 @@ export default function RepliesPage() {
       )}
       {empty && !main.length && !other.length && (
         <div className="p-[var(--space-3)] bg-[var(--color-accent-100)] text-[15px] max-w-[860px]">
-          The event is empty (reset from the P menu): the RFQ went to {ev.vendors.length} vendors, and no reply is in yet. Upload a reply below (any format) and watch it read; it joins the comparison as soon as it is done.
+          The event is empty (reset from the P menu): the RFQ went to {ev.vendors.length} vendors, and no reply is in yet. Upload a reply (any format) and watch it read; it joins the comparison as soon as it is done.
           Test replies are in the repository folder <code>test-uploads/</code>, or use the vendors’ original replies from <code>dataset/03_vendor_replies/</code>.
         </div>
       )}
-      <Upload vendors={ev.vendors} onUpload={upload} disabled={!data.keyConfigured} />
+      {(uploadOpen || (empty && !main.length && !other.length)) && <Upload vendors={ev.vendors} onUpload={upload} disabled={!data.keyConfigured} />}
       {blocked && <div className="p-[var(--space-3)] bg-d-100 text-[15px] rounded-[var(--radius-md)]">{blocked}</div>}
       <Kpis items={[
-        { label: "Replied", value: `${replied} of ${ev.vendors.length}`, sub: `${data.replies.length} messages in the inbox${other.length ? `, ${other.length} not quotes` : ""}` },
-        { label: "Prices read", value: `${priced} of ${ev.vendors.length * ev.lines.length}`, sub: unsourced ? `${unsourced} not found in the file, kept out` : "every one traced to its source" },
-        { label: "Need you", value: lookLines + toAnswer, doubt: lookLines + toAnswer > 0, sub: `${lookLines} line${lookLines === 1 ? "" : "s"} to look at · ${toAnswer} message${toAnswer === 1 ? "" : "s"} to answer` },
+        { label: "Replied", value: `${replied} of ${ev.vendors.length}` },
+        { label: "Prices read", value: `${priced} of ${ev.vendors.length * ev.lines.length}` },
+        { label: "Need you", value: <>{needs.length}{needs.length > 0 && <span style={{ fontSize: 17, fontWeight: 400 }}> · {nLines} line{nLines === 1 ? "" : "s"} · {nMsgs} message{nMsgs === 1 ? "" : "s"}</span>}</>, doubt: needs.length > 0 },
       ]} />
       {data.keyConfigured && done < data.replies.length && (
         <div className="text-[15px] text-n-700">Reading: {done} of {data.replies.length} done</div>
       )}
-      <div className="sheet" style={{ padding: "6px 8px" }}>
-        <div className="grid grid-cols-[1.3fr_0.8fr_1.1fr_1fr_1fr] gap-[20px] px-[12px] py-[8px] text-[14px] font-semibold text-n-800" style={{ boxShadow: "inset 0 -2px 0 var(--color-text)" }}>
-          <span>Vendor</span><span>Sent as</span><span>Lines priced</span><span>Quality</span><span>Reply</span>
-        </div>
-        {!main.length && <div className="px-[12px] py-[20px] text-n-700">No quotes in yet.</div>}
-        {main.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} impact={revisionImpact(data, state, r.id)} quality={qualityFor(r.id)} />)}
+      <div className="sheet" style={{ padding: "6px 24px 10px" }}>
+        {head}
+        {!main.length && <div style={{ padding: "20px 0" }} className="text-n-700">No quotes in yet.</div>}
+        {main.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} impact={revisionImpact(data, state, r.id)} quality={qualityFor(r.id)} grid={grid} />)}
       </div>
       {other.length > 0 && (
         <>
@@ -452,8 +472,9 @@ export default function RepliesPage() {
             <h2 className="text-[22px] m-0">Not in the comparison</h2>
             <p className="text-[15px] text-n-700 m-0">Messages that are not quotes, or could not be read. Each has a next step.</p>
           </div>
-          <div className="sheet" style={{ padding: "6px 8px" }}>
-            {other.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} />)}
+          <div className="sheet" style={{ padding: "6px 24px 10px" }}>
+            {head}
+            {other.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} grid={grid} />)}
           </div>
         </>
       )}
