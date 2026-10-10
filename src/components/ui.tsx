@@ -39,13 +39,13 @@ export const tabStyle = (on: boolean): React.CSSProperties => ({
   color: on ? "var(--color-text)" : "var(--color-neutral-800)", fontWeight: on ? 600 : 400, boxShadow: on ? "inset 0 -3px 0 var(--color-accent)" : "none",
 });
 
-/** The quality result in one label, everywhere: "Quality 90/100 ✓", "Quality 20/100 ✕" or "Quality: not returned". */
+/**
+ * The quality result as one badge, everywhere (review fix 4e): "✓ Quality 95/100" (cleared, cyan),
+ * "✕ Quality 20/100" (failed, solid magenta: can't be awarded) or "Quality: not returned" (outline).
+ */
 export function QualityLabel({ returned, score, cleared, style }: { returned: boolean; score: number | null | undefined; cleared: boolean; style?: React.CSSProperties }) {
-  if (!returned || score == null) return <span style={style}>Quality: not returned</span>;
-  return (
-    <span style={{ whiteSpace: "nowrap", ...style }}>
-      Quality {score}/100{" "}
-      <span style={{ color: cleared ? "var(--color-accent-700)" : "var(--color-accent-2-700)", fontWeight: 700 }} aria-label={cleared ? "cleared" : "not cleared"}>{cleared ? "✓" : "✕"}</span>
-    </span>
-  );
+  const base: React.CSSProperties = { whiteSpace: "nowrap", display: "inline-flex", alignItems: "center", gap: 3, ...style };
+  if (!returned || score == null) return <span className="tag tag-outline" style={base}>Quality: not returned</span>;
+  if (cleared) return <span className="tag tag-accent" style={base}><span aria-label="cleared">✓</span> Quality {score}/100</span>;
+  return <span className="tag" style={{ ...base, background: "var(--color-accent-2-800)", color: "#fff" }}><span aria-label="not cleared">✕</span> Quality {score}/100</span>;
 }

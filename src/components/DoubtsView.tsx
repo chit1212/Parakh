@@ -23,11 +23,13 @@ function choicesFor(d: Doubt): { label: string; effect: Decision["effect"] }[] {
   return [];
 }
 
-export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord, onUndo, me, flips, view }: {
+export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord, onUndo, me, flips, view, affects, notReason, scenarioTitle }: {
   grid: Grid; report: DoubtReport; overrides: Override[]; onSee: (vendorId: string, lineId: string) => void;
   decisions: Decision[]; onRecord: (d: Decision) => void; onUndo: (key: string) => void; me: string;
   /** Per doubt id: the lines whose winner flips under its other reading in the view on screen. */
   flips?: Map<string, Set<string>>; view?: string;
+  /** Doubts that can change a winner in the scenario on screen; the rest are listed apart, with why. */
+  affects?: Set<string>; notReason?: (d: Doubt) => string; scenarioTitle?: string;
 }) {
   const [linesOpen, setLinesOpen] = useState<Record<string, boolean>>({});
   const [open, setOpen] = useState<string | null>(report.raised[0]?.id ?? null);
@@ -66,16 +68,24 @@ export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord
       <div style={{ display: "grid", gridTemplateColumns: COLS, gap: "0 16px", ...label11, paddingBottom: 6, borderBottom: "1px solid var(--color-text)" }}>
         <span>Rank</span><span>Doubt</span><span>Lines</span><span>Goes to</span><span style={{ textAlign: "right" }}>At stake</span>
       </div>
-      {report.raised.map((d, i) => {
+      {([["Can change a winner here", report.raised.filter((d) => !affects || affects.has(d.id)), true], ["Don’t affect this scenario", affects ? report.raised.filter((d) => !affects.has(d.id)) : [], false]] as [string, Doubt[], boolean][]).map(([label, list, hot]) => list.length === 0 && !hot ? null : (
+      <div key={label} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <span style={{ fontSize: 16, fontWeight: 600, color: hot ? "var(--color-accent-2-800)" : "var(--color-neutral-800)", paddingTop: hot ? 0 : 8 }}>
+          {label} · {list.length}{hot && scenarioTitle ? <span style={{ fontWeight: 400, color: "var(--color-neutral-700)" }}> · scenario: {scenarioTitle}</span> : null}
+        </span>
+        {hot && !list.length && <span style={{ color: "var(--color-neutral-700)" }}>None: no open doubt changes a winner in this scenario.</span>}
+      {list.map((d) => {
+        const i = report.raised.indexOf(d);
         const changed = [...new Set(d.changes.map((c) => c.lineId))];
         const views = [...new Set(d.changes.map((c) => (c.view === "cleared" ? "quality-cleared" : "cheapest overall")))].join(" and ");
         const dr = drafts[d.id];
         return (
-          <div key={d.id} style={{ display: "flex", flexDirection: "column", borderBottom: "1px solid var(--color-divider)", paddingBottom: 14 }}>
+          <div key={d.id} style={{ display: "flex", flexDirection: "column", borderBottom: "1px solid var(--color-divider)", paddingBottom: 14, ...(affects?.has(d.id) ? { background: "var(--color-accent-2-100)", padding: "8px 10px 14px", borderRadius: "var(--radius-lg)" } : affects ? { opacity: 0.8 } : {}) }}>
             <button onClick={() => setOpen(open === d.id ? null : d.id)} style={{ display: "grid", gridTemplateColumns: COLS, gap: "0 16px", alignItems: "baseline", background: "none", border: 0, padding: "4px 0", textAlign: "left", font: "inherit", color: "inherit" }}>
               <span style={{ fontSize: 22, fontWeight: 600, color: "var(--color-accent-2-700)" }}>{i + 1}</span>
               <span style={{ display: "flex", flexDirection: "column", gap: 3 }}>
                 <span style={{ fontSize: 16, fontWeight: 600 }}>{d.title}</span>
+                {affects && !affects.has(d.id) && notReason && <span style={{ color: "var(--color-neutral-800)", fontStyle: "italic" }}>Doesn’t affect this scenario: {notReason(d)}.</span>}
                 <span style={{ color: "var(--color-neutral-800)" }}>{d.why} If it goes the other way, {changed.length} line{changed.length === 1 ? "" : "s"} change hands in the {views} view.</span>
               </span>
               {(() => {
@@ -182,6 +192,8 @@ export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord
           </div>
         );
       })}
+      </div>
+      ))}
       {decisions.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           <h3 style={{ fontSize: 18, margin: "8px 0 0" }}>Decisions on record</h3>

@@ -17,12 +17,12 @@ export function Rail() {
     { icon: SealCheck, label: "Award", href: `/events/${EVENT}/award` },
   ];
   return (
-    <nav style={{ width: 84, flex: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "22px 0", position: "sticky", top: 0, height: "100vh", zIndex: 30 }}>
+    <nav style={{ width: 72, flex: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "22px 0", position: "sticky", top: 0, height: "100vh", zIndex: 30 }}>
       <WorkspaceMenu />
       {items.map((r) => {
         const on = r.href.split("?")[0] === path;
         const s: React.CSSProperties = {
-          width: 68, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "10px 0", textDecoration: "none", borderRadius: "var(--radius-lg)",
+          width: 62, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, padding: "9px 0", textDecoration: "none", borderRadius: "var(--radius-lg)",
           background: on ? "var(--color-accent-200)" : "transparent", color: on ? "var(--color-accent-800)" : "var(--color-neutral-800)", fontWeight: on ? 600 : 400,
         };
         return <Link key={r.label} href={r.href} style={s} className={on ? undefined : "rail-item"}><r.icon size={24} weight="duotone" /><span style={{ fontSize: 13 }}>{r.label}</span></Link>;
