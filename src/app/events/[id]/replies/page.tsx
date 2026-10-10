@@ -9,6 +9,8 @@ import { useReadings, type EventData, type ReplyState } from "@/components/useRe
 import { buildGrid, cellKey, type Grid } from "@/lib/compare";
 import { qualityOf, type Quality } from "@/lib/quality";
 import { findDoubts } from "@/lib/doubts";
+import { assuranceOf } from "@/components/Assurance";
+import { checkKey, useVerified, type Checks } from "@/components/useVerified";
 import { useScheme } from "@/components/useScheme";
 import type { ReplyReading } from "@/lib/reader/pipeline";
 import { mainFile, type ReplySummary } from "@/lib/summary";
@@ -86,7 +88,7 @@ function needsYou(rd: ReplyReading | null, grid?: Grid, raised?: Set<string>): {
 
 const ROW_COLS = "28px minmax(0,1.6fr) minmax(0,0.75fr) minmax(0,0.9fr) minmax(0,0.9fr) minmax(0,1.9fr) 56px";
 
-function Row({ r, st, ev, onRead, impact, quality, grid, raised }: { r: ReplySummary; st: ReplyState | undefined; ev: SourcingEvent; onRead: (fresh: boolean) => void; impact?: string | null; quality?: Quality; grid?: Grid; raised?: Set<string> }) {
+function Row({ r, st, ev, onRead, impact, quality, grid, raised, checks }: { r: ReplySummary; st: ReplyState | undefined; ev: SourcingEvent; onRead: (fresh: boolean) => void; impact?: string | null; quality?: Quality; grid?: Grid; raised?: Set<string>; checks?: Checks }) {
   const [expanded, setExpanded] = useState(false);
   const [open, setOpen] = useState(false);
   const rd = st?.reading ?? null;
@@ -125,7 +127,18 @@ function Row({ r, st, ev, onRead, impact, quality, grid, raised }: { r: ReplySum
               </div>
             </>
           ) : isQuote ? (
-            <span><span className={blank ? "font-semibold" : undefined}>{rd.coverage.quoted.length} of {rd.coverage.total}</span>{blank ? <span className="text-n-700 text-[15px]"> · {blank} blank</span> : null}</span>
+            <span style={{ display: "flex", flexDirection: "column" }}>
+              <span><span className={blank ? "font-semibold" : undefined}>{rd.coverage.quoted.length} of {rd.coverage.total}</span>{blank ? <span className="text-n-700 text-[15px]"> · {blank} blank</span> : null}</span>
+              {(() => {
+                // Three assurance levels, counted over this reply's prices in the comparison.
+                if (!grid || !rd.vendorId) return null;
+                const cells = ev.lines.map((l) => grid.cells[cellKey(rd.vendorId!, l.id)]).filter((c) => c.perBox != null && c.norm.replyId === rd.replyId);
+                if (!cells.length) return null;
+                const n = { ai: 0, matched: 0, verified: 0 };
+                for (const c of cells) n[assuranceOf(c, !!checks?.[checkKey(c.vendorId, c.lineId)])]++;
+                return <span className="text-[13px] text-n-700" title="Read by AI · matched to the source by code · approved by you">{n.ai} AI only · {n.matched} matched · {n.verified} approved</span>;
+              })()}
+            </span>
           ) : st?.error ? <span className="text-d-700">Not read</span>
             : rd ? <span>{{ unreadable: "Unreadable", pending: "Pending", ignored: "Ignored", error: "Not read" }[rd.status as "unreadable"] ?? "—"}</span> : "—"}
         </div>
@@ -404,6 +417,7 @@ export default function RepliesPage() {
   const { data, state, blocked, readOne, upload, empty } = useReadings();
   const [scheme] = useScheme();
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [checks] = useVerified();
   if (!data) return <Shell><div className="text-n-700">Loading the event…</div></Shell>;
   const ev = data.event;
   const readings = data.replies.map((x) => state[x.id]?.reading).filter((x): x is ReplyReading => Boolean(x && x.status !== "error"));
@@ -439,7 +453,7 @@ export default function RepliesPage() {
   return (
     <Shell>
       <div className="flex flex-col gap-[16px]" style={{ maxWidth: 1300 }}>
-      <ScreenHead meta={`${ev.id} · ${ev.title}`} title="Replies">
+      <ScreenHead meta={<>{ev.id} · {ev.title} · Typed files are matched to the source by code. Photo readings need your check.</>} title="Replies">
         <Link href="/scorecard" style={{ fontSize: 16, marginRight: 8 }}>Reading scorecard</Link>
         <button className="btn btn-secondary" style={{ whiteSpace: "nowrap" }} aria-expanded={uploadOpen} onClick={() => setUploadOpen(!uploadOpen)}><UploadSimple size={18} weight="duotone" />Upload a reply</button>
         <Link className="btn btn-primary" href={`/events/${ev.id}/compare`} style={{ whiteSpace: "nowrap", color: "var(--color-bg)" }}>Open comparison</Link>
@@ -468,7 +482,7 @@ export default function RepliesPage() {
       <div className="sheet" style={{ padding: "6px 24px 10px" }}>
         {head}
         {!main.length && <div style={{ padding: "20px 0" }} className="text-n-700">No quotes in yet.</div>}
-        {main.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} impact={revisionImpact(data, state, r.id)} quality={qualityFor(r.id)} grid={grid} raised={raised} />)}
+        {main.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} impact={revisionImpact(data, state, r.id)} quality={qualityFor(r.id)} grid={grid} raised={raised} checks={checks} />)}
       </div>
       {other.length > 0 && (
         <>
@@ -478,7 +492,7 @@ export default function RepliesPage() {
           </div>
           <div className="sheet" style={{ padding: "6px 24px 10px" }}>
             {head}
-            {other.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} grid={grid} raised={raised} />)}
+            {other.map((r) => <Row key={r.id} r={r} st={state[r.id]} ev={ev} onRead={(fresh) => readOne(r.id, fresh)} grid={grid} raised={raised} checks={checks} />)}
           </div>
         </>
       )}

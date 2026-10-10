@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/broadsheet-b2904ec4-9842-45c9-b4be-2ac94f55f925/styles.css">
+<script src="_ds/broadsheet-b2904ec4-9842-45c9-b4be-2ac94f55f925/_ds_bundle.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/duotone/style.css">
+<script src="data.js"></script>
+<style>body{margin:0;background:var(--color-neutral-200);color:var(--color-text);font-family:var(--font-body)} a{color:var(--color-accent-700)} a:hover{color:var(--color-accent-800)}</style>
+</helmet>
+
+<div style="padding:56px 64px 96px;display:flex;flex-direction:column;gap:72px;width:max-content;">
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:1100px;">
+    <span style="font-size:16px;color:var(--color-neutral-700);">Parakh · fixes from the submission review · one at a time</span>
+    <h1 style="margin:0;font-size:52px;line-height:1.05;font-weight:600;">Review fixes</h1>
+    <p style="margin:0;font-size:18px;line-height:1.5;color:var(--color-neutral-800);text-wrap:pretty;">One section per fix, in order. The design changes are shown here. Logic the design can’t fix goes to <b>CHANGES - Review fixes.md</b> for Claude Code.</p>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;font-size:17px;padding-top:6px;">
+      <a href="#fix1">1 · Correct answers</a><a href="#fix2">2 · Visible trust</a><a href="#fix3">3 · Simpler hierarchy</a><a href="#fix4">4 · Visuals that answer</a>
+    </div>
+  </div>
+
+  <section id="fix1" data-screen-label="Fix 1 Analysis" style="display:flex;flex-direction:column;gap:28px;">
+    <div style="display:flex;align-items:baseline;gap:20px;">
+      <span style="background:var(--color-text);color:var(--color-bg);font-size:15px;font-weight:600;padding:3px 10px;border-radius:var(--radius-md);">Fix 1</span>
+      <h2 style="margin:0;font-size:36px;font-weight:600;">Make every answer correct and checkable</h2>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:18px;line-height:1.5;max-width:1500px;">
+      <span><b>One rule for every chat answer:</b> state the baseline, give the exact total and each supplier’s share, and say whether the result is proven cheapest. Chat reads the same numbers as the table.</span>
+    </div>
+
+    <div style="display:flex;gap:40px;align-items:flex-start;">
+
+      <div id="1a" style="width:480px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-size:15px;font-weight:600;color:var(--color-neutral-700);">1a</span><span style="font-size:22px;font-weight:600;">Last year: chat uses the table’s data</span></div>
+          <span style="font-size:16px;line-height:1.45;color:var(--color-neutral-800);text-wrap:pretty;"><b>Was:</b> said last year’s prices were missing. <b>Now:</b> answers from the same lines as the “vs last year” card and ranks the cost drivers.</span>
+        </div>
+        <div style="background:var(--color-surface);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:22px;display:flex;flex-direction:column;gap:16px;">
+          <div style="align-self:flex-end;max-width:88%;background:var(--color-accent-100);border-radius:var(--radius-lg);padding:10px 14px;display:flex;flex-direction:column;gap:4px;"><span style="font-size:14px;color:var(--color-accent-800);">Meera · VP</span><p style="margin:0;font-size:16px;">Among quality-cleared vendors, what are the five biggest contributors to the increase over last year?</p></div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <span style="font-size:14px;color:var(--color-neutral-700);">Parakh</span>
+            <p style="margin:0;font-size:16px;font-weight:600;line-height:1.4;text-wrap:pretty;">{{ hLead }}</p>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <sc-for list="{{ drivers }}" as="d" hint-placeholder-count="5">
+                <div style="display:flex;flex-direction:column;gap:4px;">
+                  <div style="display:flex;justify-content:space-between;gap:10px;font-size:15px;"><span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="color:var(--color-neutral-700);">{{ d.id }}</span> {{ d.name }}</span><b style="font-variant-numeric:tabular-nums;white-space:nowrap;">{{ d.amt }}</b></div>
+                  <div style="height:8px;background:var(--color-neutral-300);border-radius:4px;overflow:hidden;"><div style="height:100%;background:var(--color-accent-2);width:{{ d.w }};"></div></div>
+                  <span style="font-size:14px;color:var(--color-neutral-700);font-variant-numeric:tabular-nums;">{{ d.who }} · ₹{{ d.move }} per box · {{ d.qty }} boxes</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--color-neutral-800);background:var(--color-bg);padding:8px 10px;border-radius:var(--radius-md);"><i class="ph-duotone ph-database" style="font-size:18px;color:var(--color-accent-700);"></i>Same data as the Compare table · {{ lyCount }} lines have last year’s price</div>
+            <button onClick="{{ t1 }}" style="align-self:flex-start;font:inherit;font-size:15px;border:0;background:none;padding:0;cursor:pointer;color:var(--color-accent-700);display:flex;align-items:center;gap:6px;"><i class="ph-duotone {{ c1 }}"></i>Show working</button>
+            <sc-if value="{{ w1 }}"><p style="margin:0;font-size:15px;line-height:1.5;color:var(--color-neutral-800);text-wrap:pretty;">Scenario: cheapest per line, quality-cleared only. For each line with a last-year price: (this year’s winning price − last year’s price) × quantity. Ranked by rupees. New lines without a last-year price are left out.</p></sc-if>
+          </div>
+        </div>
+      </div>
+
+      <div id="1b" style="width:480px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-size:15px;font-weight:600;color:var(--color-neutral-700);">1b</span><span style="font-size:22px;font-weight:600;">Share cap: proven cheapest, or says so</span></div>
+          <span style="font-size:16px;line-height:1.45;color:var(--color-neutral-800);text-wrap:pretty;"><b>Was:</b> called a non-optimal split “minimum cost”. <b>Now:</b> a status badge and a self-check line on every capped scenario.</span>
+        </div>
+        <div style="background:var(--color-surface);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:22px;display:flex;flex-direction:column;gap:16px;">
+          <div style="align-self:flex-end;max-width:88%;background:var(--color-accent-100);border-radius:var(--radius-lg);padding:10px 14px;display:flex;flex-direction:column;gap:4px;"><span style="font-size:14px;color:var(--color-accent-800);">Vikram · buyer</span><p style="margin:0;font-size:16px;">Cheapest split among cleared vendors, no vendor above {{ capPct }}%.</p></div>
+          <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:16px 18px;display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+              <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:14px;color:var(--color-neutral-700);">Scenario · max {{ capPct }}% per vendor</span><span style="font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2;">{{ capTotal }}</span><span style="font-size:14px;color:var(--color-neutral-800);font-variant-numeric:tabular-nums;">{{ capExact }} exactly</span></div>
+              <sc-if value="{{ stProven }}"><span class="tag tag-accent" style="font-size:14px;display:flex;align-items:center;gap:6px;white-space:nowrap;"><i class="ph-duotone ph-seal-check" style="font-size:16px;"></i>Proven cheapest</span></sc-if>
+              <sc-if value="{{ stFeasible }}"><span class="tag tag-outline" style="font-size:14px;display:flex;align-items:center;gap:6px;white-space:nowrap;"><i class="ph-duotone ph-warning" style="font-size:16px;"></i>Meets the cap · not proven cheapest</span></sc-if>
+              <sc-if value="{{ stInfeasible }}"><span class="tag tag-accent-2" style="font-size:14px;display:flex;align-items:center;gap:6px;white-space:nowrap;"><i class="ph-duotone ph-x-circle" style="font-size:16px;"></i>Cap can’t be met</span></sc-if>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <sc-for list="{{ shares }}" as="s" hint-placeholder-count="3">
+                <div style="display:flex;flex-direction:column;gap:4px;">
+                  <div style="display:flex;justify-content:space-between;font-size:15px;font-variant-numeric:tabular-nums;"><span><b>{{ s.name }}</b> · {{ s.lines }} lines</span><span><b>{{ s.pct }}</b> · {{ s.value }}</span></div>
+                  <div style="position:relative;height:12px;background:var(--color-neutral-300);border-radius:2px;">
+                    <div style="position:absolute;left:0;top:0;bottom:0;background:var(--color-accent);border-radius:2px;width:{{ s.w }};"></div>
+                    <div style="position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--color-text);left:{{ capLeft }};"></div>
+                  </div>
+                </div>
+              </sc-for>
+              <span style="font-size:13px;color:var(--color-neutral-700);display:flex;align-items:center;gap:6px;"><span style="width:2px;height:12px;background:var(--color-text);display:inline-block;"></span><span>{{ capPct }}% cap</span></span>
+            </div>
+            <sc-if value="{{ checkPass }}"><div style="display:flex;align-items:flex-start;gap:8px;font-size:14px;line-height:1.4;background:var(--color-bg);padding:8px 10px;border-radius:var(--radius-md);"><i class="ph-duotone ph-check-circle" style="font-size:18px;color:var(--color-accent-700);flex:none;"></i><span>Self-check passed: no line can move to a cheaper vendor without breaking the cap.</span></div></sc-if>
+            <sc-if value="{{ checkFail }}"><div style="display:flex;align-items:flex-start;gap:8px;font-size:14px;line-height:1.4;background:var(--color-accent-2-100);color:var(--color-accent-2-800);padding:8px 10px;border-radius:var(--radius-md);"><i class="ph-duotone ph-warning-circle" style="font-size:18px;flex:none;"></i><span>{{ checkMsg }}</span></div></sc-if>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <span style="font-size:14px;color:var(--color-neutral-700);">If the solver can’t prove it, the card says so instead:</span>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><span class="tag tag-outline" style="font-size:14px;display:flex;align-items:center;gap:6px;"><i class="ph-duotone ph-warning" style="font-size:16px;"></i>Meets the cap · not proven cheapest</span><span style="font-size:14px;color:var(--color-neutral-800);">“Find cheaper” re-runs the solver</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="1c" style="width:480px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-size:15px;font-weight:600;color:var(--color-neutral-700);">1c</span><span style="font-size:22px;font-weight:600;">Premium: right baseline, stated up front</span></div>
+          <span style="font-size:16px;line-height:1.45;color:var(--color-neutral-800);text-wrap:pretty;"><b>Was:</b> compared with the wrong baseline and left out the total and shares. <b>Now:</b> “Compared with” is the first thing in the answer, and you can change it.</span>
+        </div>
+        <div style="background:var(--color-surface);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:22px;display:flex;flex-direction:column;gap:16px;">
+          <div style="align-self:flex-end;max-width:88%;background:var(--color-accent-100);border-radius:var(--radius-lg);padding:10px 14px;display:flex;flex-direction:column;gap:4px;"><span style="font-size:14px;color:var(--color-accent-800);">Meera · VP</span><p style="margin:0;font-size:16px;">What does the {{ capPct }}% cap cost over quality-cleared cheapest per line? Exact total and each supplier’s share.</p></div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <span style="font-size:14px;color:var(--color-neutral-700);">Parakh</span>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--color-neutral-100);box-shadow:inset 0 0 0 1px var(--color-neutral-300);padding:8px 12px;border-radius:var(--radius-md);">
+              <div style="display:flex;flex-direction:column;line-height:1.3;"><span style="font-size:13px;color:var(--color-neutral-700);">Compared with</span><span style="font-size:15px;font-weight:600;">Cheapest per line, quality-cleared only</span></div>
+              <span style="font-size:14px;color:var(--color-accent-700);display:flex;align-items:center;gap:4px;white-space:nowrap;">Change <i class="ph-duotone ph-caret-down"></i></span>
+            </div>
+            <p style="margin:0;font-size:16px;font-weight:600;line-height:1.4;text-wrap:pretty;">{{ premLead }}</p>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <sc-for list="{{ costBars }}" as="b" hint-placeholder-count="3">
+                <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 84px;gap:10px;align-items:center;font-size:14px;font-variant-numeric:tabular-nums;">
+                  <span style="line-height:1.25;">{{ b.label }}</span>
+                  <div style="height:14px;background:var(--color-neutral-300);border-radius:2px;overflow:hidden;"><div style="height:100%;background:{{ b.fill }};width:{{ b.w }};"></div></div>
+                  <span style="text-align:right;font-weight:600;">{{ b.v }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <ul style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:15px;line-height:1.45;">
+              <li>{{ shareLine }}</li>
+              <li>{{ moveLine }}</li>
+            </ul>
+            <button onClick="{{ t3 }}" style="align-self:flex-start;font:inherit;font-size:15px;border:0;background:none;padding:0;cursor:pointer;color:var(--color-accent-700);display:flex;align-items:center;gap:6px;"><i class="ph-duotone {{ c3 }}"></i>Show working</button>
+            <sc-if value="{{ w3 }}"><p style="margin:0;font-size:15px;line-height:1.5;color:var(--color-neutral-800);text-wrap:pretty;">Baseline {{ qualExact }}. Capped scenario {{ capExact }}. Difference {{ premiumExact }}. Shares are each vendor’s awarded value ÷ the capped total.</p></sc-if>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="fix2" data-screen-label="Fix 2 Trust" style="display:flex;flex-direction:column;gap:28px;">
+    <div style="display:flex;align-items:baseline;gap:20px;"><span style="background:var(--color-text);color:var(--color-bg);font-size:15px;font-weight:600;padding:3px 10px;border-radius:var(--radius-md);">Fix 2</span><h2 style="margin:0;font-size:36px;font-weight:600;">Make trust visible and precise</h2></div>
+    <span style="font-size:18px;line-height:1.5;max-width:1500px;"><b>Rule:</b> every number says how sure we are. Provisional totals look provisional, counts match everywhere, and the award state is impossible to misread.</span>
+    <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start;max-width:1620px;">
+
+      <div id="2a" style="width:500px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-size:15px;font-weight:600;color:var(--color-neutral-700);">2a</span><span style="font-size:22px;font-weight:600;">Rohit Box: freight pending</span></div>
+          <span style="font-size:16px;line-height:1.45;color:var(--color-neutral-800);text-wrap:pretty;"><b>Was:</b> his ex-works prices sat under “delivered Chakan”. <b>Now:</b> his column and every affected total say so.</span>
+        </div>
+        <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:20px 22px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:grid;grid-template-columns:minmax(0,1.6fr) 110px 130px;gap:10px;padding-bottom:6px;box-shadow:inset 0 -2px 0 var(--color-text);align-items:end;">
+            <span style="font-size:14px;font-weight:600;color:var(--color-neutral-800);">Line · ₹ per box</span>
+            <span style="font-size:15px;font-weight:600;text-align:right;">{{ v0 }}</span>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;"><span style="font-size:15px;font-weight:600;">Rohit Box</span><span class="tag tag-accent-2" style="font-size:12px;white-space:nowrap;">Freight pending</span></div>
+          </div>
+          <sc-for list="{{ rbRows }}" as="r" hint-placeholder-count="4">
+            <div style="display:grid;grid-template-columns:minmax(0,1.6fr) 110px 130px;gap:10px;align-items:center;min-height:36px;box-shadow:inset 0 -1px 0 var(--color-neutral-200);font-size:15px;font-variant-numeric:tabular-nums;">
+              <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="font-size:13px;color:var(--color-neutral-700);">{{ r.id }}</span> {{ r.name }}</span>
+              <span style="text-align:right;">{{ r.a }}</span>
+              <span style="text-align:right;">{{ r.b }}<sup style="font-size:11px;color:var(--color-accent-2-800);padding-left:2px;">+F</sup></span>
+            </div>
+          </sc-for>
+          <div style="display:flex;flex-direction:column;gap:4px;background:var(--color-bg);padding:12px 14px;border-radius:var(--radius-md);box-shadow:inset 0 0 0 1px var(--color-neutral-400);border-style:dashed;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;"><span style="font-size:14px;color:var(--color-neutral-700);">Award total, as quoted · all vendors</span><span class="tag tag-outline" style="font-size:12px;">Provisional</span></div>
+            <span style="font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;">{{ benchTotal }}</span>
+            <span style="font-size:14px;color:var(--color-neutral-800);">{{ rbNote }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="2b" style="width:500px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-size:15px;font-weight:600;color:var(--color-neutral-700);">2b</span><span style="font-size:22px;font-weight:600;">Award total counts eligible vendors only</span></div>
+          <span style="font-size:16px;line-height:1.45;color:var(--color-neutral-800);text-wrap:pretty;"><b>Was:</b> the headline included vendors who failed quality or never answered. <b>Now:</b> the headline is what you could actually award; the all-vendor number is labelled a benchmark.</span>
+        </div>
+        <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:20px 22px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;flex-direction:column;gap:2px;background:var(--color-bg);box-shadow:var(--shadow-sm);padding:14px 16px;border-radius:var(--radius-lg);">
+            <span style="font-size:14px;color:var(--color-neutral-700);">Award total · quality-cleared vendors</span>
+            <span style="font-size:30px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2;">{{ qualTotal }}</span>
+            <span style="font-size:14px;color:var(--color-neutral-800);">{{ qualNote }}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:0 4px;">
+            <div style="display:flex;flex-direction:column;"><span style="font-size:14px;color:var(--color-neutral-700);">Benchmark · as quoted, all vendors</span><span style="font-size:13px;color:var(--color-neutral-700);">Includes {{ inelig }}, who can’t be awarded</span></div>
+            <span style="font-size:18px;font-variant-numeric:tabular-nums;">{{ benchTotal }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="2c" style="width:500px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-size:15px;font-weight:600;color:var(--color-neutral-700);">2c</span><span style="font-size:22px;font-weight:600;">One count, split by scenario</span></div>
+          <span style="font-size:16px;line-height:1.45;color:var(--color-neutral-800);text-wrap:pretty;"><b>Was:</b> the header said 1 logged, Doubts said 14. <b>Now:</b> one number, read from one place, and doubts split into “affects this scenario” and “doesn’t”.</span>
+        </div>
+        <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:20px 22px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;"><span style="font-size:20px;font-weight:600;">Doubts</span><span style="font-size:14px;color:var(--color-neutral-700);">Scenario: cheapest per line, quality-cleared</span></div>
+          <span style="font-size:15px;font-weight:600;color:var(--color-accent-2-800);">Can change a winner here · {{ affN }}</span>
+          <sc-for list="{{ affList }}" as="d" hint-placeholder-count="1">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline;padding:8px 10px;background:var(--color-accent-2-100);border-radius:var(--radius-md);font-size:15px;"><span style="text-wrap:pretty;">{{ d.title }}</span><b style="white-space:nowrap;color:var(--color-accent-2-800);font-variant-numeric:tabular-nums;">{{ d.stake }}</b></div>
+          </sc-for>
+          <span style="font-size:15px;font-weight:600;color:var(--color-neutral-800);padding-top:4px;">Don’t affect this scenario · {{ notAffN }}</span>
+          <sc-for list="{{ notAffList }}" as="d" hint-placeholder-count="3">
+            <div style="display:flex;justify-content:space-between;gap:12px;font-size:14px;color:var(--color-neutral-800);"><span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ d.title }}</span><span style="white-space:nowrap;">{{ d.why }}</span></div>
+          </sc-for>
+          <div style="display:flex;align-items:flex-start;gap:8px;font-size:14px;line-height:1.4;background:var(--color-bg);padding:8px 10px;border-radius:var(--radius-md);"><i class="ph-duotone ph-list-checks" style="font-size:18px;color:var(--color-accent-700);flex:none;"></i><span><b>{{ logged }}</b> more checked and logged, none change a winner. The header shows the same number.</span></div>
+        </div>
+      </div>
+
+      <div id="2d" style="width:500px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-size:15px;font-weight:600;color:var(--color-neutral-700);">2d</span><span style="font-size:22px;font-weight:600;">Three levels of assurance</span></div>
+          <span style="font-size:16px;line-height:1.45;color:var(--color-neutral-800);text-wrap:pretty;"><b>Was:</b> “every number checked by code”, including photo readings. <b>Now:</b> each price shows whether it was read by AI, matched to the source by code, or verified by you.</span>
+        </div>
+        <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:20px 22px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:grid;grid-template-columns:170px minmax(0,1fr);gap:12px;align-items:center;"><span class="tag tag-outline" style="font-size:13px;display:flex;gap:6px;align-items:center;justify-self:start;"><i class="ph-duotone ph-sparkle"></i>Read by AI</span><span style="font-size:15px;">Extracted, not yet matched. Photos stay here until you check them.</span></div>
+            <div style="display:grid;grid-template-columns:170px minmax(0,1fr);gap:12px;align-items:center;"><span class="tag tag-neutral" style="font-size:13px;display:flex;gap:6px;align-items:center;justify-self:start;"><i class="ph-duotone ph-link-simple"></i>Matched to source</span><span style="font-size:15px;">Code found the same number in the file’s text.</span></div>
+            <div style="display:grid;grid-template-columns:170px minmax(0,1fr);gap:12px;align-items:center;"><span class="tag tag-accent" style="font-size:13px;display:flex;gap:6px;align-items:center;justify-self:start;"><i class="ph-duotone ph-seal-check"></i>Verified by you</span><span style="font-size:15px;">You checked it; time and name recorded.</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;padding-top:4px;">
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 70px 70px 70px;gap:8px;padding-bottom:6px;font-size:13px;font-weight:600;color:var(--color-neutral-800);box-shadow:inset 0 -2px 0 var(--color-text);"><span>Vendor</span><span style="text-align:right;">AI only</span><span style="text-align:right;">Matched</span><span style="text-align:right;">Verified</span></div>
+            <sc-for list="{{ assure }}" as="a" hint-placeholder-count="5">
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) 70px 70px 70px;gap:8px;align-items:center;min-height:32px;box-shadow:inset 0 -1px 0 var(--color-neutral-200);font-size:15px;font-variant-numeric:tabular-nums;"><span>{{ a.name }} <span style="font-size:13px;color:var(--color-neutral-700);">{{ a.fmt }}</span></span><span style="text-align:right;">{{ a.ai }}</span><span style="text-align:right;">{{ a.m }}</span><span style="text-align:right;">{{ a.v }}</span></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:8px;font-size:14px;line-height:1.4;background:var(--color-bg);padding:8px 10px;border-radius:var(--radius-md);"><i class="ph-duotone ph-quotes" style="font-size:18px;color:var(--color-accent-700);flex:none;"></i><span>Replies intro becomes: “Typed files are matched to the source by code. Photo readings need your check.”</span></div>
+        </div>
+      </div>
+
+      <div id="2e" style="width:500px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-size:15px;font-weight:600;color:var(--color-neutral-700);">2e</span><span style="font-size:22px;font-weight:600;">Award state you can’t misread</span></div>
+          <span style="font-size:16px;line-height:1.45;color:var(--color-neutral-800);text-wrap:pretty;"><b>Was:</b> “Frozen” with open doubts and nothing verified. <b>Now:</b> four named states, and submitting is blocked until the blockers clear.</span>
+        </div>
+        <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:20px 22px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;">
+            <div style="display:flex;flex-direction:column;gap:6px;"><div style="height:6px;background:var(--color-accent);border-radius:3px;"></div><span style="font-size:15px;font-weight:600;color:var(--color-accent-800);">Draft</span></div>
+            <div style="display:flex;flex-direction:column;gap:6px;"><div style="height:6px;background:var(--color-neutral-300);border-radius:3px;"></div><span style="font-size:15px;color:var(--color-neutral-800);">In review</span></div>
+            <div style="display:flex;flex-direction:column;gap:6px;"><div style="height:6px;background:var(--color-neutral-300);border-radius:3px;"></div><span style="font-size:15px;color:var(--color-neutral-800);">Submitted</span></div>
+            <div style="display:flex;flex-direction:column;gap:6px;"><div style="height:6px;background:var(--color-neutral-300);border-radius:3px;"></div><span style="font-size:15px;color:var(--color-neutral-800);">Approved</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:22px;font-weight:600;">Draft award</span><span style="font-size:14px;color:var(--color-neutral-800);">Snapshot saved 9 Oct, 16:42 · not submitted</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px;background:var(--color-accent-2-100);padding:12px 14px;border-radius:var(--radius-md);">
+            <span style="font-size:15px;font-weight:600;color:var(--color-accent-2-800);">Can’t submit yet</span>
+            <sc-for list="{{ blockers }}" as="b" hint-placeholder-count="3">
+              <div style="display:flex;justify-content:space-between;gap:10px;font-size:15px;color:var(--color-accent-2-900);"><span style="display:flex;gap:8px;align-items:center;"><i class="ph-duotone ph-x-circle" style="font-size:17px;"></i>{{ b.t }}</span><span style="color:var(--color-accent-700);white-space:nowrap;">{{ b.a }} →</span></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:10px;"><button class="btn btn-primary" style="font-size:15px;" disabled>Send to Meera for approval</button><button class="btn btn-secondary" style="font-size:15px;">Save draft</button></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="fix3" data-screen-label="Fix 3 Hierarchy" style="display:flex;flex-direction:column;gap:28px;">
+    <div style="display:flex;align-items:baseline;gap:20px;"><span style="background:var(--color-text);color:var(--color-bg);font-size:15px;font-weight:600;padding:3px 10px;border-radius:var(--radius-md);">Fix 3</span><h2 style="margin:0;font-size:36px;font-weight:600;">Simplify around the buyer’s decision</h2></div>
+    <span style="font-size:18px;line-height:1.5;max-width:1500px;"><b>Order on screen:</b> scenario → decision summary → comparison → inspector. Shown at 1280 px wide with no horizontal scroll.</span>
+    <div style="display:flex;gap:40px;align-items:flex-start;">
+      <div style="width:1280px;height:800px;flex-shrink:0;overflow:hidden;background:var(--color-bg);box-shadow:var(--shadow-md);display:flex;font-size:15px;line-height:1.45;font-variant-numeric:tabular-nums;position:relative;">
+        <nav style="width:72px;flex:none;display:flex;flex-direction:column;align-items:center;gap:4px;padding:18px 0;">
+          <div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:var(--color-text);color:var(--color-bg);font-size:20px;font-weight:700;border-radius:var(--radius-lg);margin-bottom:14px;">P</div>
+          <sc-for list="{{ rail }}" as="r" hint-placeholder-count="5">
+            <sc-if value="{{ r.on }}"><div style="width:60px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;background:var(--color-accent-200);color:var(--color-accent-800);border-radius:var(--radius-lg);font-weight:600;"><i class="ph-duotone {{ r.icon }}" style="font-size:22px;"></i><span style="font-size:12px;">{{ r.label }}</span></div></sc-if>
+            <sc-if value="{{ r.off }}"><div style="width:60px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;color:var(--color-neutral-800);"><i class="ph-duotone {{ r.icon }}" style="font-size:22px;"></i><span style="font-size:12px;">{{ r.label }}</span></div></sc-if>
+          </sc-for>
+        </nav>
+        <main style="flex:1;min-width:0;padding:18px 18px 18px 8px;display:flex;flex-direction:column;gap:12px;overflow:hidden;">
+          <div style="display:flex;align-items:flex-end;gap:14px;">
+            <div style="display:flex;flex-direction:column;min-width:0;margin-right:auto;"><span style="font-size:14px;color:var(--color-neutral-700);">SE-2026-041 · award by 15 Oct</span><h1 style="margin:0;font-size:26px;line-height:1.15;font-weight:600;white-space:nowrap;">Corrugated boxes, FY27 H2</h1></div>
+            <span style="font-size:16px;font-weight:600;padding:3px 0;box-shadow:inset 0 -3px 0 var(--color-accent);">Compare</span>
+            <span style="font-size:16px;color:var(--color-neutral-800);">Doubts <b style="color:var(--color-accent-2-700);">{{ affN }}</b></span>
+            <button class="btn btn-primary" style="font-size:15px;white-space:nowrap;">Save draft award</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="background:var(--color-text);color:var(--color-bg);font-size:12px;font-weight:700;width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none;">1</span>
+            <div style="display:flex;flex-direction:column;"><span style="font-size:13px;color:var(--color-neutral-700);">Scenario</span><span style="font-size:17px;font-weight:600;padding:4px 10px;margin-left:-10px;background:var(--color-neutral-100);box-shadow:inset 0 0 0 1px var(--color-neutral-400);border-radius:var(--radius-md);display:flex;align-items:center;gap:8px;white-space:nowrap;">Cheapest per line, quality-cleared <i class="ph-duotone ph-caret-down"></i></span></div>
+            <div style="display:flex;flex-direction:column;"><span style="font-size:13px;color:var(--color-neutral-700);">Compared with</span><span style="font-size:15px;padding:5px 0;white-space:nowrap;">As quoted, all vendors <span style="color:var(--color-accent-700);">Change</span></span></div>
+            <div class="seg" style="margin-left:auto;display:flex;background:var(--color-neutral-100);border-radius:var(--radius-md);padding:3px;box-shadow:inset 0 0 0 1px var(--color-neutral-300);">
+              <span style="font-size:14px;padding:5px 12px;background:var(--color-text);color:var(--color-bg);border-radius:var(--radius-sm);display:flex;gap:6px;align-items:center;"><i class="ph-duotone ph-table"></i>Table</span>
+              <span style="font-size:14px;padding:5px 12px;display:flex;gap:6px;align-items:center;"><i class="ph-duotone ph-chart-bar-horizontal"></i>Chart</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;background:var(--color-neutral-100);box-shadow:var(--shadow-sm);border-radius:var(--radius-lg);padding:10px 14px;">
+            <span style="background:var(--color-text);color:var(--color-bg);font-size:12px;font-weight:700;width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none;">2</span>
+            <div style="display:flex;flex-direction:column;"><span style="font-size:13px;color:var(--color-neutral-700);">Award total</span><span style="font-size:22px;font-weight:600;line-height:1.2;">{{ qualTotal }}</span></div>
+            <div style="width:1px;align-self:stretch;background:var(--color-neutral-300);"></div>
+            <div style="display:flex;flex-direction:column;"><span style="font-size:13px;color:var(--color-neutral-700);">vs as quoted</span><span style="font-size:22px;font-weight:600;line-height:1.2;">{{ qualVsBench }}</span></div>
+            <div style="width:1px;align-self:stretch;background:var(--color-neutral-300);"></div>
+            <div style="display:flex;flex-direction:column;"><span style="font-size:13px;color:var(--color-accent-2-800);">Doubts that could change a winner</span><span style="font-size:22px;font-weight:600;line-height:1.2;color:var(--color-accent-2-800);">{{ affN }} · {{ affStake }}</span></div>
+            <span style="margin-left:auto;font-size:14px;color:var(--color-neutral-800);display:flex;align-items:center;gap:6px;white-space:nowrap;"><i class="ph-duotone ph-funnel-simple" style="font-size:17px;"></i>Rules: 2 vendors excluded <span style="color:var(--color-accent-700);">Show</span></span>
+          </div>
+          <div style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:12px 14px;display:flex;flex-direction:column;gap:8px;flex:1;min-height:0;overflow:hidden;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span style="background:var(--color-text);color:var(--color-bg);font-size:12px;font-weight:700;width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none;">3</span>
+              <span style="font-size:14px;padding:4px 12px;border-radius:999px;background:var(--color-text);color:var(--color-bg);">All 30</span>
+              <span style="font-size:14px;padding:4px 12px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--color-neutral-400);">Doubts</span>
+              <span style="font-size:14px;padding:4px 12px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--color-neutral-400);">Not checked</span>
+              <span style="font-size:14px;color:var(--color-accent-700);display:flex;gap:4px;align-items:center;"><i class="ph-duotone ph-plus"></i>Filter</span>
+              <span style="font-size:14px;display:flex;gap:4px;align-items:center;color:var(--color-neutral-800);"><i class="ph-duotone ph-sort-ascending"></i>Sort</span>
+              <span style="margin-left:auto;font-size:14px;color:var(--color-accent-700);display:flex;gap:4px;align-items:center;"><i class="ph-duotone ph-info"></i>Cell guide</span>
+            </div>
+            <div style="display:grid;grid-template-columns:minmax(150px,1.5fr) repeat(5,minmax(0,1fr));gap:6px;padding-bottom:5px;box-shadow:inset 0 -2px 0 var(--color-text);">
+              <span style="font-size:13px;font-weight:600;color:var(--color-neutral-800);align-self:end;">Line · ₹/box</span>
+              <sc-for list="{{ vHead }}" as="v" hint-placeholder-count="5"><div style="display:flex;flex-direction:column;align-items:flex-end;line-height:1.2;"><span style="font-size:14px;font-weight:600;white-space:nowrap;">{{ v.short }}</span><span style="font-size:12px;white-space:nowrap;color:{{ v.qc }};">{{ v.q }}</span></div></sc-for>
+            </div>
+            <sc-for list="{{ tRows }}" as="r" hint-placeholder-count="12">
+              <div style="display:grid;grid-template-columns:minmax(150px,1.5fr) repeat(5,minmax(0,1fr));gap:6px;align-items:center;min-height:34px;box-shadow:inset 0 -1px 0 var(--color-neutral-200);">
+                <span style="font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="font-size:12px;color:var(--color-neutral-700);">{{ r.id }}</span> {{ r.name }}</span>
+                <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="5"><div style="text-align:right;"><span style="{{ c.s }}">{{ c.t }}</span></div></sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </main>
+        <aside style="width:330px;flex:none;background:var(--color-surface);display:flex;flex-direction:column;min-height:0;">
+          <div style="display:flex;align-items:center;gap:16px;padding:16px 18px 0;">
+            <span style="background:var(--color-text);color:var(--color-bg);font-size:12px;font-weight:700;width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none;">4</span>
+            <span style="font-size:15px;font-weight:600;padding-bottom:6px;box-shadow:inset 0 -3px 0 var(--color-accent);">Source</span>
+            <span style="font-size:15px;padding-bottom:6px;color:var(--color-neutral-800);">Conversation</span>
+            <i class="ph-duotone ph-caret-double-right" style="margin-left:auto;font-size:18px;color:var(--color-neutral-800);padding-bottom:6px;" title="Collapse"></i>
+          </div>
+          <div style="flex:1;min-height:0;overflow:hidden;padding:12px 18px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;flex-direction:column;"><span style="font-size:13px;color:var(--color-neutral-700);">{{ selId }} · {{ selVendor }}</span><span style="font-size:17px;font-weight:600;line-height:1.25;">{{ selName }}</span></div>
+            <dc-import name="SourceDoc" vid="{{ selVid }}" li="{{ selLi }}" hint-size="100%,520px"></dc-import>
+          </div>
+        </aside>
+      </div>
+      <div style="width:420px;flex-shrink:0;display:flex;flex-direction:column;gap:18px;font-size:16px;line-height:1.45;">
+        <div style="display:flex;gap:12px;"><span style="background:var(--color-text);color:var(--color-bg);font-size:13px;font-weight:700;width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;">1</span><span><b>Scenario out of Filters.</b> A labelled selector with its baseline beside it. Table/Chart choice is kept when the scenario changes.</span></div>
+        <div style="display:flex;gap:12px;"><span style="background:var(--color-text);color:var(--color-bg);font-size:13px;font-weight:700;width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;">2</span><span><b>One compact summary strip</b> replaces three cards. Rules and exclusions collapse to one “Show” link.</span></div>
+        <div style="display:flex;gap:12px;"><span style="background:var(--color-text);color:var(--color-bg);font-size:13px;font-weight:700;width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;">3</span><span><b>The table gets the most space.</b> Filters are one row; the cell guide stays one click away.</span></div>
+        <div style="display:flex;gap:12px;"><span style="background:var(--color-text);color:var(--color-bg);font-size:13px;font-weight:700;width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;">4</span><span><b>Inspector always on the right,</b> on every screen. Collapsible. “See source” and clicking a price open Source straight away.</span></div>
+        <div style="display:flex;align-items:flex-start;gap:8px;font-size:14px;line-height:1.4;background:var(--color-bg);padding:8px 10px;border-radius:var(--radius-md);font-size:15px;"><i class="ph-duotone ph-arrows-out-line-horizontal" style="font-size:18px;color:var(--color-accent-700);flex:none;"></i><span>This frame is 1280 px. The table’s columns shrink rather than scroll the page.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="fix4" data-screen-label="Fix 4 Visuals" style="display:flex;flex-direction:column;gap:28px;">
+    <div style="display:flex;align-items:baseline;gap:20px;"><span style="background:var(--color-text);color:var(--color-bg);font-size:15px;font-weight:600;padding:3px 10px;border-radius:var(--radius-md);">Fix 4</span><h2 style="margin:0;font-size:36px;font-weight:600;">Use visuals to answer questions</h2></div>
+    <span style="font-size:18px;line-height:1.5;max-width:1500px;"><b>Chart view</b> of Compare (the Table/Chart switch in Fix 3). Every chart is limited to the active scenario: cheapest per line, quality-cleared.</span>
+    <div style="display:grid;grid-template-columns:repeat(2,600px);gap:28px;">
+
+      <div id="4a" style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:20px 22px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;"><span style="font-size:20px;font-weight:600;">Scenario cost vs baseline</span><span style="font-size:14px;color:var(--color-neutral-700);">Baseline: cheapest per line, quality-cleared · {{ qualTotal }}</span></div>
+        <sc-for list="{{ scen }}" as="s" hint-placeholder-count="6">
+          <div style="display:grid;grid-template-columns:190px 84px minmax(0,1fr) 80px;gap:10px;align-items:center;font-size:14px;font-variant-numeric:tabular-nums;min-height:30px;">
+            <span style="line-height:1.25;font-weight:{{ s.fw }};">{{ s.label }}</span>
+            <span style="text-align:right;">{{ s.total }}</span>
+            <div style="display:grid;grid-template-columns:1fr 1fr;height:14px;">
+              <div style="display:flex;justify-content:flex-end;box-shadow:inset -1px 0 0 var(--color-text);"><div style="height:100%;background:var(--color-accent);width:{{ s.neg }};"></div></div>
+              <div style="display:flex;"><div style="height:100%;background:var(--color-accent-2);width:{{ s.pos }};"></div></div>
+            </div>
+            <span style="text-align:right;font-weight:600;">{{ s.delta }}</span>
+          </div>
+        </sc-for>
+        <span style="font-size:13px;color:var(--color-neutral-700);">Left of the line is cheaper than the baseline, right is dearer.</span>
+      </div>
+
+      <div id="4b" style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:20px 22px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;"><span style="font-size:20px;font-weight:600;">Supplier share</span><span style="font-size:14px;color:var(--color-neutral-700);">Risk spread · max {{ capPct }}% per vendor · {{ capTotal }}</span></div>
+        <sc-for list="{{ shares }}" as="s" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;justify-content:space-between;font-size:15px;font-variant-numeric:tabular-nums;"><span><b>{{ s.name }}</b> · {{ s.lines }} lines</span><span><b>{{ s.pct }}</b> · {{ s.value }}</span></div>
+            <div style="position:relative;height:14px;background:var(--color-neutral-300);border-radius:2px;"><div style="position:absolute;left:0;top:0;bottom:0;background:var(--color-accent);border-radius:2px;width:{{ s.w }};"></div><div style="position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--color-text);left:{{ capLeft }};"></div></div>
+          </div>
+        </sc-for>
+        <span style="font-size:13px;color:var(--color-neutral-700);display:flex;align-items:center;gap:6px;"><span style="width:2px;height:12px;background:var(--color-text);display:inline-block;"></span><span>{{ capPct }}% cap</span></span>
+      </div>
+
+      <div id="4c" style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:20px 22px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;"><span style="font-size:20px;font-weight:600;">Biggest increases vs last year</span><span style="font-size:14px;color:var(--color-neutral-700);">{{ lyCount }} comparable lines · top 5 by rupees</span></div>
+        <sc-for list="{{ drivers }}" as="d" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:200px minmax(0,1fr) 80px;gap:10px;align-items:center;font-size:14px;font-variant-numeric:tabular-nums;">
+            <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="color:var(--color-neutral-700);">{{ d.id }}</span> {{ d.name }}</span>
+            <div style="height:14px;background:var(--color-neutral-300);border-radius:2px;overflow:hidden;"><div style="height:100%;background:var(--color-accent-2);width:{{ d.w }};"></div></div>
+            <span style="text-align:right;font-weight:600;">{{ d.amt }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div id="4d" style="background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:20px 22px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;flex-direction:column;"><span style="font-size:20px;font-weight:600;">Doubts ranked by ₹ at stake</span><span style="font-size:14px;color:var(--color-neutral-700);">Only doubts that can change a winner in this scenario</span></div>
+        <sc-for list="{{ affList }}" as="d" hint-placeholder-count="2">
+          <div style="display:grid;grid-template-columns:240px minmax(0,1fr) 80px;gap:10px;align-items:center;font-size:14px;font-variant-numeric:tabular-nums;">
+            <span style="line-height:1.3;">{{ d.short }}</span>
+            <div style="height:14px;background:var(--color-neutral-300);border-radius:2px;overflow:hidden;"><div style="height:100%;background:var(--color-accent-2);width:{{ d.w }};"></div></div>
+            <span style="text-align:right;font-weight:600;color:var(--color-accent-2-800);">{{ d.stake }}</span>
+          </div>
+        </sc-for>
+        <span style="font-size:14px;color:var(--color-neutral-800);">{{ notAffN }} more don’t affect this scenario <span style="color:var(--color-accent-700);">Show</span></span>
+      </div>
+    </div>
+
+    <div id="4e" style="width:1228px;background:var(--color-neutral-100);box-shadow:var(--shadow-md);border-radius:var(--radius-lg);padding:20px 22px;display:flex;flex-direction:column;gap:14px;">
+      <span style="font-size:20px;font-weight:600;">One colour job per status</span>
+      <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px;">
+        <div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:17px;font-variant-numeric:tabular-nums;padding:2px 6px;border-radius:var(--radius-sm);box-shadow:0 0 0 2px var(--color-accent);align-self:flex-start;">24.60</span><b style="font-size:15px;">Selected</b><span style="font-size:14px;color:var(--color-neutral-800);">Cyan ring. The cell open in the inspector.</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:17px;font-variant-numeric:tabular-nums;font-weight:700;padding:2px 6px;border-radius:var(--radius-sm);background:var(--color-accent-200);align-self:flex-start;">24.60</span><b style="font-size:15px;">Winner</b><span style="font-size:14px;color:var(--color-neutral-800);">Pale cyan fill, bold.</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:17px;font-variant-numeric:tabular-nums;padding:2px 6px;align-self:flex-start;display:flex;gap:4px;align-items:center;">24.60<i class="ph-duotone ph-seal-check" style="color:var(--color-accent-700);font-size:16px;"></i></span><b style="font-size:15px;">Verified by you</b><span style="font-size:14px;color:var(--color-neutral-800);">Cyan seal after the number.</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:17px;font-variant-numeric:tabular-nums;font-weight:700;padding:2px 6px;border-radius:var(--radius-sm);background:var(--color-accent-2-100);color:var(--color-accent-2-800);align-self:flex-start;">24.60?</span><b style="font-size:15px;">Uncertain</b><span style="font-size:14px;color:var(--color-neutral-800);">Pale magenta + “?”. Could change a winner.</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px;"><span class="tag" style="font-size:13px;background:var(--color-accent-2-800);color:var(--color-bg);align-self:flex-start;display:flex;gap:4px;align-items:center;"><i class="ph-duotone ph-x"></i>Quality 20/100</span><b style="font-size:15px;">Failed</b><span style="font-size:14px;color:var(--color-neutral-800);">Solid magenta. Can’t be awarded.</span></div>
+      </div>
+      <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:center;padding-top:4px;">
+        <span style="font-size:14px;color:var(--color-neutral-800);">Eligibility badges:</span>
+        <span class="tag tag-accent" style="font-size:13px;display:flex;gap:4px;align-items:center;"><i class="ph-duotone ph-check"></i>Quality 95/100</span>
+        <span class="tag" style="font-size:13px;background:var(--color-accent-2-800);color:var(--color-bg);display:flex;gap:4px;align-items:center;"><i class="ph-duotone ph-x"></i>Quality 20/100</span>
+        <span class="tag tag-outline" style="font-size:13px;">Quality: not returned</span>
+        <span style="font-size:14px;color:var(--color-neutral-800);">All prices use tabular figures, right-aligned, two decimals.</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { work: {} };
+  componentDidMount() { if (!window.KD) this._t = setInterval(() => { if (window.KD) { clearInterval(this._t); this.forceUpdate(); } }, 150); }
+  componentWillUnmount() { clearInterval(this._t); }
+  more(K, money, Q, T, shares, CAP) {
+    const B = K.baseline, V = K.vendors, n = x => K.num(x);
+    const price = (vid, l) => { const c = K.cells[vid][l.i]; return c && c.p != null ? c.p : null; };
+    const rbWins = B.per.filter(p => p && p.vid === 'RB').length;
+    const rbRows = K.lines.filter(l => price('RB', l) != null).slice(0, 4).map(l => ({ id: l.id, name: l.name, a: price(V[0].id, l) != null ? n(price(V[0].id, l)) : '—', b: n(price('RB', l)) }));
+    const aff = K.doubts.filter(d => d.vendor.q.cleared), notAff = K.doubts.filter(d => !d.vendor.q.cleared);
+    const amax = Math.max(1, ...aff.map(d => d.stake));
+    const logged = typeof K.loggedCount === 'number' ? K.loggedCount : (K.loggedCount && K.loggedCount.length) || 0;
+    const inel = V.filter(v => !v.q.cleared);
+    const cl = V.filter(v => v.q.cleared);
+    const lineMin = (vs, l) => { let m = null; vs.forEach(v => { const p = price(v.id, l); if (p != null && (m == null || p < m)) m = p; }); return m; };
+    const costOf = vs => { let t = 0, miss = 0; K.lines.forEach(l => { const m = lineMin(vs, l); if (m == null) miss++; else t += m * l.qty; }); return { t, miss }; };
+    let two = null; for (let i = 0; i < cl.length; i++) for (let j = i + 1; j < cl.length; j++) { const c = costOf([cl[i], cl[j]]); if (!c.miss && (!two || c.t < two.t)) two = { t: c.t, nm: cl[i].short + ' + ' + cl[j].short }; }
+    let one = null; cl.forEach(v => { const c = costOf([v]); if (!c.miss && (!one || c.t < one.t)) one = { t: c.t, nm: v.short }; });
+    const worst = Q.total + aff.reduce((s, d) => s + d.stake, 0);
+    const raw = [['As quoted, all vendors', B.total], ['Cheapest per line, quality-cleared', Q.total, true], two && ['Two vendors: ' + two.nm, two.t], one && ['One vendor: ' + one.nm, one.t], ['Risk spread, max ' + Math.round(CAP * 100) + '%', T], ['Worst case: doubts go against us', worst]].filter(Boolean);
+    const dmax = Math.max(1, ...raw.map(r => Math.abs(r[1] - Q.total)));
+    const scen = raw.map(([label, t, isBase]) => { const d = t - Q.total; return { label, total: money(t), fw: isBase ? 700 : 400, delta: isBase ? 'baseline' : (d >= 0 ? '+' : '') + money(d), neg: d < 0 ? (Math.abs(d) / dmax * 100).toFixed(1) + '%' : '0%', pos: d > 0 ? (d / dmax * 100).toFixed(1) + '%' : '0%' }; });
+    const per = Q.per, sel = per[0];
+    const tRows = K.lines.slice(0, 13).map(l => ({ id: l.id, name: l.name, cells: V.map(v => { const c = K.cells[v.id][l.i]; if (!c || c.p == null) return { t: '—', s: { fontSize: 14, color: 'var(--color-neutral-700)' } }; const win = per[l.i] && per[l.i].vid === v.id, doubt = c.kind === 'doubt'; const s = { fontSize: 14, padding: '1px 5px', borderRadius: 'var(--radius-sm)', whiteSpace: 'nowrap' }; if (c.kind === 'conv') { s.textDecoration = 'underline dotted'; s.textUnderlineOffset = 3; } if (c.ly) s.fontStyle = 'italic'; if (win) Object.assign(s, { fontWeight: 700, background: doubt ? 'var(--color-accent-2-100)' : 'var(--color-accent-200)', color: doubt ? 'var(--color-accent-2-800)' : 'var(--color-text)' }); if (l.i === 0 && sel && v.id === sel.vid) s.boxShadow = '0 0 0 2px var(--color-accent)'; return { t: n(c.p) + (win && doubt ? '?' : ''), s }; }) }));
+    return {
+      v0: V[0].short, rbRows, benchTotal: money(B.total),
+      rbNote: rbWins + ' lines won by Rohit Box exclude freight. Assumed ₹0.42/box until he confirms.',
+      qualTotal: money(Q.total), qualNote: '30 lines · ' + cl.length + ' vendors · nothing provisional',
+      qualVsBench: (Q.total - B.total >= 0 ? '+' : '−') + money(Math.abs(Q.total - B.total)),
+      inelig: inel.map(v => v.short).join(' and '),
+      affN: aff.length, notAffN: notAff.length, affStake: money(aff.reduce((s, d) => s + d.stake, 0)),
+      affList: aff.map(d => ({ title: d.title, short: d.kind + ' · ' + d.vendor.short, stake: d.stakeL, w: (d.stake / amax * 100).toFixed(1) + '%' })),
+      notAffList: notAff.map(d => ({ title: d.title, why: d.vendor.short + ' not eligible' })),
+      logged,
+      assure: V.map(v => { const photo = /photo/i.test(v.fmt); const verified = v.id === (sel && sel.vid) ? 3 : 0; return { name: v.short, fmt: v.fmt, ai: photo ? v.coverage : 0, m: photo ? 0 : v.coverage - verified, v: verified }; }),
+      blockers: [{ t: aff.length + ' open doubt' + (aff.length === 1 ? '' : 's') + ' in this scenario', a: 'Resolve' }, { t: '0 of 30 winning prices verified', a: 'Check' }, { t: 'Freight pending for Rohit Box', a: 'Chase' }],
+      rail: [['ph-tray', 'Events'], ['ph-note-pencil', 'RFQ'], ['ph-envelope-open', 'Replies'], ['ph-table', 'Compare'], ['ph-seal-check', 'Award']].map(([icon, label]) => ({ icon, label, on: label === 'Compare', off: label !== 'Compare' })),
+      vHead: V.map(v => ({ short: v.short, q: v.q.returned ? 'Quality ' + v.q.score + '/100 ' + (v.q.cleared ? '✓' : '✕') : 'Quality: not returned', qc: v.q.cleared ? 'var(--color-accent-800)' : v.q.returned ? 'var(--color-accent-2-800)' : 'var(--color-neutral-700)' })),
+      tRows, scen,
+      selVid: sel ? sel.vid : V[0].id, selLi: 0, selId: K.lines[0].id, selName: K.lines[0].name, selVendor: sel ? K.VI[sel.vid].short : ''
+    };
+  }
+  renderVals() {
+    const W = this.state.work, tog = k => () => this.setState(s => ({ work: { ...s.work, [k]: !s.work[k] } }));
+    const base = { w1: !!W.a, w3: !!W.c, t1: tog('a'), t3: tog('c'), c1: W.a ? 'ph-caret-down' : 'ph-caret-right', c3: W.c ? 'ph-caret-down' : 'ph-caret-right', capLeft: '74%' };
+    const K = window.KD; if (!K) return base;
+    const money = x => (x < 0 ? '−' : '') + (Math.abs(x) >= 1e7 ? K.crore(Math.abs(x)) : K.lakh(Math.abs(x)));
+    const inr = x => '₹' + Math.round(x).toLocaleString('en-IN');
+    const Q = K.qual;
+
+    const withLy = K.lines.filter(l => l.lyPrice != null && Q.per[l.i] && Q.per[l.i].p != null);
+    const contrib = withLy.map(l => { const p = Q.per[l.i]; return { l, v: K.VI[p.vid], d: (p.p - l.lyPrice) * l.qty, now: p.p }; });
+    const net = contrib.reduce((s, c) => s + c.d, 0);
+    const top = contrib.filter(c => c.d > 0).sort((a, b) => b.d - a.d).slice(0, 5);
+    const topSum = top.reduce((s, c) => s + c.d, 0), max = top.length ? top[0].d : 1;
+    const drivers = top.map(c => ({ id: c.l.id, name: c.l.name, who: c.v.short, move: `${K.num(c.l.lyPrice)} → ${K.num(c.now)}`, qty: c.l.qty.toLocaleString('en-IN'), amt: '+' + money(c.d), w: Math.round(c.d / max * 100) + '%' }));
+    const hLead = net > 0 ? `Up ${money(net)} on ${withLy.length} comparable lines. These five add ${money(topSum)}.` : `Down ${money(-net)} overall on ${withLy.length} comparable lines. These five went up most: +${money(topSum)}.`;
+
+    const cleared = K.vendors.filter(v => v.q.cleared);
+    const price = (vid, l) => { const c = K.cells[vid][l.i]; return c && c.p != null ? c.p : null; };
+    const elig = K.lines.map(l => ({ l, c: cleared.map(v => ({ vid: v.id, x: price(v.id, l) == null ? null : price(v.id, l) * l.qty })).filter(o => o.x != null).sort((a, b) => a.x - b.x) })).filter(o => o.c.length);
+    const greedy = {}; elig.forEach(o => greedy[o.l.i] = o.c[0].vid);
+    const g0 = {}; let G = 0; cleared.forEach(v => g0[v.id] = 0); elig.forEach(o => { g0[o.c[0].vid] += o.c[0].x; G += o.c[0].x; });
+    const maxShare = Math.max(...cleared.map(v => g0[v.id] / G));
+    const solve = cap => {
+      const ord = elig.slice().sort((a, b) => (b.c[b.c.length - 1].x - b.c[0].x) - (a.c[a.c.length - 1].x - a.c[0].x));
+      const n = ord.length, minRem = Array(n + 1).fill(0), maxRem = Array(n + 1).fill(0);
+      for (let k = n - 1; k >= 0; k--) { minRem[k] = minRem[k + 1] + ord[k].c[0].x; maxRem[k] = maxRem[k + 1] + ord[k].c[ord[k].c.length - 1].x; }
+      const by = {}; cleared.forEach(v => by[v.id] = 0);
+      const pick = new Array(n); let best = Infinity, bestPick = null, nodes = 0, LIMIT = 120000, cut = false;
+      const dfs = (k, cur) => {
+        if (++nodes > LIMIT) { cut = true; return; }
+        if (cur + minRem[k] >= best - 1e-6) return;
+        const Tmax = cur + maxRem[k];
+        for (const v of cleared) if (by[v.id] > cap * Tmax + 1e-6) return;
+        if (k === n) { for (const v of cleared) if (by[v.id] > cap * cur + 1e-6) return; best = cur; bestPick = pick.slice(); return; }
+        for (const o of ord[k].c) { pick[k] = o.vid; by[o.vid] += o.x; dfs(k + 1, cur + o.x); by[o.vid] -= o.x; if (cut) return; }
+      };
+      dfs(0, 0);
+      const alloc = {}; if (bestPick) ord.forEach((o, k) => alloc[o.l.i] = bestPick[k]);
+      return { alloc, found: !!bestPick, proven: !cut, cap };
+    };
+    if (!this._sol) {
+      let cap = 0.37; if (maxShare <= cap) cap = Math.max(Math.ceil((1 / cleared.length + 0.03) * 100) / 100, Math.floor((maxShare - 0.04) * 100) / 100);
+      let r = solve(cap); for (let t = 0; t < 3 && !r.found && cap < maxShare; t++) { cap = Math.round((cap + 0.02) * 100) / 100; r = solve(cap); }
+      this._sol = r;
+    }
+    const SOL = this._sol, CAP = SOL.cap;
+    const alloc = SOL.found ? SOL.alloc : greedy;
+    const tot = () => { const by = {}; cleared.forEach(v => by[v.id] = 0); let T = 0; K.lines.forEach(l => { const vid = alloc[l.i]; if (!vid) return; const x = price(vid, l) * l.qty; by[vid] += x; T += x; }); return { by, T }; };
+    const ok = () => { const { by, T } = tot(); return cleared.every(v => by[v.id] <= CAP * T + 1e-6); };
+    const capOk = ok();
+    let badMove = null;
+    if (capOk) K.lines.forEach(l => cleared.forEach(v => { const cur = alloc[l.i], p = price(v.id, l); if (badMove || !cur || v.id === cur || p == null || p >= price(cur, l)) return; alloc[l.i] = v.id; if (ok()) badMove = { l, to: v.short, save: (price(cur, l) - p) * l.qty }; alloc[l.i] = cur; }));
+    const stProven = capOk && SOL.proven && !badMove, stFeasible = capOk && !stProven, stInfeasible = !capOk;
+    const { by, T } = tot();
+    const scale = Math.max(50, Math.ceil(Math.max(maxShare, ...cleared.map(v => by[v.id] / T)) * 100 / 10) * 10 + 10);
+    const shares = cleared.map(v => ({ name: v.short, lines: K.lines.filter(l => alloc[l.i] === v.id).length, value: money(by[v.id]), pct: (by[v.id] / T * 100).toFixed(1) + '%', w: (by[v.id] / T * 100 / scale * 100).toFixed(1) + '%' })).sort((a, b) => parseFloat(b.pct) - parseFloat(a.pct));
+    const premium = T - Q.total;
+    const moves = K.lines.filter(l => alloc[l.i] && alloc[l.i] !== Q.per[l.i].vid).map(l => ({ l, from: K.VI[Q.per[l.i].vid].short, to: K.VI[alloc[l.i]].short, d: (price(alloc[l.i], l) - Q.per[l.i].p) * l.qty })).sort((a, b) => b.d - a.d);
+    const bench = K.baseline.total, bmax = Math.max(bench, Q.total, T);
+    const costBars = [
+      ['As quoted, all vendors (benchmark)', bench, 'var(--color-neutral-600)'],
+      ['Quality-cleared cheapest (baseline)', Q.total, 'var(--color-text)'],
+      [`Max ${Math.round(CAP * 100)}% per vendor`, T, 'var(--color-accent)']
+    ].map(([label, v, fill]) => ({ label, v: money(v), fill, w: (v / bmax * 100).toFixed(1) + '%' }));
+    return Object.assign(base, this.more(K, money, Q, T, shares, CAP), {
+      hLead, drivers, lyCount: withLy.length,
+      capPct: Math.round(CAP * 100), capLeft: (CAP * 100 / scale * 100).toFixed(1) + '%',
+      capTotal: money(T), stProven, stFeasible, stInfeasible,
+      checkPass: capOk && !badMove, checkFail: !capOk || !!badMove,
+      checkMsg: !capOk ? 'No split of cleared vendors keeps every share under the cap. Raise the cap or add a vendor.' : badMove ? 'Self-check failed: ' + badMove.l.id + ' could move to ' + badMove.to + ' and save ' + money(badMove.save) + '.' : '',
+      premLead: capOk ? 'The cap costs ' + money(premium) + ' more. Total ' + inr(T) + '.' : 'The cap can’t be met with cleared vendors only.', capExact: inr(T), qualExact: inr(Q.total), premium: money(premium), premiumExact: inr(premium),
+      shares, costBars,
+      shareLine: 'Shares: ' + shares.map(s => `${s.name} ${s.pct}`).join(' · '),
+      moveLine: moves.length ? `${moves.length} lines move. Biggest: ` + moves.slice(0, 2).map(m => `${m.l.id} ${m.from} → ${m.to} (+${money(m.d)})`).join(', ') : 'No lines move: the cap isn’t binding.'
+    });
+  }
+}
+</script>
+</body>
+</html>

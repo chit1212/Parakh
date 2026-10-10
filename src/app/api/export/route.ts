@@ -24,7 +24,7 @@ export async function POST(req: Request) {
   const ws = wb.addWorksheet("Award");
   ws.addRow([`${s.eventId}: ${s.title}`]).font = { bold: true, size: 13 };
   ws.addRow([`Basis: ${s.basis}. Price per box, INR, delivered Chakan, GST extra.${s.partial ? ` Shown: ${s.partial}.` : ""}`]);
-  ws.addRow([`Frozen ${s.frozenAt} by ${s.frozenBy} · snapshot ${s.id}${s.approvedBy ? ` · approved by ${s.approvedBy} ${s.approvedAt}` : " · not yet approved"}`]);
+  ws.addRow([`Snapshot saved ${s.frozenAt} by ${s.frozenBy} · snapshot ${s.id}${s.approvedBy ? ` · approved by ${s.approvedBy} ${s.approvedAt}` : " · not yet approved"}`]);
   ws.addRow([]);
   const hdr = ws.addRow(["Line", "Box", "Awarded to", "INR per box", "Qty", "Value INR", "As written", "Calculation", "Source", "Approved by"]);
   hdr.font = { bold: true };
@@ -81,7 +81,7 @@ async function memo(s: Snapshot): Promise<Uint8Array> {
   line(`AWARD MEMO · ${s.eventId}`, { size: 9, color: 0.4 });
   line(s.title, { size: 18, f: bold, gap: 8 });
   line(`Basis: ${s.basis}. Every price per box, in rupees, delivered Chakan, GST extra.`);
-  line(`Frozen ${s.frozenAt.slice(0, 16).replace("T", " ")} UTC by ${s.frozenBy} · snapshot ${s.id} · ${s.approvedBy ? `approved by ${s.approvedBy}` : "for approval"}`, { color: 0.4, gap: 10 });
+  line(`Snapshot saved ${s.frozenAt.slice(0, 16).replace("T", " ")} UTC by ${s.frozenBy} · snapshot ${s.id} · ${s.approvedBy ? `approved by ${s.approvedBy}` : "for approval"}`, { color: 0.4, gap: 10 });
   line(`Award value ${crore(s.total)} · ${s.total >= s.cheapestOverall ? "+" : "-"}${lakh(Math.abs(s.total - s.cheapestOverall))} against cheapest overall (${crore(s.cheapestOverall)})`, { f: bold });
   if (s.lastYear) line(`Like-for-like against last year on ${s.lastYear.lines} lines: ${lakh(s.lastYear.thisYear)} this year vs ${lakh(s.lastYear.lastYear)} last year.`);
   line(`Split: ${s.byVendor.map((v) => `${v.vendor} ${v.lines} lines (${lakh(v.value)})`).join("; ")}.`, { gap: 10 });

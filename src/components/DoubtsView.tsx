@@ -141,7 +141,7 @@ export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord
                         {d.route === "vendor" && !dr && <button className="btn btn-ghost" onClick={() => draft(d)}>Or ask the vendor by email</button>}
                       </div>
                       <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>
-                        {choicesFor(d)[0].label.split(":")[0]} lets this price compete in the comparison, every scenario and the chat. You can undo it until the award is frozen.
+                        {choicesFor(d)[0].label.split(":")[0]} lets this price compete in the comparison, every scenario and the chat. You can undo it until the award is submitted.
                       </span>
                       {dr && dr !== "loading" && !("error" in dr) && (
                         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>

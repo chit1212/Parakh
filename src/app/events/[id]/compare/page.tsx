@@ -15,7 +15,7 @@ import { BASELINES, type BaselineKey } from "@/lib/baseline";
 import { shares as sharesOf, yoyDrivers } from "@/lib/facts";
 import { DoubtsView } from "@/components/DoubtsView";
 import { useDecisions } from "@/components/useDecisions";
-import { applyDecisions } from "@/lib/decisions";
+import { applyDecisions, decisionKey } from "@/lib/decisions";
 import { freeze, OVERRIDES_KEY, SNAPSHOT_KEY, type Override, type Snapshot } from "@/lib/award";
 import { download } from "@/lib/download";
 import { useRouter } from "next/navigation";
@@ -295,6 +295,7 @@ export default function ComparePage() {
       const v = h.match(/view=(table|chart)/)?.[1] ?? localStorage.getItem(VIEW_KEY);
       if (v === "chart" || v === "table") setView(v);
       const i = h.match(/inspector=(open|closed)/)?.[1] ?? localStorage.getItem(INSP_KEY);
+      if (/tab=doubts/.test(h)) setTab("doubts");
       if (i === "closed") setInspState(false);
     } catch { /* defaults */ }
   }, []);
@@ -555,7 +556,11 @@ export default function ComparePage() {
   const exportRef = useRef<(() => void) | null>(null);
   // The table as shown (as quoted, or the active strategy), frozen with every number's source.
   const snapshotNow = (only?: string[]): Snapshot => {
-    return freeze({ ev: data!.event, grid: grid!, quality, report: report!, lastYear: data!.lastYear, decisions, checks, only,
+    // What blocks submission is saved with the draft: open doubts that flip a winner here, and pending freight.
+    const affecting = report!.raised.filter((d) => (flips.get(d.id)?.size ?? 0) > 0 && !decisions.some((x) => x.key === decisionKey(d) && x.effect !== "asked"))
+      .map((d) => ({ title: `Doubt ${report!.raised.indexOf(d) + 1}, ${d.title}`, lineIds: [...flips.get(d.id)!] }));
+    const pendingVendors = [...new Set([...report!.raised, ...report!.logged].filter((d) => d.kind === "freight_unknown").map((d) => d.vendorId))];
+    return freeze({ ev: data!.event, grid: grid!, quality, report: report!, lastYear: data!.lastYear, decisions, checks, only, affecting, pendingVendors,
       scenario: cur ? { title: `${isScenario ? active.title : "As quoted"}${overrides.length ? `, with ${overrides.length} override${overrides.length > 1 ? "s" : ""}` : ""}`, result: cur } : null,
       overrides });
   };
@@ -1174,7 +1179,7 @@ function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, overrid
             <button className="btn btn-secondary" onClick={() => onCheck({ at: new Date().toISOString(), who: me }, true)}>Approve &amp; open next winner</button>
           </div>
           <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>
-            {doubt ? `Confirms the price matches the document. Doubt ${doubt.rank} stays open until you decide it on the Doubts tab.` : "Confirms the price matches the document. Recorded with your name and the time, and listed on the award when you freeze it."}
+            {doubt ? `Confirms the price matches the document. Doubt ${doubt.rank} stays open until you decide it on the Doubts tab.` : "Confirms the price matches the document. Recorded with your name and the time, and listed on the award when you save the draft."}
           </span>
         </div>
       ))}

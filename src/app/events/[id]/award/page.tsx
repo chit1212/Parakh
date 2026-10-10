@@ -8,7 +8,7 @@ import { Kpis, QualityLabel } from "@/components/ui";
 import { Rail } from "@/components/Rail";
 import { SourceDoc } from "@/components/SourceDoc";
 import { useReadings } from "@/components/useReadings";
-import { fmtAt, SNAPSHOT_KEY, type Snapshot } from "@/lib/award";
+import { awardState, blockersOf, fmtAt, SNAPSHOT_KEY, type AwardState, type Snapshot } from "@/lib/award";
 import { download } from "@/lib/download";
 import { crore, inr, lakh } from "@/lib/format";
 import { HOME } from "@/lib/routes";
@@ -16,6 +16,21 @@ import { useRole } from "@/components/useRole";
 import { stamp } from "@/components/useVerified";
 
 const label11 = { fontSize: 15, color: "var(--color-neutral-700)" };
+
+/** Draft → In review → Submitted → Approved; the current step in accent. */
+function StateBar({ state }: { state: AwardState }) {
+  const steps: [AwardState, string][] = [["draft", "Draft"], ["in_review", "In review"], ["submitted", "Submitted"], ["approved", "Approved"]];
+  const at = steps.findIndex(([k]) => k === state);
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 6 }} aria-label={`Award state: ${steps[at][1]}`}>
+      {steps.map(([k, t], i) => (
+        <span key={k} style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 14, fontWeight: i === at ? 600 : 400, color: i === at ? "var(--color-accent-800)" : "var(--color-neutral-700)" }}>
+          <span style={{ height: 6, borderRadius: 3, background: i <= at ? "var(--color-accent)" : "var(--color-neutral-300)" }} />{t}
+        </span>
+      ))}
+    </div>
+  );
+}
 
 /** A collapsed row (v2): caret, a 17 px title and a 15 px sub-line; the detail opens below. */
 function Fold({ title, sub, open, children }: { title: string; sub: string; open?: boolean; children: React.ReactNode }) {
@@ -36,13 +51,14 @@ export default function AwardPage() {
   const [role] = useRole();
   const [s, setS] = useState<Snapshot | null | undefined>(undefined);
   const [tr, setTr] = useState(0);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   useEffect(() => {
     try { setS(JSON.parse(localStorage.getItem(SNAPSHOT_KEY) ?? "null")); } catch { setS(null); }
   }, []);
   const save = (n: Snapshot) => { setS(n); try { localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(n)); } catch { /* blocked */ } };
 
   const frame = (body: React.ReactNode, aside?: React.ReactNode) => (
-    <div style={{ display: "flex", minHeight: "100vh", minWidth: 1360, fontSize: 16, lineHeight: 1.45, fontVariantNumeric: "tabular-nums" }}>
+    <div style={{ display: "flex", minHeight: "100vh", fontSize: 16, lineHeight: 1.45, fontVariantNumeric: "tabular-nums" }}>
       <Rail />
       <div style={{ flex: 1, minWidth: 0, padding: "20px 28px 40px 12px", display: "flex", flexDirection: "column", gap: 18 }}>{body}</div>
       {aside}
@@ -53,13 +69,23 @@ export default function AwardPage() {
     return frame(
       <>
         <span style={label11}>Award record · SE-2026-041</span>
-        <h1 style={{ fontSize: 30, fontWeight: 600, margin: 0 }}>Nothing frozen yet</h1>
-        <p style={{ margin: 0, maxWidth: 640 }}>Open the comparison, pick the view you want to award (as quoted, or a scenario from the conversation), and press <b>Freeze for award</b>. The numbers are copied here with their sources and do not change afterwards.</p>
+        <h1 style={{ fontSize: 30, fontWeight: 600, margin: 0 }}>No draft award yet</h1>
+        <p style={{ margin: 0, maxWidth: 640 }}>Open the comparison, pick the scenario you want to award, and press <b>Save draft award</b>. The numbers are copied here with their sources; a later reading or revision does not change a saved draft.</p>
         <Link className="btn btn-primary" href={HOME} style={{ alignSelf: "flex-start", color: "var(--color-bg)" }}>Go to the comparison</Link>
       </>,
     );
 
   const ev = data?.event;
+  const blockers = blockersOf(s);
+  const state = awardState(s);
+  // The server checks the blockers too, so the rule holds even if the button is bypassed.
+  const submit = async () => {
+    setSubmitError(null);
+    const r = await fetch("/api/award/submit", { method: "POST", body: JSON.stringify({ snapshot: s }) }).catch(() => null);
+    const j = r ? await r.json().catch(() => ({})) : {};
+    if (!r?.ok || !j.sentAt) { setSubmitError(j.error ? `${j.error} ${(j.blockers ?? []).length} blocker(s) remain.` : "Could not submit just now; try again."); return; }
+    save({ ...s, sentAt: j.sentAt, audit: [...(s.audit ?? []), { at: j.sentAt, who: ev?.buyer ?? "Buyer", what: `Sent the award to ${ev?.vp ?? "the VP"} for approval`, why: "Buyer's recommendation, no blockers open" }] });
+  };
   const d = s.total - s.cheapestOverall;
   const awarded = s.rows.filter((r) => r.perBox != null);
   const checked = awarded.filter((r) => r.checked);
@@ -91,18 +117,37 @@ export default function AwardPage() {
         <button className="btn btn-secondary" style={{ whiteSpace: "nowrap" }} onClick={() => download(s, "pdf")}><FilePdf size={16} weight="duotone" />PDF memo</button>
         {s.approvedBy ? (
           <span className="tag tag-accent" style={{ padding: "8px 12px", whiteSpace: "nowrap" }}>Approved by {s.approvedBy}</span>
+        ) : role === "VP" && !s.sentAt ? (
+          <span className="tag tag-neutral" style={{ padding: "8px 12px", whiteSpace: "nowrap" }}>Waiting for {ev?.buyer.split(" ")[0] ?? "the buyer"} to submit</span>
         ) : role === "VP" ? (
-          <button className="btn btn-primary" style={{ whiteSpace: "nowrap" }} onClick={() => { const at = new Date().toISOString(); save({ ...s, approvedBy: `${ev?.vp ?? "VP"} (${ev?.vpRole ?? "VP"})`, approvedAt: at, audit: [...(s.audit ?? []), { at, who: ev?.vp ?? "VP", what: `Approved the award (${crore(s.total)}, snapshot ${s.id})`, why: "VP approval of the frozen award" }] }); }}>
+          <button className="btn btn-primary" style={{ whiteSpace: "nowrap" }} onClick={() => { const at = new Date().toISOString(); save({ ...s, approvedBy: `${ev?.vp ?? "VP"} (${ev?.vpRole ?? "VP"})`, approvedAt: at, audit: [...(s.audit ?? []), { at, who: ev?.vp ?? "VP", what: `Approved the award (${crore(s.total)}, snapshot ${s.id})`, why: "VP approval of the submitted award" }] }); }}>
             Approve award
           </button>
         ) : s.sentAt ? (
           <span className="tag tag-neutral" style={{ padding: "8px 12px", whiteSpace: "nowrap" }} title="Demo: nothing is sent; switch to the VP in the P menu to approve">Sent to {ev?.vp.split(" ")[0] ?? "the VP"} {stamp(s.sentAt)}</span>
         ) : (
-          <button className="btn btn-primary" style={{ whiteSpace: "nowrap" }} onClick={() => { const at = new Date().toISOString(); save({ ...s, sentAt: at, audit: [...(s.audit ?? []), { at, who: ev?.buyer ?? "Buyer", what: `Sent the award to ${ev?.vp ?? "the VP"} for approval`, why: "Buyer's recommendation, frozen for approval" }] }); }}>
+          <button className="btn btn-primary" style={{ whiteSpace: "nowrap" }} disabled={blockers.length > 0} title={blockers.length ? "Clear the blockers below first" : undefined} onClick={submit}>
             Send to {ev?.vp.split(" ")[0] ?? "the VP"} for approval
           </button>
         )}
       </div>
+      <StateBar state={state} />
+      <span style={{ fontSize: 15, color: "var(--color-neutral-800)" }}>
+        {state === "approved" ? `Approved by ${s.approvedBy} ${s.approvedAt ? stamp(s.approvedAt) : ""}` : s.sentAt ? `Submitted to ${ev?.vp ?? "the VP"} ${stamp(s.sentAt)}` : `${state === "draft" ? "Draft award" : "In review"} · snapshot saved ${fmtAt(s.frozenAt)} · not submitted`}
+      </span>
+      {!s.sentAt && blockers.length > 0 && (
+        <div style={{ background: "var(--color-accent-2-100)", color: "var(--color-accent-2-800)", borderRadius: "var(--radius-lg)", padding: "12px 16px", display: "flex", flexDirection: "column", gap: 6 }}>
+          <b style={{ fontSize: 17 }}>Can’t submit yet</b>
+          {blockers.map((b, i) => (
+            <span key={i} style={{ display: "flex", gap: 10, flexWrap: "wrap", fontSize: 15 }}>
+              <span>{b.text}</span>
+              <Link href={`/events/${s.eventId}/compare${b.kind === "unapproved" ? "" : "#tab=doubts"}`} style={{ color: "var(--color-accent-700)" }}>{b.action} →</Link>
+            </span>
+          ))}
+          <span style={{ fontSize: 14, color: "var(--color-neutral-800)" }}>Settle these on Compare, then save the draft again.</span>
+        </div>
+      )}
+      {submitError && <span style={{ color: "var(--color-accent-2-800)" }}>{submitError}</span>}
       <p style={{ margin: 0, fontSize: 16, maxWidth: 900 }}>{summary}</p>
       <Kpis items={kpis} />
       <div className="sheet" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -150,7 +195,7 @@ export default function AwardPage() {
                 ))}
               </tbody>
             </table>
-          ) : <span style={{ color: "var(--color-neutral-700)" }}>Nothing approved, decided or overridden before this award was frozen.</span>}
+          ) : <span style={{ color: "var(--color-neutral-700)" }}>Nothing approved, decided or overridden before this draft was saved.</span>}
         </Fold>
         <Fold title="Rules applied" sub={`${s.rules.length} rules, solved in code`}>
           {s.rules.map((t, i) => <div key={i} style={{ display: "grid", gridTemplateColumns: "30px 1fr", gap: 12 }}><span style={{ color: "var(--color-neutral-700)" }}>R{i + 1}</span><span>{t}</span></div>)}
@@ -160,7 +205,7 @@ export default function AwardPage() {
         <div style={{ display: "flex", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
           <h3 style={{ fontSize: 20, margin: 0 }}>Line snapshot</h3>
           <span style={{ display: "flex", alignItems: "center", gap: 5, color: "var(--color-neutral-700)" }}>
-            <LockSimple weight="duotone" />Frozen {new Date(s.frozenAt).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Kolkata" })} · snapshot {s.id} · later revisions will not change these numbers
+            <LockSimple weight="duotone" />Snapshot saved {new Date(s.frozenAt).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Asia/Kolkata" })} · snapshot {s.id} · later revisions will not change these numbers
           </span>
         </div>
         <table className="table" style={{ fontSize: 15 }}>
@@ -179,7 +224,7 @@ export default function AwardPage() {
         </table>
       </div>
     </>,
-    <aside style={{ width: 440, flex: "none", background: "var(--color-surface)", padding: "22px 22px 30px", display: "flex", flexDirection: "column", gap: 14, position: "sticky", top: 0, alignSelf: "flex-start", maxHeight: "100vh", overflow: "auto" }}>
+    <aside style={{ width: 330, flex: "none", background: "var(--color-surface)", padding: "20px 16px 30px", display: "flex", flexDirection: "column", gap: 14, position: "sticky", top: 0, alignSelf: "flex-start", maxHeight: "100vh", overflow: "auto" }}>
       <span style={{ display: "flex", flexDirection: "column" }}><span style={{ fontSize: 17, fontWeight: 600 }}>Trace</span><span style={label11}>{row.lineId} · {row.name}</span></span>
       {row.source && row.replyId ? (
         <>
