@@ -6,10 +6,10 @@ import {
   CaretDown, CaretRight, ChatsCircle, Export, SealCheck, FileMagnifyingGlass, X,
 } from "@phosphor-icons/react";
 import { Rail } from "@/components/Rail";
-import { Kpis, PageHead, tabStyle } from "@/components/ui";
+import { Kpis, PageHead, QualityLabel, tabStyle } from "@/components/ui";
 import { AWARD_BY } from "@/lib/routes";
 import { SourceDoc } from "@/components/SourceDoc";
-import { Conversation, type ChatMsg } from "@/components/Conversation";
+import { Conversation, VP_QUESTION, type ChatMsg } from "@/components/Conversation";
 import { DoubtsView } from "@/components/DoubtsView";
 import { useDecisions } from "@/components/useDecisions";
 import { applyDecisions } from "@/lib/decisions";
@@ -22,8 +22,9 @@ import { useScheme } from "@/components/useScheme";
 import { useRole } from "@/components/useRole";
 import { checkKey, stamp, useVerified, type Check, type Checks } from "@/components/useVerified";
 import { useReadings } from "@/components/useReadings";
-import { findDoubts, type Doubt, type DoubtReport } from "@/lib/doubts";
+import { findDoubts, loggedLabel, withPatch, type Doubt, type DoubtReport } from "@/lib/doubts";
 import { qualityOf, type Quality } from "@/lib/quality";
+import type { SourcingEvent } from "@/lib/types";
 import { buildGrid, cellKey, type Award, type Grid, type GridCell } from "@/lib/compare";
 import { crore, day, inr, lakh, num2, where } from "@/lib/format";
 import type { ReplyReading } from "@/lib/reader/pipeline";
@@ -42,11 +43,30 @@ const paneS = (on: boolean): React.CSSProperties => ({
 function ScenarioStrip({ r, title, grid, askedBy, onBack, backLabel }: { r: ScenarioResult; title: string; grid: Grid; askedBy: string | null; onBack: () => void; backLabel: string }) {
   const d = r.award.total - r.base.total;
   const lbl = { ...label11, color: "var(--color-accent-800)" };
+  const [open, setOpen] = useState(false);
+  if (!open)
+    return (
+      <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", padding: "10px 14px", fontSize: 15, background: "var(--color-accent-100)", borderRadius: "var(--radius-lg)" }}>
+        <button onClick={() => setOpen(true)} aria-expanded={false} style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: 0, padding: 0, font: "inherit", fontWeight: 600, color: "var(--color-accent-800)", cursor: "pointer" }}>
+          <CaretRight weight="duotone" />{title}
+        </button>
+        <span style={{ color: "var(--color-neutral-800)" }}>
+          {r.rules.length} rules · {r.excluded.length ? `${r.excluded.map((x) => grid.vendors.find((v) => v.id === x.vendorId)?.short ?? x.name).join(" and ")} excluded` : "no vendor excluded"} · {r.changed.length} line{r.changed.length === 1 ? "" : "s"} change hands
+        </span>
+        <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12 }}>
+          <b>{crore(r.award.total)}</b>
+          <span style={{ color: "var(--color-accent-800)" }}>{d >= 0 ? "+" : "−"}{lakh(Math.abs(d))} vs cheapest overall</span>
+          <button className="btn btn-ghost" style={{ padding: "2px 6px" }} onClick={onBack}>{backLabel}</button>
+        </span>
+      </div>
+    );
   return (
     <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) auto", gap: 24, padding: "12px 14px", fontSize: 15, background: "var(--color-accent-100)", borderRadius: "var(--radius-lg)" }}>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          <span style={lbl}>{title} · rules applied</span>
+          <button onClick={() => setOpen(false)} aria-expanded style={{ ...lbl, display: "inline-flex", alignItems: "center", gap: 6, background: "none", border: 0, padding: 0, font: "inherit", fontSize: 15, cursor: "pointer", alignSelf: "flex-start" }}>
+            <CaretDown weight="duotone" />{title} · rules applied
+          </button>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: "4px 18px" }}>
             {r.rules.map((t, i) => (
               <div key={i} style={{ display: "grid", gridTemplateColumns: "26px 1fr", gap: 4, lineHeight: 1.35 }}>
@@ -212,6 +232,9 @@ type Show = "all" | "doubts" | "changed" | "unverified";
 interface Asked { title: string; rules: ScenarioRules; asker: "buyer" | "vp"; libKey: string | null }
 const SHOW: [Show, string][] = [["all", "All lines"], ["doubts", "With doubts"], ["changed", "Winner changed"], ["unverified", "Not approved by you"]];
 const NO_FILTER = { show: "all" as Show, win: "" };
+const DEFAULT_SCENARIO = "S1";
+const GUIDE_KEY = "parakh-guide-open";
+const START_KEY = "parakh-start-dismissed";
 
 export default function ComparePage() {
   const { data, state, empty } = useReadings();
@@ -220,14 +243,22 @@ export default function ComparePage() {
   const [checks, setCheck] = useVerified();
   const [decisions, recordDecision, undoDecision] = useDecisions();
   const [sel, setSel] = useState<{ v: string; l: string } | null>(null);
-  const [legendUser, setLegendUser] = useState<boolean | null>(null);
+  // "How to read a price": open by default; the buyer's toggle is remembered in this browser.
+  const [guideOpen, setGuideOpenState] = useState(true);
+  useEffect(() => { try { if (localStorage.getItem(GUIDE_KEY) === "0") setGuideOpenState(false); } catch { /* default */ } }, []);
+  const setGuideOpen = (v: boolean) => { setGuideOpenState(v); try { localStorage.setItem(GUIDE_KEY, v ? "1" : "0"); } catch { /* kept for this visit */ } };
   const [tab, setTab] = useState<"compare" | "doubts">("compare");
   const [pane, setPane] = useState<"conv" | "src">("conv");
   const [view, setView] = useState<"table" | "chart">("table");
   const [msgs, setMsgs] = useState<ChatMsg[]>([]);
   const [asked, setAsked] = useState<Asked[]>([]);
   // The view on screen: a library strategy ("base", "S1", …) or a scenario asked in chat ("asked:3").
-  const [scen, setScen] = useState<string>("base");
+  // Opens on the VP's view (quality-cleared only); a #scenario=<key> link wins. "As quoted" stays first in the list as the reference.
+  const [scen, setScen] = useState<string>(DEFAULT_SCENARIO);
+  useEffect(() => {
+    const h = window.location.hash.match(/scenario=([\w:]+)/)?.[1];
+    if (h && LIBRARY.some((x) => x.key === h)) setScen(h);
+  }, []);
   const [f, setF] = useState<{ show: Show; win: string }>(NO_FILTER);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -252,19 +283,22 @@ export default function ComparePage() {
     () => (data && grid ? findDoubts(data.event, grid, quality.filter((q) => q.cleared).map((q) => q.vendorId)) : null),
     [data, grid, quality],
   );
-  // Each cell a raised doubt is about, on the lines where it would change the winner.
-  const doubtAt = useMemo(() => {
-    const m = new Map<string, { d: Doubt; rank: number }>();
-    report?.raised.forEach((d, i) => {
-      const changed = new Set(d.changes.map((c) => c.lineId));
-      for (const l of d.lineIds) if (changed.has(l) && !m.has(cellKey(d.vendorId, l))) m.set(cellKey(d.vendorId, l), { d, rank: i + 1 });
-    });
-    return m;
-  }, [report]);
   // Every scenario asked so far, solved in code (the chat only chose the rules).
   const results = useMemo<ScenarioResult[]>(
     () => (data && grid ? asked.map((a) => runScenario(data.event, grid, quality, a.rules)) : []),
     [data, grid, quality, asked],
+  );
+  // For each answer's scenario: the open doubts whose other reading would change a winner under its rules (the chat's caveat bullet).
+  const openFor = useMemo<number[][]>(
+    () => (data && grid && report ? asked.map((a, i) => {
+      const now = results[i]?.award;
+      if (!now) return [];
+      return report.raised.map((d, k) => ({ d, k })).filter(({ d }) => {
+        const alt = runScenario(data.event, withPatch(grid, d.patch), quality, a.rules).award;
+        return data.event.lines.some((l) => alt.per[l.id]?.vendorId !== now.per[l.id]?.vendorId);
+      }).map(({ k }) => k);
+    }) : []),
+    [data, grid, report, quality, asked, results],
   );
   // L32: buyer overrides with an audit trail (who, from, to, why, when), kept in this browser.
   const [overrides, setOverridesState] = useState<Override[]>([]);
@@ -288,17 +322,40 @@ export default function ComparePage() {
   }, [scen, asked]);
   const isScenario = scen !== "base";
   // The view on screen, with the buyer's overrides applied on top.
+  // The rules on screen: the active strategy, with lines it fixes (e.g. "award L01 to Shree Balaji") kept and the buyer's own overrides winning on the same line.
+  const rulesNow = useMemo<ScenarioRules>(() => {
+    const mine = overrides.map((o) => ({ lineId: o.lineId, vendorId: o.to }));
+    const fixed = [...(active.rules.overrides ?? []).filter((x) => !mine.some((m) => m.lineId === x.lineId)), ...mine];
+    return { ...active.rules, overrides: fixed };
+  }, [active, overrides]);
   const cur = useMemo<ScenarioResult | null>(() => {
     if (!data || !grid) return null;
     if (!isScenario && !overrides.length) return null;
-    // Lines the scenario itself fixes (e.g. "award L01 to Shree Balaji") stay fixed; the buyer's own overrides win on the same line.
-    const mine = overrides.map((o) => ({ lineId: o.lineId, vendorId: o.to }));
-    const fixed = [...(active.rules.overrides ?? []).filter((x) => !mine.some((m) => m.lineId === x.lineId)), ...mine];
-    return runScenario(data.event, grid, quality, { ...active.rules, overrides: fixed });
-  }, [data, grid, quality, active, isScenario, overrides]);
+    return runScenario(data.event, grid, quality, rulesNow);
+  }, [data, grid, quality, rulesNow, isScenario, overrides]);
+  // Every doubt (raised or logged) re-solved under the view on screen: the lines whose winner flips if its other reading holds.
+  const flips = useMemo(() => {
+    const m = new Map<string, Set<string>>();
+    if (!data || !grid || !report) return m;
+    const now = cur?.award ?? grid.asQuoted;
+    for (const d of [...report.raised, ...report.logged]) {
+      const alt = runScenario(data.event, withPatch(grid, d.patch), quality, rulesNow).award;
+      m.set(d.id, new Set(data.event.lines.filter((l) => alt.per[l.id]?.vendorId !== now.per[l.id]?.vendorId).map((l) => l.id)));
+    }
+    return m;
+  }, [data, grid, report, quality, rulesNow, cur]);
+  // A cell carries "?" only where its doubt would change the winner in this view (scenario and overrides).
+  const doubtAt = useMemo(() => {
+    const m = new Map<string, { d: Doubt; rank: number }>();
+    report?.raised.forEach((d, i) => {
+      const f = flips.get(d.id);
+      for (const l of d.lineIds) if (f?.has(l) && !m.has(cellKey(d.vendorId, l))) m.set(cellKey(d.vendorId, l), { d, rank: i + 1 });
+    });
+    return m;
+  }, [report, flips]);
 
-  const ask = async (text: string) => {
-    const who = asker;
+  const ask = async (text: string, as?: "buyer" | "vp") => {
+    const who = as ?? asker;
     const next: ChatMsg[] = [...msgs, { role: "user", text, asker: who }];
     setMsgs(next);
     setQ("");
@@ -360,6 +417,52 @@ export default function ComparePage() {
     }
   };
 
+  // "‡" on a vendor whose prices carry a condition: said once, in the header; the cells mark it only where it changes a winner.
+  const vendorNote = useMemo(() => {
+    const out: Record<string, string> = {};
+    if (!data || !grid || !report) return out;
+    const plan = Object.values(data.event.terms).join(" ").match(/monthly PO value per vendor\s+INR\s*([\d.]+)\s*[-–]\s*([\d.]+)\s*lakh/i);
+    for (const v of grid.vendors) {
+      const disc = data.event.lines.map((l) => grid.cells[cellKey(v.id, l.id)].norm.variants.conditionalDiscount).find(Boolean);
+      if (!disc) continue;
+      const pct = disc.calc.match(/less ([\d.]+)%/)?.[1];
+      const rank = report.raised.findIndex((d) => d.kind === "conditional_discount" && d.vendorId === v.id) + 1;
+      out[v.id] = `Prices are shown without ${v.short}’s ${pct}% discount, which applies only ${disc.when.replace(/^if (provided )?(that )?(the value of )?/i, "if ")}.`
+        + (plan ? ` The RFQ plans monthly POs of ₹${plan[1]}–${plan[2]} L per vendor.` : "")
+        + (rank ? ` Doubt ${rank}.` : " Logged: it does not change a winner.");
+    }
+    return out;
+  }, [data, grid, report]);
+  // A cell read two ways: both readings, the one in use, and whether it is logged or a doubt in this view.
+  const readNote = useMemo(() => {
+    const out = new Map<string, string>();
+    if (!grid || !report) return out;
+    for (const c of Object.values(grid.cells)) {
+      if (c.perBox == null || !c.norm.alternatives.length) continue;
+      const k = cellKey(c.vendorId, c.lineId);
+      const raised = report.raised.findIndex((d) => d.kind === "hard_to_read" && d.vendorId === c.vendorId && d.lineIds.includes(c.lineId));
+      const how = c.norm.legibility === "corrected_by_hand" ? "hand-corrected" : "hard to read";
+      out.set(k, `Two readings: ${[c.perBox, ...c.norm.alternatives.map((a) => a.perBox)].map((x) => `₹${x.toFixed(2)}`).join(" · ")} (${how}). Using ₹${c.perBox.toFixed(2)}. `
+        + (raised < 0 ? "Logged." : doubtAt.has(k) ? `Doubt ${raised + 1}.` : `Doubt ${raised + 1}; no winner changes in this view.`));
+    }
+    return out;
+  }, [grid, report, doubtAt]);
+  const twoReadingsNote = (v: string, l: string) => {
+    if (!report) return null;
+    const i = report.raised.findIndex((d) => d.kind === "hard_to_read" && d.vendorId === v && d.lineIds.includes(l));
+    const d = i >= 0 ? report.raised[i] : report.logged.find((x) => x.kind === "hard_to_read" && x.vendorId === v && x.lineIds.includes(l));
+    if (!d) return null;
+    const flipsHere = flips.get(d.id)?.has(l);
+    return flipsHere ? `${i >= 0 ? `Doubt ${i + 1}` : "Logged"}, but the other reading changes the winner in this scenario: settle it before you award.`
+      : i >= 0 ? `Doubt ${i + 1}. It doesn’t change a winner in this scenario.` : "Logged. It doesn’t change a winner in this scenario.";
+  };
+  // "Start here" (dismissible): three things a reviewer can do in two minutes. Dismissal is remembered; Reset demo clears it.
+  const [startOn, setStartOn] = useState(false);
+  useEffect(() => { try { setStartOn(localStorage.getItem(START_KEY) !== "1"); } catch { setStartOn(true); } }, []);
+  const [startDone, setStartDone] = useState<Record<number, boolean>>({});
+  const [vendorPop, setVendorPop] = useState<string | null>(null);
+  const [pulse, setPulse] = useState<string | null>(null);
+
   const award = cur?.award ?? grid?.asQuoted ?? null;
   const excluded = useMemo(() => new Set(cur?.excluded.map((e) => e.vendorId) ?? []), [cur]);
 
@@ -411,7 +514,6 @@ export default function ComparePage() {
   if (!data || !grid || !report || !award) return <div style={{ padding: 40, color: "var(--color-neutral-700)" }}>Loading the event…</div>;
   const ev = data.event;
   const pending = data.replies.filter((r) => !state[r.id] || state[r.id].stage !== "done").length;
-  const guideOpen = legendUser ?? false;
   const shownValue = shown.reduce((a, l) => a + (award.per[l.id] ? award.per[l.id]!.perBox * l.qty : 0), 0);
   const askedLabel = (a: Asked) => (a.asker === "vp" ? `Asked by ${ev.vp}, ${ev.vpRole}` : `Asked by ${ev.buyer}, buyer`);
   const sel11 = { ...label11, display: "flex", flexDirection: "column" as const, gap: 4 };
@@ -452,13 +554,38 @@ export default function ComparePage() {
           </span>
         </PageHead>
 
+        {startOn && readings.length > 0 && (
+          <StartStrip
+            intro={`${numberWord(new Set(readings.filter((r) => r.status === "read" && r.vendorId).map((r) => r.vendorId)).size)} vendor replies in ${numberWord(new Set(grid.vendors.filter((v) => readings.some((r) => r.vendorId === v.id && r.status === "read")).map((v) => v.format)).size).toLowerCase()} formats, read into one comparison you can check.`}
+            doubts={report.raised.length} done={startDone}
+            onPrice={() => {
+              // The first cell with a doubt in this view, else the first line's winner.
+              const order = shown.length ? shown : grid.lines;
+              const hit = order.flatMap((l) => grid.vendors.map((v) => cellKey(v.id, l.id))).find((k) => doubtAt.has(k));
+              const first = order.find((l) => award.per[l.id]);
+              const k = hit ?? (first ? cellKey(award.per[first.id]!.vendorId, first.id) : null);
+              if (!k) return;
+              const [v, l] = k.split("|");
+              setTab("compare"); setView("table"); setSel({ v, l }); setPane("src"); setPulse(k);
+              setTimeout(() => document.querySelector(`[data-cell="${k}"]`)?.scrollIntoView({ block: "center", behavior: "smooth" }), 50);
+              setTimeout(() => setPulse(null), 1300);
+              setStartDone((d) => ({ ...d, 1: true }));
+            }}
+            onDoubts={() => { setTab("doubts"); setStartDone((d) => ({ ...d, 2: true })); }}
+            onAsk={() => { setPane("conv"); setStartDone((d) => ({ ...d, 3: true })); if (!busy) ask(VP_QUESTION, "vp"); }}
+            onDismiss={() => { setStartOn(false); try { localStorage.setItem(START_KEY, "1"); } catch { /* this visit only */ } }} />
+        )}
+
         <Kpis items={[
-          { label: `Award total · ${isScenario ? active.title : overrides.length ? "as quoted, with your overrides" : "cheapest per line"}`, value: award.total >= 1e7 ? crore(award.total) : lakh(award.total), sub: split ? `${split} lines` : "No prices read yet" },
+          { label: `Award total · ${isScenario ? active.title : overrides.length ? "as quoted, with your overrides" : "as quoted, all vendors"}`, value: award.total >= 1e7 ? crore(award.total) : lakh(award.total), title: split ? `${split} lines` : undefined,
+            sub: !readings.length ? "No prices read yet" : !cur ? (split ? `${split} lines` : "")
+              : Math.abs(award.total - grid.asQuoted.total) < 1 ? "Same as as quoted, all vendors"
+              : `${lakh(Math.abs(award.total - grid.asQuoted.total))} ${award.total > grid.asQuoted.total ? "more" : "less"} than as quoted, all vendors` },
           { label: `vs last year, same ${lyLines.length} boxes`, value: lyLines.length ? <span style={{ color: "var(--color-accent-800)" }}>{lyDelta >= 0 ? "+" : "−"}{lakh(Math.abs(lyDelta))}</span> : "—",
             sub: lyLines.length ? `${lyDelta >= 0 ? "+" : "−"}${Math.abs((lyDelta / lyThen) * 100).toFixed(1)}% on ${lakh(lyThen)} last year` : "No line has a price from last year",
             title: "Like for like: the lines with a price from last year (SE-2025-037), at this view's winners" },
           { label: "Doubts that could change a winner", value: `${report.raised.length} · ${lakh(stake)}`, doubt: true, onClick: () => setTab("doubts"), title: "Open the Doubts tab",
-            sub: `at stake · ${report.logged.length} more checked and logged` },
+            sub: `at stake · ${loggedLabel(report)}` },
         ]} />
 
         {(pending > 0 || !readings.length) && (
@@ -471,7 +598,7 @@ export default function ComparePage() {
         {tab === "doubts" ? (
           <div className="sheet" style={{ padding: "8px 20px" }}>
             <DoubtsView grid={grid} report={report} overrides={overrides} onSee={(v, l) => { setSel({ v, l }); setTab("compare"); }}
-              decisions={decisions} onRecord={recordDecision} onUndo={undoDecision} me={me} />
+              decisions={decisions} onRecord={recordDecision} onUndo={undoDecision} me={me} flips={flips} view={isScenario ? `“${active.title}”` : "the view on screen"} />
           </div>
         ) : (
         <div className="sheet" style={{ display: "flex", flexDirection: "column", gap: 10, padding: "14px 20px 4px" }}>
@@ -482,7 +609,7 @@ export default function ComparePage() {
               {filtersOpen ? <CaretDown weight="duotone" /> : <CaretRight weight="duotone" />}Filters
             </button>
             {/* "How to read a price" folds away the same way as Filters. */}
-            <button onClick={() => setLegendUser(!guideOpen)} aria-expanded={guideOpen}
+            <button onClick={() => setGuideOpen(!guideOpen)} aria-expanded={guideOpen}
               style={{ flex: "none", display: "flex", alignItems: "center", gap: 6, background: "none", border: 0, padding: 0, marginLeft: 12, font: "inherit", fontSize: 16, fontWeight: 600, cursor: "pointer", color: guideOpen ? "var(--color-text)" : "var(--color-accent-800)" }}>
               {guideOpen ? <CaretDown weight="duotone" /> : <CaretRight weight="duotone" />}How to read a price
             </button>
@@ -533,11 +660,13 @@ export default function ComparePage() {
             <ChartView grid={grid} r={cur} />
           ) : (
             <GridTable grid={grid} lines={shown} filtered={filtered} sel={sel} quality={quality} doubtAt={doubtAt} award={award} base={cur ? grid.asQuoted : null}
-              excluded={excluded} checks={checks} onSelect={(v, l) => { setSel({ v, l }); setPane("src"); }} />
+              excluded={excluded} checks={checks} onSelect={(v, l) => { setSel({ v, l }); setPane("src"); }}
+              vendorNote={vendorNote} readNote={readNote} pulse={pulse} onVendor={setVendorPop} showWas={f.show === "changed"} />
           )}
         </div>
         )}
       </main>
+      {vendorPop && <VendorPopover ev={ev} vendorId={vendorPop} grid={grid} quality={quality} readings={readings} paths={paths} onClose={() => setVendorPop(null)} />}
 
       <aside style={{ width: 440, flex: "none", background: "var(--color-surface)", display: "flex", flexDirection: "column", minHeight: 0 }}>
         <div style={{ display: "flex", gap: 22, padding: "22px 22px 0" }}>
@@ -550,12 +679,12 @@ export default function ComparePage() {
         {pane === "conv" ? (
           <Conversation msgs={msgs} results={results} titles={asked.map((a) => a.title)} people={{ buyer: ev.buyer, vp: ev.vp }} asker={asker}
             busy={busy} q={q} setQ={setQ} onAsk={ask} onShow={(i, v) => { setScen(asked[i]?.libKey ?? `asked:${i}`); setView(v); setTab("compare"); }}
-            vendorNames={Object.fromEntries(grid.vendors.map((v) => [v.id, v.short]))}
+            vendorNames={Object.fromEntries(grid.vendors.map((v) => [v.id, v.short]))} quality={quality} doubts={report.raised} openFor={openFor}
             opening={!readings.length ? `No replies are read yet, so there is nothing to compare. Upload a reply on the Replies screen; as soon as it is read it joins this table, and you can ask me about it.` : `Quotes from ${new Set(readings.filter((r) => r.status === "read" && r.vendorId).map((r) => r.vendorId)).size} of ${ev.vendors.length} vendors are read and on one basis. ${report.raised.length} doubts could change a winner (${lakh(stake)} at stake); see the Doubts tab. Ask me anything about this table; every answer is solved in code and added to the Scenario list, so you can keep, compare and switch between them.`} />
         ) : (
         <div style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "16px 22px 24px", display: "flex", flexDirection: "column", gap: 16 }}>
           {sel ? (
-            <SourcePanel grid={grid} sel={sel} readings={readings} paths={paths} doubt={doubtAt.get(cellKey(sel.v, sel.l))} report={report}
+            <SourcePanel grid={grid} sel={sel} readings={readings} paths={paths} doubt={doubtAt.get(cellKey(sel.v, sel.l))} report={report} twoReadings={twoReadingsNote(sel.v, sel.l)}
               shown={award} override={overrides.find((o) => o.lineId === sel.l)} buyer={ev.buyer}
               check={checks[checkKey(sel.v, sel.l)] ?? null} me={me}
               onCheck={(c, next) => { setCheck(checkKey(sel.v, sel.l), c); if (next) nextWinner(sel.l); }}
@@ -598,9 +727,115 @@ function CellGuide() {
   );
 }
 
-function GridTable({ grid, lines, filtered, sel, quality, doubtAt, award, base, excluded, checks, onSelect }: {
+const WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+const numberWord = (n: number) => WORDS[n] ?? String(n);
+
+function StartStrip({ intro, doubts, done, onPrice, onDoubts, onAsk, onDismiss }: {
+  intro: string; doubts: number; done: Record<number, boolean>; onPrice: () => void; onDoubts: () => void; onAsk: () => void; onDismiss: () => void;
+}) {
+  const items: [number, string, () => void][] = [
+    [1, "Click any price to see where it came from", onPrice],
+    [2, `Open Doubts: only the ${doubts} that could change a winner`, onDoubts],
+    [3, "Ask the VP’s question in the chat", onAsk],
+  ];
+  return (
+    <div style={{ flex: "none", display: "flex", alignItems: "center", flexWrap: "wrap", gap: "6px 20px", minHeight: 44, padding: "10px 16px", background: "var(--color-accent-100)", borderRadius: "var(--radius-lg)", fontSize: 15 }}>
+      <span><b>Start here</b> {intro}</span>
+      {items.map(([n, label, act]) => (
+        <button key={n} onClick={act} style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "none", border: 0, padding: 0, font: "inherit", fontSize: 15, color: "var(--color-accent-700)", cursor: "pointer", textAlign: "left" }}>
+          <span aria-hidden style={{ flex: "none", width: 20, height: 20, borderRadius: 10, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700,
+            background: done[n] ? "var(--color-accent-700)" : "var(--color-accent)", color: "var(--color-bg)" }}>{done[n] ? "✓" : n}</span>
+          {label}
+        </button>
+      ))}
+      <button className="btn btn-ghost btn-icon" aria-label="Dismiss" title="Dismiss" onClick={onDismiss} style={{ marginLeft: "auto" }}><X size={16} weight="duotone" /></button>
+    </div>
+  );
+}
+
+/** A small focusable mark with a tooltip (max 280 px), shown on hover or keyboard focus. */
+function Tip({ text, label, children }: { text: string; label: string; children: React.ReactNode }) {
+  const [on, setOn] = useState(false);
+  return (
+    <span tabIndex={0} role="note" aria-label={`${label}. ${text}`} onMouseEnter={() => setOn(true)} onMouseLeave={() => setOn(false)} onFocus={() => setOn(true)} onBlur={() => setOn(false)}
+      style={{ position: "relative", fontSize: 14, fontWeight: 700, color: "var(--color-accent-2-800)", cursor: "help", padding: "0 2px" }}>
+      {children}
+      {on && (
+        <span role="tooltip" style={{ position: "absolute", right: 0, top: "100%", marginTop: 4, zIndex: 20, width: "max-content", maxWidth: 280, textAlign: "left", fontSize: 14, fontWeight: 400, lineHeight: 1.4,
+          color: "var(--color-text)", background: "var(--color-bg)", boxShadow: "var(--shadow-md)", borderRadius: "var(--radius-lg)", padding: "8px 10px" }}>{text}</span>
+      )}
+    </span>
+  );
+}
+
+/** Click a vendor's column header: how its quality score was worked out, every answer traceable to its source. */
+function VendorPopover({ ev, vendorId, grid, quality, readings, paths, onClose }: {
+  ev: SourcingEvent; vendorId: string; grid: Grid; quality: Quality[]; readings: ReplyReading[]; paths: Record<string, string>; onClose: () => void;
+}) {
+  const [src, setSrc] = useState<string | null>(null);
+  const v = grid.vendors.find((x) => x.id === vendorId)!;
+  const q = quality.find((x) => x.vendorId === vendorId);
+  const mine = readings.filter((r) => r.vendorId === vendorId);
+  const answerOf = (id: string) => {
+    for (const r of mine) { const a = r.questionnaire.find((x) => x.question_id === id); if (a) return { a, replyId: r.replyId }; }
+    return null;
+  };
+  const mand = q?.items.filter((x) => x.mandatory) ?? [];
+  const shown = src ? answerOf(src) : null;
+  return (
+    <>
+      <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 50, background: "color-mix(in srgb, var(--color-text) 18%, transparent)" }} />
+      <div role="dialog" aria-label={`${v.name}: quality score`} style={{ position: "fixed", zIndex: 51, top: 64, left: "50%", transform: "translateX(-50%)", width: 820, maxWidth: "calc(100vw - 40px)", maxHeight: "calc(100vh - 100px)", overflow: "auto",
+        background: "var(--color-neutral-100)", boxShadow: "var(--shadow-lg)", borderRadius: "var(--radius-lg)", padding: "20px 24px", display: "flex", flexDirection: "column", gap: 12, fontSize: 15 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+          <div style={{ display: "flex", flexDirection: "column", marginRight: "auto" }}>
+            <span style={{ fontSize: 21, fontWeight: 600 }}>{v.name}</span>
+            <span style={{ color: "var(--color-neutral-700)" }}>{v.format}{v.note ? ` · ${v.note}` : ""}</span>
+          </div>
+          <QualityLabel returned={!!q?.returned} score={q?.score} cleared={!!q?.cleared} style={{ fontSize: 17, fontWeight: 600 }} />
+          <button className="btn btn-ghost btn-icon" onClick={onClose} aria-label="Close"><X size={18} weight="duotone" /></button>
+        </div>
+        <span style={{ fontSize: 17, fontWeight: 600 }}>How this score was worked out</span>
+        {!q?.returned ? <span style={{ color: "var(--color-neutral-800)" }}>{v.short} did not return the questionnaire, so it is not scored and does not clear quality.</span> : (
+          <>
+            <table className="table" style={{ fontSize: 15 }}>
+              <thead><tr><th>#</th><th>Question</th><th>Type</th><th>Answer (as given)</th><th style={{ textAlign: "right" }}>Points</th></tr></thead>
+              <tbody>
+                {ev.questions.map((x) => {
+                  const it = q.items.find((i) => i.id === x.id);
+                  const a = answerOf(x.id);
+                  return (
+                    <tr key={x.id} style={{ background: src === x.id ? "var(--color-accent-100)" : undefined }}>
+                      <td>{x.id}</td><td>{x.text}</td><td>{x.type}</td>
+                      <td>{a ? <button onClick={() => setSrc(src === x.id ? null : x.id)} title="See where this answer was read" style={{ background: "none", border: 0, padding: 0, font: "inherit", textAlign: "left", color: "var(--color-accent-700)", cursor: "pointer" }}>“{a.a.answer}”</button> : <span style={{ color: "var(--color-neutral-700)" }}>no answer</span>}
+                        {it && <div style={{ fontSize: 13, color: "var(--color-neutral-700)" }}>{it.why}</div>}</td>
+                      <td style={{ textAlign: "right", whiteSpace: "nowrap", fontWeight: 600, color: it?.mandatory && !it.pts ? "var(--color-accent-2-800)" : undefined }}>
+                        {!it ? "—" : it.mandatory ? `${it.pts ? "Pass" : "Fail"} · ${it.pts}/${it.of}` : `${it.pts}/${it.of}`}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            <span style={{ fontWeight: 600 }}>
+              Total {q.score}/100 · pass mark {q.passMark} · mandatory {mand.length - q.mandatoryFailed}/{mand.length} passed → {q.cleared ? "Cleared" : "Not cleared"}
+            </span>
+            <span style={{ fontSize: 14, color: "var(--color-neutral-700)" }}>Marked in code against the marking scheme on the RFQ’s Evaluation rules tab. Click an answer to see it in the vendor’s document.</span>
+            {shown && <SourceDoc replyId={shown.replyId} source={shown.a.source} raw={null} lineId={src!} filePath={paths[`${shown.replyId}|${shown.a.source.file.toLowerCase()}`] ?? null} />}
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
+function GridTable({ grid, lines, filtered, sel, quality, doubtAt, award, base, excluded, checks, onSelect, vendorNote, readNote, pulse, onVendor, showWas }: {
   grid: Grid; lines: Grid["lines"]; filtered: boolean; sel: { v: string; l: string } | null; quality: Quality[]; doubtAt: Map<string, { d: Doubt; rank: number }>;
   award: Award; base: Award | null; excluded: Set<string>; checks: Checks; onSelect: (v: string, l: string) => void;
+  /** A "‡" note per vendor (a condition on its prices), and a status per cell with two readings. */
+  vendorNote: Record<string, string>; readNote: Map<string, string>; pulse: string | null; onVendor: (v: string) => void;
+  /** Show "was <vendor>" beside lines whose winner changed (the "Winner changed" filter). */
+  showWas: boolean;
 }) {
   const muted = { fontSize: 13, color: "var(--color-neutral-700)" };
   // The footer totals the lines shown.
@@ -621,9 +856,15 @@ function GridTable({ grid, lines, filtered, sel, quality, doubtAt, award, base, 
         {grid.vendors.map((v) => {
           const q = quality.find((x) => x.vendorId === v.id);
           return (
-            <div key={v.id} title={`${v.name} · ${v.format}${v.note ? ` · ${v.note}` : ""}${q?.why ? `\n${q.why}` : ""}`} style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", textAlign: "right", gap: 1, paddingRight: 10 }}>
-              <span style={{ fontWeight: 600, fontSize: 15, lineHeight: 1.2 }}>{v.short}</span>
-              <span style={muted}>{!q?.returned ? "quality not returned" : `${q.score} · ${q.cleared ? "cleared" : "not cleared"}`}{excluded.has(v.id) ? " · excluded" : ""}</span>
+            <div key={v.id} style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", textAlign: "right", gap: 1, paddingRight: 10 }}>
+              <button onClick={() => onVendor(v.id)} title={`${v.name} · ${v.format}${v.note ? ` · ${v.note}` : ""}. Click for how the quality score was worked out.`}
+                style={{ background: "none", border: 0, padding: 0, font: "inherit", textAlign: "right", cursor: "pointer", color: "inherit", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 1 }}>
+                <span style={{ fontWeight: 600, fontSize: 15, lineHeight: 1.2, textDecoration: "underline dotted var(--color-neutral-500)", textUnderlineOffset: 3 }}>{v.short}</span>
+              </button>
+              <span style={{ ...muted, display: "flex", alignItems: "baseline", justifyContent: "flex-end", flexWrap: "wrap", gap: "0 3px", lineHeight: 1.3 }}>
+                <QualityLabel returned={!!q?.returned} score={q?.score} cleared={!!q?.cleared} style={{ whiteSpace: "normal" }} />
+                {vendorNote[v.id] && <Tip text={vendorNote[v.id]} label={`${v.short}: a condition on these prices`}>‡</Tip>}
+              </span>
             </div>
           );
         })}
@@ -632,7 +873,7 @@ function GridTable({ grid, lines, filtered, sel, quality, doubtAt, award, base, 
       {!lines.length && <div style={{ padding: "28px 0", color: "var(--color-neutral-700)" }}>No lines match these filters.</div>}
       {lines.map((l) => {
         const w = award.per[l.id];
-        const was = base && base.per[l.id]?.vendorId !== w?.vendorId ? short(base.per[l.id]?.vendorId) : null;
+        const was = showWas && base && base.per[l.id]?.vendorId !== w?.vendorId ? short(base.per[l.id]?.vendorId) : null;
         return (
           <div key={l.id} className="hover-row" style={{ display: "grid", gridTemplateColumns: COLS, alignItems: "stretch", minHeight: 36, boxShadow: "inset 0 -1px 0 var(--color-neutral-200)", background: sel?.l === l.id ? "var(--color-bg)" : undefined }}>
             <span title={`${l.id} · ${l.name} · ${l.spec} · ${l.qty.toLocaleString("en-IN")} boxes · should-cost ₹${num2(l.shouldCost)}`} style={{ display: "flex", alignItems: "baseline", gap: 8, minWidth: 0, paddingRight: 8, alignSelf: "center" }}>
@@ -641,7 +882,8 @@ function GridTable({ grid, lines, filtered, sel, quality, doubtAt, award, base, 
               {was && <span style={{ fontSize: 13, color: "var(--color-accent-800)", flex: "none", marginLeft: "auto" }}>was {was}</span>}
             </span>
             {grid.vendors.map((v) => (
-              <Cell key={v.id} c={grid.cells[cellKey(v.id, l.id)]} checked={!!checks[checkKey(v.id, l.id)]} doubt={doubtAt.has(cellKey(v.id, l.id)) && !excluded.has(v.id)} win={w?.vendorId === v.id} selected={sel?.v === v.id && sel.l === l.id} onClick={() => onSelect(v.id, l.id)} tip={`${v.short} · ${l.id}: ${grid.cells[cellKey(v.id, l.id)].norm.asWritten}`} />
+              <Cell key={v.id} c={grid.cells[cellKey(v.id, l.id)]} checked={!!checks[checkKey(v.id, l.id)]} doubt={doubtAt.has(cellKey(v.id, l.id)) && !excluded.has(v.id)} win={w?.vendorId === v.id} selected={sel?.v === v.id && sel.l === l.id} pulse={pulse === cellKey(v.id, l.id)} onClick={() => onSelect(v.id, l.id)}
+                tip={readNote.get(cellKey(v.id, l.id)) ?? `${v.short} · ${l.id}: ${grid.cells[cellKey(v.id, l.id)].norm.asWritten}`} />
             ))}
           </div>
         );
@@ -666,7 +908,7 @@ function GridTable({ grid, lines, filtered, sel, quality, doubtAt, award, base, 
   );
 }
 
-function Cell({ c, checked, doubt, win, selected, onClick, tip }: { c: GridCell; checked: boolean; doubt: boolean; win: boolean; selected: boolean; onClick: () => void; tip: string }) {
+function Cell({ c, checked, doubt, win, selected, pulse, onClick, tip }: { c: GridCell; checked: boolean; doubt: boolean; win: boolean; selected: boolean; pulse?: boolean; onClick: () => void; tip: string }) {
   const k = c.kind;
   // v2: the winner sits on a pale cyan fill; a doubt is magenta (filled only when it is the winner). Losing prices keep full ink.
   const ns: React.CSSProperties = {
@@ -682,6 +924,8 @@ function Cell({ c, checked, doubt, win, selected, onClick, tip }: { c: GridCell;
     <button
       onClick={onClick}
       title={checked ? `${tip} · approved by you` : tip}
+      className={pulse ? "cell-pulse" : undefined}
+      data-cell={`${c.vendorId}|${c.lineId}`}
       style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", height: "100%", minHeight: 36, padding: "0 10px", border: 0, font: "inherit", fontSize: 15, background: "transparent", outline: selected ? "2px solid var(--color-accent)" : "none", outlineOffset: -2, color: "inherit", cursor: "pointer" }}
     >
       {checked && c.perBox != null && <SealCheck size={14} weight="duotone" color="var(--color-accent-700)" style={{ marginRight: 4, flex: "none" }} aria-label="Approved by you" />}
@@ -693,7 +937,9 @@ function Cell({ c, checked, doubt, win, selected, onClick, tip }: { c: GridCell;
   );
 }
 
-function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, override, buyer, check, me, onCheck, onOverride, onSelect, onClose }: {
+function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, override, buyer, check, me, onCheck, onOverride, onSelect, onClose, twoReadings }: {
+  /** For a cell read two ways: whether the other reading changes a winner in the view on screen. */
+  twoReadings?: string | null;
   grid: Grid; sel: { v: string; l: string }; readings: ReplyReading[]; paths: Record<string, string>;
   doubt: { d: Doubt; rank: number } | undefined; report: DoubtReport; onSelect: (v: string) => void; onClose: () => void;
   shown: Award; override: Override | undefined; buyer: string; onOverride: (o: Override) => void;
@@ -822,8 +1068,22 @@ function SourcePanel({ grid, sel, readings, paths, doubt, report, shown, overrid
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <span style={label11}>As written</span>
-          <span style={{ fontSize: 20, fontWeight: 600, lineHeight: 1.2 }}>{n.asWritten}</span>
-          {n.alternatives.length > 0 && <span style={{ fontSize: 14, color: "var(--color-neutral-800)" }}>or {n.alternatives.map((a) => a.value.toFixed(2)).join(" / ")}: {n.legibility === "corrected_by_hand" ? "corrected by hand" : "hard to read"}</span>}
+          {n.alternatives.length > 0 ? (
+            // Two readings side by side: the one in use in bold, the other struck through.
+            <span style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "baseline" }}>
+              <span style={{ display: "flex", flexDirection: "column" }}>
+                <b style={{ fontSize: 20, lineHeight: 1.2 }}>{n.raw?.text ?? n.asWritten}</b>
+                <span style={{ fontSize: 13, color: "var(--color-neutral-700)" }}>as read · {n.legibility === "corrected_by_hand" ? "hand-corrected" : "hard to read"} · in use</span>
+              </span>
+              {n.alternatives.map((a, i) => (
+                <span key={i} style={{ display: "flex", flexDirection: "column" }}>
+                  <s style={{ fontSize: 20, lineHeight: 1.2, color: "var(--color-neutral-700)" }}>{a.value.toFixed(2)}</s>
+                  <span style={{ fontSize: 13, color: "var(--color-neutral-700)" }}>{/Code's alternative/.test(a.reason) ? "code’s other reading" : "reader’s other reading"}</span>
+                </span>
+              ))}
+            </span>
+          ) : <span style={{ fontSize: 20, fontWeight: 600, lineHeight: 1.2 }}>{n.asWritten}</span>}
+          {twoReadings && <span style={{ fontSize: 14, color: "var(--color-neutral-800)" }}>{twoReadings}</span>}
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <span style={label11}>On our basis</span>

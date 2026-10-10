@@ -6,7 +6,8 @@ import { useState } from "react";
 import { cellKey, type Grid } from "@/lib/compare";
 import type { Override } from "@/lib/award";
 import { acceptable, decisionKey, type Decision } from "@/lib/decisions";
-import type { Doubt, DoubtReport } from "@/lib/doubts";
+import { loggedLabel, type Doubt, type DoubtReport } from "@/lib/doubts";
+import { CaretDown, CaretRight } from "@phosphor-icons/react";
 import { lakh } from "@/lib/format";
 import { stamp } from "./useVerified";
 
@@ -22,10 +23,13 @@ function choicesFor(d: Doubt): { label: string; effect: Decision["effect"] }[] {
   return [];
 }
 
-export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord, onUndo, me }: {
+export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord, onUndo, me, flips, view }: {
   grid: Grid; report: DoubtReport; overrides: Override[]; onSee: (vendorId: string, lineId: string) => void;
   decisions: Decision[]; onRecord: (d: Decision) => void; onUndo: (key: string) => void; me: string;
+  /** Per doubt id: the lines whose winner flips under its other reading in the view on screen. */
+  flips?: Map<string, Set<string>>; view?: string;
 }) {
+  const [linesOpen, setLinesOpen] = useState<Record<string, boolean>>({});
   const [open, setOpen] = useState<string | null>(report.raised[0]?.id ?? null);
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
   const [choice, setChoice] = useState<Record<string, number>>({});
@@ -34,7 +38,7 @@ export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord
   const record = (d: Doubt, choiceText: string, effect: Decision["effect"], reason: string) =>
     onRecord({ key: decisionKey(d), title: d.title, vendorId: d.vendorId, lineIds: d.lineIds, choice: choiceText, effect, who: me, at: new Date().toISOString(), why: reason });
   const name = (v: string) => grid.vendors.find((x) => x.id === v)?.short ?? v;
-  const logged = report.logged.length + report.checks.length;
+  const logged = loggedLabel(report);
 
   const draft = async (d: Doubt) => {
     setDrafts((s) => ({ ...s, [d.id]: "loading" }));
@@ -57,7 +61,7 @@ export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord
   return (
     <div style={{ flex: 1, minHeight: 0, overflow: "auto", padding: "18px 28px 32px 8px", display: "flex", flexDirection: "column", gap: 16, maxWidth: 1180 }}>
       <p style={{ margin: 0, maxWidth: 760, color: "var(--color-neutral-800)" }}>
-        Only doubts that could change who wins a line, ranked by rupees at stake. {logged} more were checked and logged; none of them changes a winner.
+        Only doubts that could change who wins a line, ranked by rupees at stake. {logged[0].toUpperCase() + logged.slice(1)}.
       </p>
       <div style={{ display: "grid", gridTemplateColumns: COLS, gap: "0 16px", ...label11, paddingBottom: 6, borderBottom: "1px solid var(--color-text)" }}>
         <span>Rank</span><span>Doubt</span><span>Lines</span><span>Goes to</span><span style={{ textAlign: "right" }}>At stake</span>
@@ -74,7 +78,28 @@ export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord
                 <span style={{ fontSize: 16, fontWeight: 600 }}>{d.title}</span>
                 <span style={{ color: "var(--color-neutral-800)" }}>{d.why} If it goes the other way, {changed.length} line{changed.length === 1 ? "" : "s"} change hands in the {views} view.</span>
               </span>
-              <span>{changed.join(", ")}</span>
+              {(() => {
+                const f = flips?.get(d.id) ?? new Set<string>();
+                const list = (
+                  <span style={{ display: "flex", flexWrap: "wrap", gap: "0 6px" }}>
+                    {changed.map((l) => <span key={l} style={{ fontWeight: f.has(l) ? 700 : 400 }}>{l}</span>)}
+                  </span>
+                );
+                if (changed.length <= 3) return list;
+                const on = !!linesOpen[d.id];
+                return (
+                  <span style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <span role="button" tabIndex={0} aria-expanded={on} title={view ? `Bold: the winner flips in ${view}` : undefined}
+                      onClick={(e) => { e.stopPropagation(); setLinesOpen((s) => ({ ...s, [d.id]: !on })); }}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.stopPropagation(); setLinesOpen((s) => ({ ...s, [d.id]: !on })); } }}
+                      style={{ display: "inline-flex", alignItems: "center", gap: 4, fontWeight: 600, cursor: "pointer", color: "var(--color-accent-800)" }}>
+                      {on ? <CaretDown size={14} weight="duotone" /> : <CaretRight size={14} weight="duotone" />}{changed.length} lines
+                    </span>
+                    {on && list}
+                    {on && f.size > 0 && <span style={{ fontSize: 13, color: "var(--color-neutral-700)" }}>Bold: {f.size} flip{f.size === 1 ? "s" : ""}{view ? ` in ${view}` : ""}</span>}
+                  </span>
+                );
+              })()}
               <span>{d.route === "vendor" ? `${name(d.vendorId)}, email` : "You, judgement"}</span>
               <span style={{ textAlign: "right", fontSize: 16, fontWeight: 600 }}>{lakh(d.stake)}</span>
             </button>
@@ -178,7 +203,7 @@ export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord
         </div>
       )}
       <details style={{ color: "var(--color-neutral-800)" }}>
-        <summary style={{ cursor: "pointer", color: "var(--color-accent-800)" }}>The {logged} checked and logged</summary>
+        <summary style={{ cursor: "pointer", color: "var(--color-accent-800)" }}>The {logged.split(" ")[0]} checked and logged</summary>
         <ul style={{ margin: "8px 0 0", paddingLeft: 18 }}>
           {report.logged.map((d) => <li key={d.id}>{d.title}: {d.tested}; no winner changes.</li>)}
           {report.checks.map((c, i) => <li key={i}>{c}</li>)}

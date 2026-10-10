@@ -43,8 +43,8 @@ export interface Snapshot {
   cheapestOverall: number;
   /** Like-for-like against last year, on the lines that have a price from last year. */
   lastYear: { lines: number; thisYear: number; lastYear: number } | null;
-  /** quality: the questionnaire result at freeze time, e.g. "90 · cleared" (absent on older snapshots). */
-  byVendor: { vendor: string; lines: number; value: number; quality?: string; cleared?: boolean }[];
+  /** The questionnaire result at freeze time (absent on older snapshots). */
+  byVendor: { vendor: string; lines: number; value: number; returned?: boolean; score?: number | null; cleared?: boolean }[];
   /** Set when only some lines were exported (a filtered view). */
   partial?: string;
   decisions: { title: string; status: string }[];
@@ -89,7 +89,7 @@ export function freeze(o: {
       const q = o.quality.find((x) => x.vendorId === v.id);
       return {
         vendor: v.short, lines: rows.filter((r) => r.vendorId === v.id).length, value: rows.filter((r) => r.vendorId === v.id).reduce((a, r) => a + r.value, 0),
-        quality: !q?.returned ? "quality not returned" : `${q.score} · ${q.cleared ? "cleared" : "not cleared"}`, cleared: !!q?.cleared,
+        returned: !!q?.returned, score: q?.score ?? null, cleared: !!q?.cleared,
       };
     })
     .filter((v) => v.lines);

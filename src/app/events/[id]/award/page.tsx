@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CaretRight, FilePdf, FileXls, LockSimple } from "@phosphor-icons/react";
-import { Kpis } from "@/components/ui";
+import { Kpis, QualityLabel } from "@/components/ui";
 import { Rail } from "@/components/Rail";
 import { SourceDoc } from "@/components/SourceDoc";
 import { useReadings } from "@/components/useReadings";
@@ -123,7 +123,7 @@ export default function AwardPage() {
                       <span style={{ width: 52, textAlign: "right" }}>{pct.toFixed(0)}%</span>
                     </span>
                   </td>
-                  <td>{v.quality ? <span className={v.cleared ? "tag tag-accent" : "tag tag-accent-2"}>{v.quality}</span> : "—"}</td>
+                  <td>{v.returned !== undefined ? <QualityLabel returned={v.returned} score={v.score} cleared={!!v.cleared} /> : "—"}</td>
                 </tr>
               );
             })}
