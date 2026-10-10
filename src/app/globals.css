@@ -160,3 +160,5 @@ button { cursor: pointer; }
 .chip-on { background: var(--color-text); color: var(--color-bg); box-shadow: none; }
 .hover-row:hover { background: var(--color-bg); }
 .rail-item:hover { background: var(--color-accent-100); }
+details.fold > summary::-webkit-details-marker { display: none; }
+details.fold[open] .fold-caret { transform: rotate(90deg); }

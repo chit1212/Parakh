@@ -48,6 +48,9 @@ function Rule({ name, how, val, used, locked }: { name: string; how: string; val
   );
 }
 
+/** How many reading, conversion and checking rules this tab lists (the marking scheme comes on top). */
+export const FIXED_RULES = 14;
+
 export function EvaluationRules({ ev, grid, readings, report }: { ev: SourcingEvent; grid: Grid; readings: ReplyReading[]; report: DoubtReport }) {
   const [scheme, saveScheme] = useScheme();
   // Direct edits stay a draft until they add up; the comparison only ever uses a valid scheme.

@@ -43,7 +43,8 @@ export interface Snapshot {
   cheapestOverall: number;
   /** Like-for-like against last year, on the lines that have a price from last year. */
   lastYear: { lines: number; thisYear: number; lastYear: number } | null;
-  byVendor: { vendor: string; lines: number; value: number }[];
+  /** quality: the questionnaire result at freeze time, e.g. "90 · cleared" (absent on older snapshots). */
+  byVendor: { vendor: string; lines: number; value: number; quality?: string; cleared?: boolean }[];
   /** Set when only some lines were exported (a filtered view). */
   partial?: string;
   decisions: { title: string; status: string }[];
@@ -84,7 +85,13 @@ export function freeze(o: {
     };
   });
   const byVendor = grid.vendors
-    .map((v) => ({ vendor: v.short, lines: rows.filter((r) => r.vendorId === v.id).length, value: rows.filter((r) => r.vendorId === v.id).reduce((a, r) => a + r.value, 0) }))
+    .map((v) => {
+      const q = o.quality.find((x) => x.vendorId === v.id);
+      return {
+        vendor: v.short, lines: rows.filter((r) => r.vendorId === v.id).length, value: rows.filter((r) => r.vendorId === v.id).reduce((a, r) => a + r.value, 0),
+        quality: !q?.returned ? "quality not returned" : `${q.score} · ${q.cleared ? "cleared" : "not cleared"}`, cleared: !!q?.cleared,
+      };
+    })
     .filter((v) => v.lines);
   const ly = rows.filter((r) => r.perBox != null && o.lastYear.some((x) => x.lineId === r.lineId));
   const lastYear = ly.length
