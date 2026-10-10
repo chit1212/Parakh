@@ -26,7 +26,7 @@ export async function POST(req: Request) {
   ws.addRow([`Basis: ${s.basis}. Price per box, INR, delivered Chakan, GST extra.${s.partial ? ` Shown: ${s.partial}.` : ""}`]);
   ws.addRow([`Frozen ${s.frozenAt} by ${s.frozenBy} · snapshot ${s.id}${s.approvedBy ? ` · approved by ${s.approvedBy} ${s.approvedAt}` : " · not yet approved"}`]);
   ws.addRow([]);
-  const hdr = ws.addRow(["Line", "Box", "Awarded to", "INR per box", "Qty", "Value INR", "As written", "Calculation", "Source", "Checked by"]);
+  const hdr = ws.addRow(["Line", "Box", "Awarded to", "INR per box", "Qty", "Value INR", "As written", "Calculation", "Source", "Approved by"]);
   hdr.font = { bold: true };
   for (const r of s.rows) ws.addRow([r.lineId, r.name, r.vendor ?? "none", r.perBox, r.qty, r.value, r.asWritten, r.calc, r.where, r.checked ? `${r.checked.who}, ${r.checked.at.slice(0, 16).replace("T", " ")} UTC` : "not yet"]);
   ws.addRow([]);
@@ -43,6 +43,10 @@ export async function POST(req: Request) {
   r2.addRow([]);
   r2.addRow(["Decisions on record"]).font = { bold: true };
   s.decisions.forEach((d) => r2.addRow([d.title, d.status]));
+  const r3 = wb.addWorksheet("Audit trail");
+  r3.addRow(["When (UTC)", "Who", "What", "Why"]).font = { bold: true };
+  for (const a of s.audit ?? []) r3.addRow([a.at.slice(0, 16).replace("T", " "), a.who, a.what, a.why]);
+  [18, 22, 70, 60].forEach((w, i) => (r3.getColumn(i + 1).width = w));
   r2.getColumn(1).width = 60;
   r2.getColumn(2).width = 80;
   const buf = await wb.xlsx.writeBuffer();
@@ -87,6 +91,11 @@ async function memo(s: Snapshot): Promise<Uint8Array> {
   y -= 4;
   line("Decisions on record", { f: bold, size: 12 });
   s.decisions.forEach((d) => line(`${d.title}: ${d.status}`));
+  if (s.audit?.length) {
+    y -= 4;
+    line("Approvals, decisions and overrides (UTC)", { f: bold, size: 12 });
+    s.audit.forEach((a) => line(`${a.at.slice(0, 16).replace("T", " ")} · ${a.who}: ${a.what}. Why: ${a.why}`));
+  }
   y -= 6;
   line("Snapshot at decision", { f: bold, size: 12 });
   const cols = [M, M + 34, M + 230, M + 310, M + 370, M + 430];

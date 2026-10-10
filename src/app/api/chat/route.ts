@@ -8,6 +8,7 @@ import { z } from "zod";
 import { gemini, MissingKeyError } from "@/lib/ai";
 import { buildGrid, cellKey, type Grid } from "@/lib/compare";
 import { CHAT } from "@/lib/config";
+import { applyDecisions, parseDecisions, type Decision } from "@/lib/decisions";
 import { findDoubts, type DoubtReport } from "@/lib/doubts";
 import { loadEventState } from "@/lib/event";
 import { crore, lakh, where } from "@/lib/format";
@@ -77,13 +78,14 @@ async function fast<T>(deadline: number, budget: () => void, fn: (model: string,
 }
 
 /** The table the buyer is looking at, rebuilt in code from their readings (uploads and empty events included). */
-async function tableFor(readings: ReplyReading[] | null, scheme: QualityScheme) {
+async function tableFor(readings: ReplyReading[] | null, scheme: QualityScheme, decisions: Decision[]) {
   const state = await loadEventState();
-  if (!readings && scheme === DEFAULT_SCHEME) return state;
+  if (!readings && scheme === DEFAULT_SCHEME && !decisions.length) return state;
   const ev = state.ev;
   const rs = readings ?? Object.values(await loadSavedReadings(await loadDemoInbox()));
   const history = await loadHistory();
-  const grid = readings ? buildGrid(ev, rs, history, {}, history.lines) : state.grid;
+  // The buyer's recorded decisions apply, as on their screen (an accepted price may win).
+  const grid = applyDecisions(ev, readings ? buildGrid(ev, rs, history, {}, history.lines) : state.grid, decisions);
   const quality = ev.vendors.map((v) => qualityOf(ev, v.id, rs, scheme));
   const report = findDoubts(ev, grid, quality.filter((q) => q.cleared).map((q) => q.vendorId));
   return { ev, grid, quality, report };
@@ -146,7 +148,7 @@ function codeAnswer(f: Record<string, unknown>): string {
 }
 
 export async function POST(req: Request) {
-  const body = (await req.json().catch(() => ({}))) as { messages?: Msg[]; scheme?: QualityScheme; readings?: ReplyReading[]; prior?: (ScenarioRules & { title: string })[] };
+  const body = (await req.json().catch(() => ({}))) as { messages?: Msg[]; scheme?: QualityScheme; readings?: ReplyReading[]; decisions?: unknown; prior?: (ScenarioRules & { title: string })[] };
   const messages = body.messages;
   if (!messages?.length) return Response.json({ error: "Ask a question." }, { status: 400 });
   const deadline = Date.now() + CHAT.deadlineMs;
@@ -160,7 +162,7 @@ export async function POST(req: Request) {
         const { ev } = await loadEventState();
         const scheme = body.scheme && Array.isArray(body.scheme.rules) && !schemeProblems(body.scheme, ev.questions.map((x) => x.id)).length ? body.scheme : DEFAULT_SCHEME;
         const own = Array.isArray(body.readings) && body.readings.length <= 40 && body.readings.every((r) => r && typeof r.replyId === "string" && Array.isArray(r.prices)) ? body.readings : null;
-        const { grid, quality, report } = await tableFor(own, scheme);
+        const { grid, quality, report } = await tableFor(own, scheme, parseDecisions(body.decisions));
         const ids = new Set(grid.vendors.map((v) => v.id));
         const lineIds = new Set(ev.lines.map((l) => l.id));
 

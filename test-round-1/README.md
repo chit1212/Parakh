@@ -93,8 +93,9 @@ None of these should change the Compare table.
    - "If we drop Rohit Box completely, which lines change hands and what is the new total?"
    - "Two vendors only?"
    - "Where did Kaveri's L09 price come from?"
-2. **Verified by you:** click a bold (winning) price, then **I've checked this**. Then try **Check & open next winner**.
-3. **Award:** click **Freeze for award**.
+2. **Approved by you:** click a bold (winning) price, then **Approve this price**. Then try **Approve & open next winner**.
+3. **Decide a doubt:** on the Doubts tab, open Kaveri L09, choose **Approve the price as written**, type a reason and click **Record decision**. Kaveri's ₹6.25 can now win L09; check the table.
+4. **Award:** click **Freeze for award**. The award lists every approval and decision with who, when and why.
    - In the **P** menu, switch to **Meera · VP**. Expect the button **Approve award**.
    - Switch back to Vikram. Expect **Send to Meera for approval**.
    - Download the Excel and the PDF memo.

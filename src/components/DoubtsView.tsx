@@ -2,34 +2,37 @@
 // Doubts (design: Comparison - Ledger, #doubts). Only doubts that change a winner, ranked by rupees.
 // Vendor-routed doubts get an AI-drafted email the buyer edits and approves (sending is stubbed);
 // buyer judgements get options. Nothing goes to a vendor without approval.
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { cellKey, type Grid } from "@/lib/compare";
 import type { Override } from "@/lib/award";
+import { acceptable, decisionKey, type Decision } from "@/lib/decisions";
 import type { Doubt, DoubtReport } from "@/lib/doubts";
 import { lakh } from "@/lib/format";
+import { stamp } from "./useVerified";
 
 const label11 = { fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--color-neutral-700)" };
 const COLS = "40px minmax(0,1fr) 120px 110px 120px";
-export const DECISIONS_KEY = "parakh.decisions.v1";
 
 type Draft = { to: string; subject: string; body: string; model?: string } | { error: string } | "loading";
 
-export function DoubtsView({ grid, report, overrides, onSee }: { grid: Grid; report: DoubtReport; overrides: Override[]; onSee: (vendorId: string, lineId: string) => void }) {
+/** The buyer's choices on a doubt they can settle themselves; "accept" lets the held price compete. */
+function choicesFor(d: Doubt): { label: string; effect: Decision["effect"] }[] {
+  if (d.kind === "substitute_spec") return [{ label: "Accept the substitute for this award", effect: "accept" }, { label: "Reject: hold to the RFQ spec", effect: "hold" }];
+  if (d.kind === "far_below_should_cost") return [{ label: "Approve the price as written: I have confirmed it", effect: "accept" }, { label: "Hold it until the vendor confirms", effect: "hold" }];
+  return [];
+}
+
+export function DoubtsView({ grid, report, overrides, onSee, decisions, onRecord, onUndo, me }: {
+  grid: Grid; report: DoubtReport; overrides: Override[]; onSee: (vendorId: string, lineId: string) => void;
+  decisions: Decision[]; onRecord: (d: Decision) => void; onUndo: (key: string) => void; me: string;
+}) {
   const [open, setOpen] = useState<string | null>(report.raised[0]?.id ?? null);
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
-  // Decisions persist in this browser (by doubt title) so the award record can show them.
-  const [done, setDoneState] = useState<Record<string, string>>({});
-  useEffect(() => {
-    try { setDoneState(JSON.parse(localStorage.getItem(DECISIONS_KEY) ?? "{}")); } catch { /* none yet */ }
-  }, []);
-  const setDone = (f: (s: Record<string, string>) => Record<string, string>) =>
-    setDoneState((s) => {
-      const n = f(s);
-      try { localStorage.setItem(DECISIONS_KEY, JSON.stringify(n)); } catch { /* storage blocked: kept for this visit */ }
-      return n;
-    });
-  const decided = Object.fromEntries(report.raised.map((d) => [d.id, done[d.title]]).filter(([, v]) => v));
   const [choice, setChoice] = useState<Record<string, number>>({});
+  const [why, setWhy] = useState<Record<string, string>>({});
+  const decisionOf = (d: Doubt) => decisions.find((x) => x.key === decisionKey(d));
+  const record = (d: Doubt, choiceText: string, effect: Decision["effect"], reason: string) =>
+    onRecord({ key: decisionKey(d), title: d.title, vendorId: d.vendorId, lineIds: d.lineIds, choice: choiceText, effect, who: me, at: new Date().toISOString(), why: reason });
   const name = (v: string) => grid.vendors.find((x) => x.id === v)?.short ?? v;
   const logged = report.logged.length + report.checks.length;
 
@@ -83,8 +86,37 @@ export function DoubtsView({ grid, report, overrides, onSee }: { grid: Grid; rep
                   <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>
                     Checked by code: {d.tested}. Changes: {d.changes.map((c) => `${c.lineId} ${c.from ? name(c.from.vendorId) : "—"} → ${c.to ? name(c.to.vendorId) : "—"} (${c.view === "cleared" ? "quality-cleared" : "all vendors"})`).join("; ")}.
                   </span>
-                  {decided[d.id] ? (
-                    <span style={{ color: "var(--color-accent-800)" }}>{decided[d.id]}</span>
+                  {decisionOf(d) ? (
+                    <span style={{ color: "var(--color-accent-800)" }}>
+                      {decisionOf(d)!.choice} · {decisionOf(d)!.who}, {stamp(decisionOf(d)!.at)} · “{decisionOf(d)!.why}”{" "}
+                      <button className="btn btn-ghost" style={{ padding: "0 4px" }} onClick={() => onUndo(decisionKey(d))}>Undo</button>
+                    </span>
+                  ) : acceptable(d) ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {choicesFor(d).map((o, k) => (
+                        <label key={k} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                          <input type="radio" name={d.id} checked={choice[d.id] === k} onChange={() => setChoice((s) => ({ ...s, [d.id]: k }))} />{o.label}
+                        </label>
+                      ))}
+                      <input className="input" style={{ minHeight: 32, maxWidth: 560 }} placeholder="Why (recorded with your name and the time on the award)" value={why[d.id] ?? ""} onChange={(e) => setWhy((s) => ({ ...s, [d.id]: e.target.value }))} />
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                        <button className="btn btn-primary" disabled={choice[d.id] === undefined || !(why[d.id] ?? "").trim()}
+                          onClick={() => { const o = choicesFor(d)[choice[d.id]]; record(d, o.label, o.effect, why[d.id].trim()); }}>Record decision</button>
+                        <button className="btn btn-ghost" onClick={() => onSee(d.vendorId, d.lineIds[0])}>See source</button>
+                        {d.route === "vendor" && !dr && <button className="btn btn-ghost" onClick={() => draft(d)}>Or ask the vendor by email</button>}
+                      </div>
+                      <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>
+                        {choicesFor(d)[0].label.split(":")[0]} lets this price compete in the comparison, every scenario and the chat. You can undo it until the award is frozen.
+                      </span>
+                      {dr && dr !== "loading" && !("error" in dr) && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                          <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>To {dr.to} · {dr.subject} · drafted by {dr.model ?? "AI"}, for you to check</span>
+                          <textarea className="input" style={{ minHeight: 190, whiteSpace: "pre-wrap" }} value={dr.body} onChange={(e) => setDrafts((s) => ({ ...s, [d.id]: { ...dr, body: e.target.value } }))} />
+                          <button className="btn btn-primary" style={{ alignSelf: "flex-start" }} onClick={() => record(d, `Asked ${name(d.vendorId)} by email (${dr.to}); held until they reply`, "asked", `To settle: ${d.ask}`)}>Approve &amp; send</button>
+                        </div>
+                      )}
+                      {dr === "loading" && <span style={{ color: "var(--color-neutral-700)" }}>Drafting with AI…</span>}
+                    </div>
                   ) : d.route === "vendor" ? (
                     !dr ? (
                       <div style={{ display: "flex", gap: 8 }}>
@@ -100,8 +132,8 @@ export function DoubtsView({ grid, report, overrides, onSee }: { grid: Grid; rep
                         <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>To {dr.to} · {dr.subject} · drafted by {dr.model ?? "AI"}, for you to check</span>
                         <textarea className="input" style={{ minHeight: 190, whiteSpace: "pre-wrap" }} value={dr.body} onChange={(e) => setDrafts((s) => ({ ...s, [d.id]: { ...dr, body: e.target.value } }))} />
                         <div style={{ display: "flex", gap: 8 }}>
-                          <button className="btn btn-primary" onClick={() => setDone((s) => ({ ...s, [d.title]: `Approved by you and marked as sent to ${dr.to}. (Demo: no email server; nothing left this app.)` }))}>Approve &amp; send</button>
-                          <button className="btn btn-ghost" onClick={() => setDone((s) => ({ ...s, [d.title]: "You will call instead. The doubt stays open until you record the answer." }))}>I’ll call instead</button>
+                          <button className="btn btn-primary" onClick={() => record(d, `Asked ${name(d.vendorId)} by email (${dr.to}); open until they reply. (Demo: nothing left this app.)`, "asked", `To settle: ${d.ask}`)}>Approve &amp; send</button>
+                          <button className="btn btn-ghost" onClick={() => record(d, `Will call ${name(d.vendorId)}; open until the answer is recorded`, "asked", `To settle: ${d.ask}`)}>I’ll call instead</button>
                         </div>
                       </div>
                     )
@@ -112,8 +144,9 @@ export function DoubtsView({ grid, report, overrides, onSee }: { grid: Grid; rep
                           <input type="radio" name={d.id} checked={choice[d.id] === k} onChange={() => setChoice((s) => ({ ...s, [d.id]: k }))} />{o}
                         </label>
                       ))}
+                      <input className="input" style={{ minHeight: 32, maxWidth: 560 }} placeholder="Why (recorded with your name and the time)" value={why[d.id] ?? ""} onChange={(e) => setWhy((s) => ({ ...s, [d.id]: e.target.value }))} />
                       <div style={{ display: "flex", gap: 8 }}>
-                        <button className="btn btn-primary" disabled={choice[d.id] === undefined} onClick={() => setDone((s) => ({ ...s, [d.title]: `Decision recorded: ${d.options![choice[d.id]]}.` }))}>Record decision</button>
+                        <button className="btn btn-primary" disabled={choice[d.id] === undefined || !(why[d.id] ?? "").trim()} onClick={() => record(d, d.options![choice[d.id]], "hold", why[d.id].trim())}>Record decision</button>
                         <button className="btn btn-ghost" onClick={() => onSee(d.vendorId, d.lineIds[0])}>See source</button>
                       </div>
                     </div>
@@ -124,6 +157,18 @@ export function DoubtsView({ grid, report, overrides, onSee }: { grid: Grid; rep
           </div>
         );
       })}
+      {decisions.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <h3 style={{ fontSize: 18, margin: "8px 0 0" }}>Decisions on record</h3>
+          {decisions.map((x) => (
+            <div key={x.key}>
+              <b>{x.title}</b>: {x.choice} · {x.who}, {stamp(x.at)} · “{x.why}”
+              {x.effect === "accept" && <span style={{ color: "var(--color-neutral-700)" }}> · the price now competes</span>}{" "}
+              <button className="btn btn-ghost" style={{ padding: "0 4px" }} onClick={() => onUndo(x.key)}>Undo</button>
+            </div>
+          ))}
+        </div>
+      )}
       {overrides.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
           <h3 style={{ fontSize: 18, margin: "8px 0 0" }}>Overrides on record</h3>

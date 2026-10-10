@@ -7,7 +7,7 @@ import { FilePdf, FileXls, LockSimple } from "@phosphor-icons/react";
 import { Rail } from "@/components/Rail";
 import { SourceDoc } from "@/components/SourceDoc";
 import { useReadings } from "@/components/useReadings";
-import { SNAPSHOT_KEY, type Snapshot } from "@/lib/award";
+import { fmtAt, SNAPSHOT_KEY, type Snapshot } from "@/lib/award";
 import { download } from "@/lib/download";
 import { crore, inr, lakh } from "@/lib/format";
 import { HOME } from "@/lib/routes";
@@ -55,7 +55,7 @@ export default function AwardPage() {
     { v: `${d >= 0 ? "+" : "−"}${lakh(Math.abs(d))}`, t: "vs cheapest overall" },
     ...(lyPct != null ? [{ v: `${lyPct >= 0 ? "+" : "−"}${Math.abs(lyPct).toFixed(1)}%`, t: `vs last year, like for like (${s.lastYear!.lines} lines)` }] : []),
     { v: String(s.byVendor.length), t: s.byVendor.length === 1 ? "vendor" : "vendors" },
-    { v: `${checked.length} of ${awarded.length}`, t: `awarded prices checked${checkers.length ? ` by ${checkers.join(" and ")}` : " against the document"}` },
+    { v: `${checked.length} of ${awarded.length}`, t: `awarded prices approved${checkers.length ? ` by ${checkers.join(" and ")}` : " against the document"}` },
   ];
   const summary = `${s.basis}. ${s.byVendor.map((v) => `${v.vendor} ${v.lines} line${v.lines === 1 ? "" : "s"} (${lakh(v.value)})`).join(", ")}. `
     + (s.excluded.length ? `Left out: ${s.excluded.map((x) => `${x.name} (${x.why})`).join("; ")}. ` : "")
@@ -77,13 +77,13 @@ export default function AwardPage() {
         {s.approvedBy ? (
           <span className="tag tag-accent" style={{ padding: "8px 12px", whiteSpace: "nowrap" }}>Approved by {s.approvedBy}</span>
         ) : role === "VP" ? (
-          <button className="btn btn-primary" style={{ whiteSpace: "nowrap" }} onClick={() => save({ ...s, approvedBy: `${ev?.vp ?? "VP"} (${ev?.vpRole ?? "VP"})`, approvedAt: new Date().toISOString() })}>
+          <button className="btn btn-primary" style={{ whiteSpace: "nowrap" }} onClick={() => { const at = new Date().toISOString(); save({ ...s, approvedBy: `${ev?.vp ?? "VP"} (${ev?.vpRole ?? "VP"})`, approvedAt: at, audit: [...(s.audit ?? []), { at, who: ev?.vp ?? "VP", what: `Approved the award (${crore(s.total)}, snapshot ${s.id})`, why: "VP approval of the frozen award" }] }); }}>
             Approve award
           </button>
         ) : s.sentAt ? (
           <span className="tag tag-neutral" style={{ padding: "8px 12px", whiteSpace: "nowrap" }} title="Demo: nothing is sent; switch to the VP in the P menu to approve">Sent to {ev?.vp.split(" ")[0] ?? "the VP"} {stamp(s.sentAt)}</span>
         ) : (
-          <button className="btn btn-primary" style={{ whiteSpace: "nowrap" }} onClick={() => save({ ...s, sentAt: new Date().toISOString() })}>
+          <button className="btn btn-primary" style={{ whiteSpace: "nowrap" }} onClick={() => { const at = new Date().toISOString(); save({ ...s, sentAt: at, audit: [...(s.audit ?? []), { at, who: ev?.buyer ?? "Buyer", what: `Sent the award to ${ev?.vp ?? "the VP"} for approval`, why: "Buyer's recommendation, frozen for approval" }] }); }}>
             Send to {ev?.vp.split(" ")[0] ?? "the VP"} for approval
           </button>
         )}
@@ -110,6 +110,19 @@ export default function AwardPage() {
           </div>
         ))}
       </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6, maxWidth: 1000 }}>
+        <h3 style={{ fontSize: 20, margin: 0 }}>Approvals, decisions and overrides on record</h3>
+        {(s.audit ?? []).length ? (
+          <table className="table" style={{ fontSize: 13 }}>
+            <thead><tr><th style={{ whiteSpace: "nowrap" }}>When</th><th>Who</th><th>What</th><th>Why</th></tr></thead>
+            <tbody>
+              {(s.audit ?? []).map((a, i) => (
+                <tr key={i}><td style={{ whiteSpace: "nowrap" }}>{fmtAt(a.at)}</td><td style={{ whiteSpace: "nowrap" }}>{a.who}</td><td>{a.what}</td><td style={{ color: "var(--color-neutral-800)" }}>{a.why}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        ) : <span style={{ color: "var(--color-neutral-700)" }}>Nothing approved, decided or overridden before this award was frozen.</span>}
+      </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
           <h3 style={{ fontSize: 20, margin: 0 }}>Snapshot at decision</h3>
@@ -118,7 +131,7 @@ export default function AwardPage() {
           </span>
         </div>
         <table className="table" style={{ fontSize: 13 }}>
-          <thead><tr><th>Line</th><th>Box</th><th>Awarded to</th><th style={{ textAlign: "right" }}>₹/box</th><th style={{ textAlign: "right" }}>Qty</th><th style={{ textAlign: "right" }}>Value</th><th>Source</th><th>Checked by you</th></tr></thead>
+          <thead><tr><th>Line</th><th>Box</th><th>Awarded to</th><th style={{ textAlign: "right" }}>₹/box</th><th style={{ textAlign: "right" }}>Qty</th><th style={{ textAlign: "right" }}>Value</th><th>Source</th><th>Approved by you</th></tr></thead>
           <tbody>
             {s.rows.map((r, i) => (
               <tr key={r.lineId} onClick={() => setTr(i)} style={{ cursor: "pointer", background: i === tr ? "var(--color-accent-100)" : undefined }}>
