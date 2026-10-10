@@ -1,7 +1,7 @@
 "use client";
 // Comparison (design: "Comparison - Ledger"). Every line by every vendor on one basis, built in
 // code from the readings. Click a price to see where it came from and how it was converted.
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CaretDown, CaretRight, Camera, ChatsCircle, Export, SealCheck, EnvelopeSimple, File, FileDoc, FileMagnifyingGlass, FilePdf, FileXls, X,
 } from "@phosphor-icons/react";
@@ -297,7 +297,10 @@ export default function ComparePage() {
   const cur = useMemo<ScenarioResult | null>(() => {
     if (!data || !grid) return null;
     if (!isScenario && !overrides.length) return null;
-    return runScenario(data.event, grid, quality, { ...active.rules, overrides: overrides.map((o) => ({ lineId: o.lineId, vendorId: o.to })) });
+    // Lines the scenario itself fixes (e.g. "award L01 to Shree Balaji") stay fixed; the buyer's own overrides win on the same line.
+    const mine = overrides.map((o) => ({ lineId: o.lineId, vendorId: o.to }));
+    const fixed = [...(active.rules.overrides ?? []).filter((x) => !mine.some((m) => m.lineId === x.lineId)), ...mine];
+    return runScenario(data.event, grid, quality, { ...active.rules, overrides: fixed });
   }, [data, grid, quality, active, isScenario, overrides]);
 
   const ask = async (text: string) => {
@@ -348,6 +351,9 @@ export default function ComparePage() {
             put({ scenarios: [...Array(added).keys()].map((k) => base + k) });
             setScen(a.libKey ?? `asked:${index}`);
             setView(msg.view === "chart" ? "chart" : "table"); setTab("compare");
+          } else if (msg.type === "export") {
+            // Exported after the table has switched to the answer's view.
+            setTimeout(() => exportRef.current?.(), 300);
           } else if (msg.type === "delta") { textSoFar += msg.text; put({ text: textSoFar, status: undefined }); }
           else if (msg.type === "done") put({ model: msg.model, status: undefined });
           else if (msg.type === "error") put({ text: msg.message, error: true, status: undefined });
@@ -393,12 +399,15 @@ export default function ComparePage() {
   };
   const me = role === "VP" ? `${data?.event.vp}` : `${data?.event.buyer}`;
 
+  // The chat's "export this": the latest render's snapshot, so it includes a scenario the same answer just applied.
+  const exportRef = useRef<(() => void) | null>(null);
   // The table as shown (as quoted, or the active strategy), frozen with every number's source.
   const snapshotNow = (only?: string[]): Snapshot => {
     return freeze({ ev: data!.event, grid: grid!, quality, report: report!, lastYear: data!.lastYear, decisions, checks, only,
       scenario: cur ? { title: `${isScenario ? active.title : "As quoted"}${overrides.length ? `, with ${overrides.length} override${overrides.length > 1 ? "s" : ""}` : ""}`, result: cur } : null,
       overrides });
   };
+  exportRef.current = () => { if (data && grid && report) download(snapshotNow(), "xlsx"); };
 
   // Where each file lives, to link "Open original".
   const paths: Record<string, string> = {};

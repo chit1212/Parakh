@@ -26,7 +26,7 @@ export const FALLBACKS: Record<string, string[]> = {
 };
 
 /** Free-tier rate limits: how long to keep retrying a busy or rate-limited call before giving up calmly. */
-export const RETRY = { attempts: 4, firstDelayMs: 4_000, maxDelayMs: 40_000 } as const;
+export const RETRY = { attempts: 2, firstDelayMs: 3_000, maxDelayMs: 15_000 } as const;
 
 /**
  * USD reference rate shown to the buyer next to every converted number.

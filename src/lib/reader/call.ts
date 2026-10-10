@@ -114,7 +114,7 @@ export async function callStructured<S extends z.ZodType>(opts: {
   const models = [opts.model, ...(FALLBACKS[opts.model] ?? [])];
   let busy = false; // any model was only busy, not out of quota for the day
   for (const model of models) {
-    if (isUsedUp(model)) continue;
+    if (isUsedUp(model) || (isBusy(model) && model !== models[models.length - 1])) continue;
     let delay: number = RETRY.firstDelayMs;
     for (let attempt = 1; attempt <= RETRY.attempts; attempt++) {
       try {
@@ -157,7 +157,7 @@ export async function callStructured<S extends z.ZodType>(opts: {
         // Server log only (never shown to the buyer): which model refused, and how.
         console.warn(`[gemini] ${opts.step} ${model} attempt ${attempt}: ${e instanceof ApiError ? e.status : "error"} ${(e as Error).message.slice(0, 120)}`);
         if (!c.retry) throw e instanceof ReaderError ? e : new ReaderError(`Reading failed (${opts.step}): ${(e as Error).message.slice(0, 200)}`);
-        if (attempt === RETRY.attempts) break;
+        if (attempt === RETRY.attempts) { markBusy(model); break; }
         const wait = Math.min(c.waitMs ?? delay, RETRY.maxDelayMs);
         opts.onWait?.(Math.round(wait / 1000));
         await sleep(wait);
@@ -181,12 +181,25 @@ export const markUsedUp = (m: string) => {
   usedUp.set(m, today());
 };
 /** Tests only. */
-export const resetUsedUp = () => usedUp.clear();
+export const resetUsedUp = () => { usedUp.clear(); busyUntil.clear(); };
+
+/**
+ * Models that stayed busy through their retries, skipped for a while so later files and steps go
+ * straight to a model that answers (the free tier's newest model is often busy for long spells).
+ */
+const busyUntil = new Map<string, number>();
+const BUSY_FOR_MS = 10 * 60_000;
+export const isBusy = (m: string) => (busyUntil.get(m) ?? 0) > Date.now();
+export const markBusy = (m: string) => {
+  console.warn(`[gemini] ${m}: still busy after retries; skipped for 10 minutes`);
+  busyUntil.set(m, Date.now() + BUSY_FOR_MS);
+};
 
 export async function withModels<T>(step: string, first: string, fn: (model: string) => Promise<T>, onWait?: (s: number) => void): Promise<{ value: T; model: string }> {
   let busy = false; // any model was only busy, not out of quota for the day
-  for (const model of [first, ...(FALLBACKS[first] ?? [])]) {
-    if (isUsedUp(model)) continue;
+  const all = [first, ...(FALLBACKS[first] ?? [])];
+  for (const model of all) {
+    if (isUsedUp(model) || (isBusy(model) && model !== all[all.length - 1])) continue;
     let delay: number = RETRY.firstDelayMs;
     for (let attempt = 1; attempt <= RETRY.attempts; attempt++) {
       try {
@@ -197,7 +210,7 @@ export async function withModels<T>(step: string, first: string, fn: (model: str
         busy = true;
         console.warn(`[gemini] ${step} ${model} attempt ${attempt}: ${e instanceof ApiError ? e.status : "error"} ${(e as Error).message.slice(0, 120)}`);
         if (!c.retry) throw e;
-        if (attempt === RETRY.attempts) break;
+        if (attempt === RETRY.attempts) { markBusy(model); break; }
         const wait = Math.min(c.waitMs ?? delay, RETRY.maxDelayMs);
         onWait?.(Math.round(wait / 1000));
         await sleep(wait);

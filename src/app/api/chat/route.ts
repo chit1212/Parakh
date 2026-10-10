@@ -31,7 +31,7 @@ interface Msg { role: "user" | "assistant"; text: string; asker?: string }
 
 const Pick = z.object({
   intent: z.enum(["scenario", "cell_source", "table_fact", "cannot"]).describe("scenario = any what-if or award question solved by the rules below; cell_source = where one vendor's price for one line came from; table_fact = a question the as-quoted table answers (who is cheapest on a line, totals, quality, doubts); cannot = needs something the table does not have."),
-  title: z.string().describe("Scenario only: a short label, e.g. 'Without Rohit Box, cheapest per line'."),
+  title: z.string().describe("Scenario only: a short label, e.g. 'Without <vendor>, cheapest per line'."),
   eligible: z.enum(["all", "quality_cleared"]),
   exclude: z.array(z.object({ vendorId: z.string(), reason: z.string() })).describe("Vendors the user wants left out, with the user's reason."),
   assumeDiscounts: z.boolean().describe("Treat conditional discounts as applying."),
@@ -43,7 +43,7 @@ const Pick = z.object({
   overrides: z.array(z.object({ lineId: z.string(), vendorId: z.string() })).describe("Lines the user fixes to a vendor."),
   vendorId: z.string().nullable().describe("cell_source only."),
   lineId: z.string().nullable().describe("cell_source or table_fact about one line."),
-  view: z.enum(["table", "chart"]).describe("chart only if the user asks for a chart or picture."),
+  view: z.enum(["table", "chart", "export"]).describe("chart only if the user asks for a chart or picture; export only if the user asks to download, export or send a file (Excel)."),
   missing: z.string().nullable().describe("cannot only: what the table does not have."),
 });
 type Pick = z.infer<typeof Pick>;
@@ -199,7 +199,12 @@ Defaults when the question does not say: eligible "all", no exclusions, assumeDi
           const title = lib?.title ?? (p.title.trim() || "Asked in chat");
           const r = runScenario(ev, grid, quality, rules);
           send({ type: "scenario", scenario: { title, ...rules }, view: p.view });
+          if (p.view === "export") send({ type: "export" });
           facts = scenarioFacts(grid, r, title);
+        } else if (p.view === "export" && p.intent !== "cannot") {
+          // "Export this": the buyer's current view, as an Excel file, built in code on their screen.
+          send({ type: "export" });
+          facts = { exported: "The table as shown on the buyer's screen was downloaded as an Excel file, with every number's source.", ...tableFacts(ev, grid, quality, report, null) };
         } else if (p.intent === "cell_source" && p.vendorId && p.lineId && ids.has(p.vendorId) && lineIds.has(p.lineId)) {
           const c = grid.cells[cellKey(p.vendorId, p.lineId)];
           facts = { cell: `${grid.vendors.find((v) => v.id === p.vendorId)!.short} ${p.lineId}`, asWritten: c.norm.asWritten, perBox: c.perBox != null ? `₹${c.perBox.toFixed(2)}` : "not on the basis", calculation: c.norm.calc, source: c.norm.source ? `${where(c.norm.source)}: "${c.norm.source.snippet}"` : null, check: c.norm.verification?.note ?? null, otherReadings: c.norm.alternatives.map((a) => `${a.value} (₹${a.perBox.toFixed(2)}/box): ${a.reason}`), lastYear: c.lastYear?.note ?? null, canWin: c.canWin ? "yes" : `no: ${c.whyNot}` };
@@ -222,6 +227,7 @@ Defaults when the question does not say: eligible "all", no exclusions, assumeDi
                 systemInstruction: `You are Parakh, a procurement analyst for ${ev.buyer} (buyer) and ${ev.vp} (${ev.vpRole}). Answer the question from the facts only, in 2 to 5 plain sentences.
 - Never calculate: every number you write must appear in the facts, copied exactly.
 - For a scenario: give the new total and the change against as quoted, who is left out and why (briefly), and the lines changing hands exactly as listed: all of them if the facts list them all, otherwise say how many change hands out of the lines in the event (e.g. "25 of 30") and name the five the facts give. Mention a note only if it matters.
+- If the facts say a file was exported, say so in one sentence first.
 - Write in plain words; never repeat the facts' field names. Do not address people by name. No headings, no bullet points.
 - For a scenario only, you may end with one short clause that the buyer decides the award. For other questions, do not.`,
                 maxOutputTokens: 900, temperature: 0.2, abortSignal: signal,
