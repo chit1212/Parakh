@@ -11,7 +11,7 @@ import { CHAT } from "@/lib/config";
 import { applyDecisions, parseDecisions, type Decision } from "@/lib/decisions";
 import { findDoubts, type DoubtReport } from "@/lib/doubts";
 import { loadEventState } from "@/lib/event";
-import { crore, lakh, where } from "@/lib/format";
+import { crore, lakh, rupees, where } from "@/lib/format";
 import { callBudget, RateLimitedError, visitorOf } from "@/lib/guard";
 import { loadDemoInbox } from "@/lib/inbox";
 import { qualityOf, type Quality } from "@/lib/quality";
@@ -20,7 +20,10 @@ import { isUsedUp, markUsedUp, QuotaError } from "@/lib/reader/call";
 import type { ReplyReading } from "@/lib/reader/pipeline";
 import { loadHistory } from "@/lib/rfq";
 import { loadSavedReadings } from "@/lib/saved";
-import { LIBRARY, runScenario, sameRules, type ScenarioResult, type ScenarioRules } from "@/lib/scenario";
+import { describeRules, goodTitle, LIBRARY, runScenario, sameRules, type ScenarioResult, type ScenarioRules } from "@/lib/scenario";
+import { BASELINES, baselineFor, type BaselineKey } from "@/lib/baseline";
+import { shares, yoyDrivers } from "@/lib/facts";
+import type { LastYearLine } from "@/lib/types";
 import type { SourcingEvent } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -30,8 +33,10 @@ export const maxDuration = 300;
 interface Msg { role: "user" | "assistant"; text: string; asker?: string }
 
 const Pick = z.object({
-  intent: z.enum(["scenario", "cell_source", "table_fact", "cannot"]).describe("scenario = any what-if or award question solved by the rules below; cell_source = where one vendor's price for one line came from; table_fact = a question the as-quoted table answers (who is cheapest on a line, totals, quality, doubts); cannot = needs something the table does not have."),
-  title: z.string().describe("Scenario only: a short label, e.g. 'Without <vendor>, cheapest per line'."),
+  intent: z.enum(["scenario", "yoy", "cell_source", "table_fact", "cannot"]).describe("scenario = any what-if, award or premium/cost-of question solved by the rules below; yoy = what drives the change against last year's prices (biggest increases or contributors), under the rules below; cell_source = where one vendor's price for one line came from; table_fact = a question the as-quoted table answers (who is cheapest on a line, totals, quality, doubts, last year's prices); cannot = needs something the table does not have."),
+  baseline: z.enum(["as_quoted", "quality_cleared", "unstated"]).describe("What the user compares against: as_quoted = cheapest per line among all vendors; quality_cleared = cheapest per line among quality-cleared vendors; unstated = the question names no baseline."),
+  n: z.number().nullable().describe("yoy only: how many lines the user asks for (e.g. 'five biggest' = 5)."),
+  title: z.string().describe("Scenario or yoy: a short label for the rules (not the question), e.g. 'Without <vendor>, cheapest per line' or 'Quality-cleared, max 37% per vendor'."),
   eligible: z.enum(["all", "quality_cleared"]),
   exclude: z.array(z.object({ vendorId: z.string(), reason: z.string() })).describe("Vendors the user wants left out, with the user's reason."),
   assumeDiscounts: z.boolean().describe("Treat conditional discounts as applying."),
@@ -80,26 +85,27 @@ async function fast<T>(deadline: number, budget: () => void, fn: (model: string,
 /** The table the buyer is looking at, rebuilt in code from their readings (uploads and empty events included). */
 async function tableFor(readings: ReplyReading[] | null, scheme: QualityScheme, decisions: Decision[]) {
   const state = await loadEventState();
-  if (!readings && scheme === DEFAULT_SCHEME && !decisions.length) return state;
+  const history = await loadHistory();
+  if (!readings && scheme === DEFAULT_SCHEME && !decisions.length) return { ...state, lastYear: history.lines };
   const ev = state.ev;
   const rs = readings ?? Object.values(await loadSavedReadings(await loadDemoInbox()));
-  const history = await loadHistory();
   // The buyer's recorded decisions apply, as on their screen (an accepted price may win).
   const grid = applyDecisions(ev, readings ? buildGrid(ev, rs, history, {}, history.lines) : state.grid, decisions);
   const quality = ev.vendors.map((v) => qualityOf(ev, v.id, rs, scheme));
   const report = findDoubts(ev, grid, quality.filter((q) => q.cleared).map((q) => q.vendorId));
-  return { ev, grid, quality, report };
+  return { ev, grid, quality, report, lastYear: history.lines };
 }
 
-function scenarioFacts(grid: Grid, r: ScenarioResult, title: string) {
+function scenarioFacts(grid: Grid, r: ScenarioResult, title: string, base: { title: string; r: ScenarioResult }) {
   const name = (v: string | null) => (v ? grid.vendors.find((x) => x.id === v)?.short ?? v : "nobody");
-  const d = r.award.total - r.base.total;
+  const d = r.award.total - base.r.award.total;
   return {
     scenario: title,
-    "new total": crore(r.award.total),
-    "total as quoted (cheapest per line, all vendors)": crore(r.base.total),
-    "change against as quoted": `${d >= 0 ? "+" : "−"}${lakh(Math.abs(d))} (${d >= 0 ? "+" : "−"}${Math.abs((d / (r.base.total || 1)) * 100).toFixed(1)}%)`,
-    "split by vendor": grid.vendors.filter((v) => r.award.byVendor[v.id].lines).map((v) => `${v.short} ${r.award.byVendor[v.id].lines} lines, ${lakh(r.award.byVendor[v.id].value)}`),
+    "new total": `${crore(r.award.total)} (exactly ${rupees(r.award.total)})`,
+    "compared with (baseline)": `${base.title}: ${crore(base.r.award.total)} (exactly ${rupees(base.r.award.total)})`,
+    "change against the baseline": `${d >= 0 ? "+" : "−"}${lakh(Math.abs(d))} (exactly ${d >= 0 ? "+" : "−"}${rupees(Math.abs(d))}, ${d >= 0 ? "+" : "−"}${Math.abs((d / (base.r.award.total || 1)) * 100).toFixed(1)}%)`,
+    "solver status": r.status === "proven_optimal" ? "proven cheapest under these rules" : r.status === "feasible" ? "meets the rules but is not proven cheapest; never call it minimum cost" : "the rules cannot all be met",
+    "share of award value by vendor": shares(grid, r.award).map((s) => `${s.name} ${(s.pct * 100).toFixed(1)}%, ${s.lines} lines, ${lakh(s.value)}`),
     "left out, and why": r.excluded.map((e) => `${e.name}: ${e.why}`),
     "rules applied": r.rules,
     "number of lines changing hands": r.changed.length,
@@ -111,8 +117,23 @@ function scenarioFacts(grid: Grid, r: ScenarioResult, title: string) {
   };
 }
 
-function tableFacts(ev: SourcingEvent, grid: Grid, quality: Quality[], report: DoubtReport, lineId: string | null) {
+/** Year on year, from the same function as the chart and the "vs last year" figure. */
+function yoyFacts(grid: Grid, r: ScenarioResult, lastYear: LastYearLine[], title: string, n: number, ev: SourcingEvent) {
+  const y = yoyDrivers(ev, r.award, lastYear, n);
+  const name = (v: string) => grid.vendors.find((x) => x.id === v)?.short ?? v;
+  const sum = y.top.reduce((a, d) => a + d.amount, 0);
+  return {
+    yoy: `${title}, against last year's prices (SE-2025-037)`,
+    "lines with last year's price": y.comparableLines,
+    "net change against last year": `${y.net >= 0 ? "+" : "−"}${lakh(Math.abs(y.net))} on those lines (${crore(y.lastYear)} last year → ${crore(y.thisYear)})`,
+    [`the ${y.top.length} biggest (ranked by code), together`]: `${sum >= 0 ? "+" : "−"}${lakh(Math.abs(sum))}`,
+    "top lines": y.top.map((d) => `${d.lineId} ${d.name}: ${d.amount >= 0 ? "+" : "−"}${lakh(Math.abs(d.amount))} (${name(d.vendorId)}, ₹${d.lyPrice.toFixed(2)} → ₹${d.price.toFixed(2)} per box, ${d.qty.toLocaleString("en-IN")} boxes)`),
+  };
+}
+
+function tableFacts(ev: SourcingEvent, grid: Grid, quality: Quality[], report: DoubtReport, lineId: string | null, lastYear: LastYearLine[] = []) {
   const a = grid.asQuoted;
+  const ly = yoyDrivers(ev, a, lastYear, 3);
   const name = (v: string) => grid.vendors.find((x) => x.id === v)?.short ?? v;
   const lines = ev.lines.filter((l) => !lineId || l.id === lineId);
   return {
@@ -128,6 +149,8 @@ function tableFacts(ev: SourcingEvent, grid: Grid, quality: Quality[], report: D
       ...(lineId ? { all: grid.vendors.map((v) => { const c = grid.cells[cellKey(v.id, l.id)]; return `${v.short}: ${c.perBox != null ? `₹${c.perBox.toFixed(2)}${c.canWin ? "" : ` (cannot win yet: ${c.whyNot})`}` : "not quoted"}`; }) } : {}),
     })),
     openDoubts: report.raised.map((d) => `${d.title} (${lakh(d.stake)} at stake)`),
+    lastYear: `${ly.comparableLines} lines have last year's price (SE-2025-037); as quoted, they cost ${ly.net >= 0 ? "+" : "−"}${lakh(Math.abs(ly.net))} against last year`,
+    ...(lineId ? { lastYearPrice: lastYear.find((x) => x.lineId === lineId) ? `₹${lastYear.find((x) => x.lineId === lineId)!.price.toFixed(2)} per box last year` : "new line, no price last year" } : {}),
   };
 }
 
@@ -137,18 +160,22 @@ function codeAnswer(f: Record<string, unknown>): string {
     const x = f as ReturnType<typeof scenarioFacts>;
     const moves = (x["lines changing hands"] ?? x["the five lines changing hands that move the most rupees (ranked by code)"]) as string[];
     const n = x["number of lines changing hands"];
-    return `${x.scenario}: ${x["new total"]}, ${x["change against as quoted"]} against as quoted (${x["total as quoted (cheapest per line, all vendors)"]}). Split: ${x["split by vendor"].join("; ")}.`
+    return `${x.scenario}: ${x["new total"]}, ${x["change against the baseline"]} against ${x["compared with (baseline)"]}. Shares: ${x["share of award value by vendor"].join("; ")}.`
       + (x["left out, and why"].length ? ` Left out: ${x["left out, and why"].join("; ")}.` : "")
       + (n ? ` ${n} line${n === 1 ? "" : "s"} change hands${n > moves.length ? `; the five that move the most: ` : ": "}${moves.join("; ")}.` : " No line changes hands.")
       + (x["lines left unawarded"].length ? ` Not awarded: ${x["lines left unawarded"].join(", ")}.` : "")
       + " Solved in code; the buyer decides.";
+  }
+  if ("yoy" in f) {
+    const y = f as { yoy: string; "net change against last year": string; "top lines": string[] };
+    return `${y.yoy}: ${y["net change against last year"]}. The biggest: ${y["top lines"].join("; ")}.`;
   }
   if ("missing" in f) return `I cannot answer that from this table: ${f.missing}`;
   return `From the table: ${JSON.stringify(f).slice(0, 600)}`;
 }
 
 export async function POST(req: Request) {
-  const body = (await req.json().catch(() => ({}))) as { messages?: Msg[]; scheme?: QualityScheme; readings?: ReplyReading[]; decisions?: unknown; prior?: (ScenarioRules & { title: string })[] };
+  const body = (await req.json().catch(() => ({}))) as { messages?: Msg[]; scheme?: QualityScheme; readings?: ReplyReading[]; decisions?: unknown; prior?: (ScenarioRules & { title: string })[]; active?: ScenarioRules };
   const messages = body.messages;
   if (!messages?.length) return Response.json({ error: "Ask a question." }, { status: 400 });
   const deadline = Date.now() + CHAT.deadlineMs;
@@ -162,7 +189,8 @@ export async function POST(req: Request) {
         const { ev } = await loadEventState();
         const scheme = body.scheme && Array.isArray(body.scheme.rules) && !schemeProblems(body.scheme, ev.questions.map((x) => x.id)).length ? body.scheme : DEFAULT_SCHEME;
         const own = Array.isArray(body.readings) && body.readings.length <= 40 && body.readings.every((r) => r && typeof r.replyId === "string" && Array.isArray(r.prices)) ? body.readings : null;
-        const { grid, quality, report } = await tableFor(own, scheme, parseDecisions(body.decisions));
+        const { grid, quality, report, lastYear } = await tableFor(own, scheme, parseDecisions(body.decisions));
+        const active: ScenarioRules = body.active && (body.active.eligible === "all" || body.active.eligible === "quality_cleared") ? body.active : LIBRARY.find((x) => x.key === "S1")!.rules;
         const ids = new Set(grid.vendors.map((v) => v.id));
         const lineIds = new Set(ev.lines.map((l) => l.id));
 
@@ -176,6 +204,7 @@ Vendors (id: name, quality): ${grid.vendors.map((v) => { const x = quality.find(
 Lines: ${ev.lines.map((l) => `${l.id} ${l.name}`).join("; ")}.
 Strategies already in the buyer's list; when the question matches one, use exactly its rules: ${LIBRARY.map((x) => `"${x.title}" = ${JSON.stringify(x.rules)}`).join("; ")}.
 Scenarios asked earlier in this conversation (for "same split, but…"): ${(body.prior ?? []).slice(-3).map((p) => JSON.stringify(p)).join("; ") || "none"}.
+For yoy, set the rules for the award being compared with last year (e.g. "among quality-cleared vendors" = eligible "quality_cleared"); if the question does not say, use the scenario on the buyer's screen: ${JSON.stringify(active)}.
 Defaults when the question does not say: eligible "all", no exclusions, assumeDiscounts false, freight "as_read", acceptHeld false, worstCase false, cap null, maxVendors null, overrides [], view "table". "Drop" or "without" a vendor means exclude it, with the user's reason or "left out by the buyer".`;
         const pick = await fast(deadline, budget, (model, signal) =>
           gemini().models.generateContent({
@@ -196,22 +225,32 @@ Defaults when the question does not say: eligible "all", no exclusions, assumeDi
             overrides: p.overrides.filter((o) => ids.has(o.vendorId) && lineIds.has(o.lineId)),
           };
           const lib = LIBRARY.find((x) => sameRules(x.rules, rules));
-          const title = lib?.title ?? (p.title.trim() || "Asked in chat");
+          const title = lib?.title ?? (goodTitle(p.title) ? p.title.trim() : describeRules(rules, (v) => grid.vendors.find((x) => x.id === v)?.short ?? v));
           const r = runScenario(ev, grid, quality, rules);
-          send({ type: "scenario", scenario: { title, ...rules }, view: p.view });
+          // Every comparison states its baseline: the one asked for, else the screen's eligibility (never all vendors by default).
+          const baseline: BaselineKey = baselineFor(p.baseline, rules, active);
+          const b = runScenario(ev, grid, quality, BASELINES[baseline].rules);
+          send({ type: "scenario", scenario: { title, ...rules }, view: p.view, baseline });
           if (p.view === "export") send({ type: "export" });
-          facts = scenarioFacts(grid, r, title);
+          facts = scenarioFacts(grid, r, title, { title: BASELINES[baseline].title, r: b });
+        } else if (p.intent === "yoy") {
+          const rules: ScenarioRules = { eligible: p.eligible, exclude: p.exclude.filter((x) => ids.has(x.vendorId)), assumeDiscounts: p.assumeDiscounts, freight: p.freight, acceptHeld: p.acceptHeld, worstCase: p.worstCase, cap: p.cap && p.cap > 0 && p.cap < 1 ? p.cap : null, maxVendors: p.maxVendors && p.maxVendors >= 1 ? Math.floor(p.maxVendors) : null, overrides: [] };
+          const n = Math.min(10, Math.max(1, Math.floor(p.n ?? 5)));
+          const lib = LIBRARY.find((x) => sameRules(x.rules, rules));
+          const title = lib?.title ?? (goodTitle(p.title) ? p.title.trim() : describeRules(rules, (v) => grid.vendors.find((x) => x.id === v)?.short ?? v));
+          send({ type: "yoy", scenario: { title, ...rules }, n });
+          facts = yoyFacts(grid, runScenario(ev, grid, quality, rules), lastYear, title, n, ev);
         } else if (p.view === "export" && p.intent !== "cannot") {
           // "Export this": the buyer's current view, as an Excel file, built in code on their screen.
           send({ type: "export" });
-          facts = { exported: "The table as shown on the buyer's screen was downloaded as an Excel file, with every number's source.", ...tableFacts(ev, grid, quality, report, null) };
+          facts = { exported: "The table as shown on the buyer's screen was downloaded as an Excel file, with every number's source.", ...tableFacts(ev, grid, quality, report, null, lastYear) };
         } else if (p.intent === "cell_source" && p.vendorId && p.lineId && ids.has(p.vendorId) && lineIds.has(p.lineId)) {
           const c = grid.cells[cellKey(p.vendorId, p.lineId)];
           facts = { cell: `${grid.vendors.find((v) => v.id === p.vendorId)!.short} ${p.lineId}`, asWritten: c.norm.asWritten, perBox: c.perBox != null ? `₹${c.perBox.toFixed(2)}` : "not on the basis", calculation: c.norm.calc, source: c.norm.source ? `${where(c.norm.source)}: "${c.norm.source.snippet}"` : null, check: c.norm.verification?.note ?? null, otherReadings: c.norm.alternatives.map((a) => `${a.value} (₹${a.perBox.toFixed(2)}/box): ${a.reason}`), lastYear: c.lastYear?.note ?? null, canWin: c.canWin ? "yes" : `no: ${c.whyNot}` };
         } else if (p.intent === "cannot") {
           facts = { missing: p.missing ?? "the table does not hold that." };
         } else {
-          facts = tableFacts(ev, grid, quality, report, p.lineId && lineIds.has(p.lineId) ? p.lineId : null);
+          facts = tableFacts(ev, grid, quality, report, p.lineId && lineIds.has(p.lineId) ? p.lineId : null, lastYear);
         }
 
         // 3. The model writes the answer from code's facts, streamed. Code's own words if time runs out.
@@ -226,7 +265,8 @@ Defaults when the question does not say: eligible "all", no exclusions, assumeDi
               config: {
                 systemInstruction: `You are Parakh, a procurement analyst for ${ev.buyer} (buyer) and ${ev.vp} (${ev.vpRole}). Answer the question from the facts only, in 2 to 5 plain sentences.
 - Never calculate: every number you write must appear in the facts, copied exactly.
-- For a scenario: give the new total and the change against as quoted, who is left out and why (briefly), and the lines changing hands exactly as listed: all of them if the facts list them all, otherwise say how many change hands out of the lines in the event (e.g. "25 of 30") and name the five the facts give. Mention a note only if it matters.
+- For a scenario: name the baseline first ("Compared with …"), then the exact new total and the change against that baseline, each vendor's share, who is left out and why (briefly), and the lines changing hands exactly as listed: all of them if the facts list them all, otherwise say how many change hands out of the lines in the event (e.g. "25 of 30") and name the five the facts give. Use "minimum cost" or "cheapest" only if the solver status says proven cheapest. Mention a note only if it matters.
+- For year on year: the net change, then the lines exactly as listed with their amounts.
 - If the facts say a file was exported, say so in one sentence first.
 - Write in plain words; never repeat the facts' field names. Do not address people by name. No headings, no bullet points.
 - For a scenario only, you may end with one short clause that the buyer decides the award. For other questions, do not.`,

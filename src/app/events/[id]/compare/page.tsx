@@ -9,7 +9,9 @@ import { Rail } from "@/components/Rail";
 import { Kpis, PageHead, QualityLabel, tabStyle } from "@/components/ui";
 import { AWARD_BY } from "@/lib/routes";
 import { SourceDoc } from "@/components/SourceDoc";
-import { Conversation, VP_QUESTION, type ChatMsg } from "@/components/Conversation";
+import { Conversation, VP_QUESTION, type AnswerMeta, type ChatMsg, type Store } from "@/components/Conversation";
+import type { BaselineKey } from "@/lib/baseline";
+import { shares as sharesOf, yoyDrivers } from "@/lib/facts";
 import { DoubtsView } from "@/components/DoubtsView";
 import { useDecisions } from "@/components/useDecisions";
 import { applyDecisions } from "@/lib/decisions";
@@ -229,7 +231,7 @@ const STATE_LABEL: Record<GridCell["kind"], string> = {
 };
 
 type Show = "all" | "doubts" | "changed" | "unverified";
-interface Asked { title: string; rules: ScenarioRules; asker: "buyer" | "vp"; libKey: string | null }
+interface Asked { title: string; rules: ScenarioRules; asker: "buyer" | "vp"; libKey: string | null; meta: AnswerMeta }
 const SHOW: [Show, string][] = [["all", "All lines"], ["doubts", "With doubts"], ["changed", "Winner changed"], ["unverified", "Not approved by you"]];
 const NO_FILTER = { show: "all" as Show, win: "" };
 const DEFAULT_SCENARIO = "S1";
@@ -300,6 +302,17 @@ export default function ComparePage() {
     }) : []),
     [data, grid, report, quality, asked, results],
   );
+  // The panel reads the same computed store as the table: one solver, one fact set.
+  const store = useMemo<Store | null>(() => {
+    if (!data || !grid) return null;
+    const cache = new Map<string, ScenarioResult>();
+    return {
+      solve: (rules) => { const k = JSON.stringify(rules); if (!cache.has(k)) cache.set(k, runScenario(data.event, grid, quality, rules)); return cache.get(k)!; },
+      yoy: (r, n) => yoyDrivers(data.event, r.award, data.lastYear, n),
+      shares: (r) => sharesOf(grid, r.award),
+      lyLines: data.lastYear.length,
+    };
+  }, [data, grid, quality]);
   // L32: buyer overrides with an audit trail (who, from, to, why, when), kept in this browser.
   const [overrides, setOverridesState] = useState<Override[]>([]);
   useEffect(() => {
@@ -376,7 +389,7 @@ export default function ComparePage() {
       const res = await fetch("/api/chat", {
         method: "POST",
         body: JSON.stringify({
-          scheme, readings, decisions, prior: asked.map((a) => ({ title: a.title, ...a.rules })),
+          scheme, readings, decisions, prior: asked.map((a) => ({ title: a.title, ...a.rules })), active: rulesNow,
           messages: next.map((m) => ({ role: m.role, text: m.text, asker: m.asker === "vp" ? `${data!.event.vp} (VP)` : m.asker ? `${data!.event.buyer} (buyer)` : undefined })),
         }),
       });
@@ -393,10 +406,11 @@ export default function ComparePage() {
           const msg = JSON.parse(buf.slice(0, nl));
           buf = buf.slice(nl + 1);
           if (msg.type === "status") put({ status: msg.text });
-          else if (msg.type === "scenario") {
+          else if (msg.type === "scenario" || msg.type === "yoy") {
             const { title, ...rules } = msg.scenario as ScenarioRules & { title: string };
             const lib = LIBRARY.find((x) => sameRules(x.rules, rules));
-            const a: Asked = { title: lib?.title ?? title, rules, asker: who, libKey: lib?.key ?? null };
+            const meta: AnswerMeta = msg.type === "yoy" ? { kind: "yoy", n: msg.n } : { kind: "scenario", baseline: msg.baseline as BaselineKey, cap: rules.cap ?? null };
+            const a: Asked = { title: lib?.title ?? title, rules, asker: who, libKey: lib?.key ?? null, meta };
             const index = base + added++;
             setAsked((xs) => [...xs, a]);
             put({ scenarios: [...Array(added).keys()].map((k) => base + k) });
@@ -677,7 +691,9 @@ export default function ComparePage() {
           </button>
         </div>
         {pane === "conv" ? (
-          <Conversation msgs={msgs} results={results} titles={asked.map((a) => a.title)} people={{ buyer: ev.buyer, vp: ev.vp }} asker={asker}
+          <Conversation msgs={msgs} results={results} titles={asked.map((a) => a.title)} metas={asked.map((a) => a.meta)} store={store!}
+            onBaseline={(i, b) => setAsked((xs) => xs.map((x, k) => (k === i ? { ...x, meta: { ...x.meta, baseline: b } } : x)))}
+            onFindCheaper={(i) => setAsked((xs) => xs.map((x, k) => (k === i ? { ...x, rules: { ...x.rules, solveMs: 20000 } } : x)))} people={{ buyer: ev.buyer, vp: ev.vp }} asker={asker}
             busy={busy} q={q} setQ={setQ} onAsk={ask} onShow={(i, v) => { setScen(asked[i]?.libKey ?? `asked:${i}`); setView(v); setTab("compare"); }}
             vendorNames={Object.fromEntries(grid.vendors.map((v) => [v.id, v.short]))} quality={quality} doubts={report.raised} openFor={openFor}
             opening={!readings.length ? `No replies are read yet, so there is nothing to compare. Upload a reply on the Replies screen; as soon as it is read it joins this table, and you can ask me about it.` : `Quotes from ${new Set(readings.filter((r) => r.status === "read" && r.vendorId).map((r) => r.vendorId)).size} of ${ev.vendors.length} vendors are read and on one basis. ${report.raised.length} doubts could change a winner (${lakh(stake)} at stake); see the Doubts tab. Ask me anything about this table; every answer is solved in code and added to the Scenario list, so you can keep, compare and switch between them.`} />

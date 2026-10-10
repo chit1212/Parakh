@@ -3,6 +3,7 @@ import { asQuotedPrice, cellKey, solve, type Award, type Grid, type GridCell, ty
 import { crore, lakh } from "./format";
 import type { Quality } from "./quality";
 import type { SourcingEvent } from "./types";
+import { allocate, type AllocStatus } from "./allocate";
 
 export interface ScenarioRules {
   /** "all" vendors, or only those that cleared the quality questionnaire. */
@@ -23,6 +24,8 @@ export interface ScenarioRules {
   maxVendors?: number | null;
   /** Lines fixed to a vendor by the buyer. */
   overrides?: { lineId: string; vendorId: string }[];
+  /** "Find cheaper": give the exact solver longer before it settles for "not proven". */
+  solveMs?: number;
 }
 
 export interface ScenarioResult {
@@ -38,6 +41,9 @@ export interface ScenarioResult {
   tried?: number;
   /** Doubts that still matter under these rules, in words. */
   notes: string[];
+  /** Whether the allocation is proven cheapest under the rules (exact solver + independent single-move check). */
+  status: AllocStatus;
+  selfCheck: { passed: boolean; move?: string };
 }
 
 export function runScenario(ev: SourcingEvent, grid: Grid, quality: Quality[], r: ScenarioRules): ScenarioResult {
@@ -93,40 +99,32 @@ export function runScenario(ev: SourcingEvent, grid: Grid, quality: Quality[], r
     const best = sets[0];
     if (best) for (const v of [...ids]) if (!best.vendors.includes(v)) ids.splice(ids.indexOf(v), 1);
   }
-  // Cheapest per line, then a share cap if asked: move the cheapest-to-move line off any vendor over the cap.
-  const options = ev.lines.map((l) =>
-    ids.map((v) => ({ v, p: withOverrides(grid.cells[cellKey(v, l.id)]) })).filter((o): o is { v: string; p: number } => o.p != null).sort((a, b) => a.p - b.p),
+  // Each line to its cheapest eligible vendor; with a share cap, an exact integer program instead
+  // (jointly with any vendor limit), then an independent check that no single move is cheaper.
+  const optionsFor = (vs: string[]) => ev.lines.map((l) =>
+    vs.map((v) => ({ v, p: withOverrides(grid.cells[cellKey(v, l.id)]) })).filter((o): o is { v: string; p: number } => o.p != null).sort((a, b) => a.p - b.p),
   );
-  const pick = options.map(() => 0);
-  let moved = 0;
+  const capVs = r.cap ? allEligible : ids;
+  const options = optionsFor(capVs);
+  let alloc = allocate(ev.lines.map((l, i) => ({ lineId: l.id, qty: l.qty, options: options[i] })), r.cap ?? null, r.cap && r.maxVendors ? Math.floor(r.maxVendors) : null, r.solveMs);
+  // A cap that cannot be met: keep the other rules (e.g. the vendor limit) and say the cap is not applied.
+  if (alloc.status === "infeasible" && r.cap) {
+    const rest = optionsFor(ids);
+    alloc = { ...allocate(ev.lines.map((l, i) => ({ lineId: l.id, qty: l.qty, options: rest[i] })), null, null), status: "infeasible", selfCheck: alloc.selfCheck };
+  }
+  const base0 = optionsFor(capVs).map((o) => o[0]?.v);
+  const moved = r.cap ? ev.lines.filter((l, i) => alloc.pick[l.id] && alloc.pick[l.id]!.v !== base0[i]).length : 0;
   const tally = (): Award => {
     const per: Award["per"] = {};
     const byVendor: Award["byVendor"] = Object.fromEntries(grid.vendors.map((v) => [v.id, { lines: 0, value: 0 }]));
     let total = 0;
-    ev.lines.forEach((l, i) => {
-      const o = options[i][pick[i]];
+    ev.lines.forEach((l) => {
+      const o = alloc.pick[l.id];
       per[l.id] = o ? { vendorId: o.v, perBox: o.p } : null;
       if (o) { byVendor[o.v].lines++; byVendor[o.v].value += o.p * l.qty; total += o.p * l.qty; }
     });
     return { per, byVendor, total };
   };
-  if (r.cap) {
-    for (let it = 0; it < 200; it++) {
-      const t = tally();
-      const over = ids.find((v) => t.byVendor[v].value > r.cap! * t.total);
-      if (!over) break;
-      let best: { i: number; cost: number } | null = null;
-      ev.lines.forEach((l, i) => {
-        const k = pick[i];
-        if (options[i][k]?.v !== over || !options[i][k + 1] || fixed.has(l.id)) return;
-        const cost = (options[i][k + 1].p - options[i][k].p) * l.qty;
-        if (!best || cost < best.cost) best = { i, cost };
-      });
-      if (!best) break;
-      pick[(best as { i: number }).i]++;
-      moved++;
-    }
-  }
   const award = tally();
   const base = solve(ev, grid.cells, grid.vendors.map((v) => v.id), asQuotedPrice);
   const changed = ev.lines
@@ -154,7 +152,9 @@ export function runScenario(ev: SourcingEvent, grid: Grid, quality: Quality[], r
       ? `One vendor for everything: ${full.length ? `${full.length} of ${tried} eligible vendors can take every line; lowest total wins` : `no eligible vendor can take every line, so the one covering most lines wins`}. ${sets.map(show).join(" · ")}.`
       : `${k} vendors only: ${tried} sets of eligible vendors tried, ${full.length} cover every line; lowest total wins. Best: ${sets.slice(0, 3).map(show).join(" · ")}.`);
   } else if (r.maxVendors && r.maxVendors >= allEligible.length) rules.push(`At most ${r.maxVendors} vendors: only ${allEligible.length} are eligible, so no limit applies.`);
-  if (r.cap) rules.push(`No vendor above ${Math.round(r.cap * 100)}% of award value; lines move to the next-cheapest eligible vendor, cheapest moves first.`);
+  if (r.cap) rules.push(alloc.status === "infeasible"
+    ? `No vendor above ${Math.round(r.cap * 100)}% of award value: this cannot be met with the eligible vendors, so the cap is not applied.`
+    : `No vendor above ${Math.round(r.cap * 100)}% of award value; solved exactly (an integer program over every line and vendor), ${alloc.status === "proven_optimal" ? "proven cheapest" : "meets the cap but not proven cheapest"}.`);
 
   const notes: string[] = [];
   const winners = new Set(Object.values(award.per).filter(Boolean).map((w) => w!.vendorId));
@@ -174,7 +174,8 @@ export function runScenario(ev: SourcingEvent, grid: Grid, quality: Quality[], r
       ? "Resolving every open doubt against us costs nothing more here: the doubts that remain are with vendors already left out, or already priced at their less favourable reading."
       : `Open doubts can cost up to ${lakh(d)} more than the same rules with doubts as read (${crore(asRead.award.total)}).`);
   }
-  return { rules, excluded, award, base, changed, moved, notes, sets, tried };
+  if (alloc.selfCheck.move) notes.push(`Self-check: ${alloc.selfCheck.move}.`);
+  return { rules, excluded, award, base, changed, moved, notes, sets, tried, status: alloc.status, selfCheck: alloc.selfCheck };
 }
 
 /**
@@ -201,3 +202,18 @@ export function sameRules(a: ScenarioRules, b: ScenarioRules): boolean {
   });
   return norm(a) === norm(b);
 }
+
+/** A short name for a scenario, from its rules, when the model's label is missing or is the question itself. */
+export function describeRules(r: ScenarioRules, short: (v: string) => string): string {
+  const parts: string[] = [r.eligible === "quality_cleared" ? "Quality-cleared" : "All vendors"];
+  if (r.exclude?.length) parts.push(`without ${r.exclude.map((x) => short(x.vendorId)).join(" and ")}`);
+  if (r.maxVendors) parts.push(`${r.maxVendors} vendor${r.maxVendors > 1 ? "s" : ""} only`);
+  if (r.cap) parts.push(`max ${Math.round(r.cap * 100)}% per vendor`);
+  if (r.worstCase) parts.push("doubts against us");
+  if (r.assumeDiscounts) parts.push("discounts applied");
+  if (r.freight === "last_year") parts.push("last year’s freight");
+  if (r.acceptHeld) parts.push("held prices allowed");
+  if (r.overrides?.length) parts.push(`${r.overrides.length} line${r.overrides.length > 1 ? "s" : ""} fixed`);
+  return parts.join(", ");
+}
+export const goodTitle = (t: string) => !!t.trim() && t.trim().length <= 70 && !/\?\s*$/.test(t.trim()) && !/^(what|how|which|why|can|should|is|are|do|does)\b/i.test(t.trim());
